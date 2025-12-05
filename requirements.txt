@@ -1,0 +1,8 @@
+# Core dependencies (required for CLI)
+pynvml>=11.5.0           # NVIDIA GPU metrics via NVML
+psutil>=5.9.0            # System metrics (CPU, RAM, disk)
+pyyaml>=6.0              # Configuration file parsing
+click>=8.1.0             # Command line interface
+rich>=13.0.0             # Terminal UI
+fastapi>=0.104.0
+uvicorn>=0.24.0

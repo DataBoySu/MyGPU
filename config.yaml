@@ -1,0 +1,34 @@
+# Cluster Health Monitor Configuration
+
+cluster:
+  name: "My GPU Cluster"
+  nodes: []  # Add nodes for multi-node monitoring
+  # Example:
+  # - hostname: gpu-server-01
+  #   ssh_user: admin
+  # - hostname: gpu-server-02
+  #   ssh_user: admin
+
+monitoring:
+  interval_seconds: 5
+  history_retention_hours: 168  # 1 week
+
+alerts:
+  # GPU alerts
+  gpu_temperature_warn: 80      # Warning at 80°C
+  gpu_temperature_critical: 90  # Critical at 90°C
+  gpu_memory_usage_warn: 90     # Warning at 90% memory
+  gpu_utilization_low: 10       # Alert if GPU idle
+  
+  # System alerts (percentages)
+  cpu_usage_warn: 90
+  memory_usage_warn: 90
+  disk_usage_warn: 90
+
+web:
+  host: "0.0.0.0"
+  port: 8090
+  
+storage:
+  type: sqlite
+  path: ./metrics.db
