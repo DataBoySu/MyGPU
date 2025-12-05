@@ -139,25 +139,25 @@ def get_dashboard_html() -> str:
     <title>Cluster Health Monitor</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
         
         :root {
-            --bg-primary: #0d1117;
-            --bg-secondary: #161b22;
-            --bg-tertiary: #21262d;
-            --text-primary: #c9d1d9;
-            --text-secondary: #8b949e;
-            --accent-green: #238636;
-            --accent-blue: #58a6ff;
-            --accent-yellow: #d29922;
-            --accent-red: #f85149;
-            --border-color: #30363d;
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2a2a2a;
+            --bg-tertiary: #3a3a3a;
+            --text-primary: #f0f0f0;
+            --text-secondary: #a0a0a0;
+            --accent-green: #76b900;
+            --accent-blue: #00a0ff;
+            --accent-yellow: #ffc107;
+            --accent-red: #dc3545;
+            --border-color: #4a4a4a;
         }
         
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
-            font-family: 'Merriweather', Georgia, serif;
+            font-family: 'Roboto', sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
             line-height: 1.6;
@@ -166,7 +166,7 @@ def get_dashboard_html() -> str:
         .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
         
         header {
-            background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+            background: var(--accent-green);
             padding: 20px 30px;
             border-radius: 12px;
             margin-bottom: 20px;
@@ -175,7 +175,10 @@ def get_dashboard_html() -> str:
             align-items: center;
         }
         
-        header h1 { font-size: 1.5em; }
+        header h1 { 
+            font-size: 1.5em; 
+            color: #000;
+        }
         
         .status-badge {
             padding: 6px 16px;
@@ -183,10 +186,11 @@ def get_dashboard_html() -> str:
             font-weight: bold;
             text-transform: uppercase;
             font-size: 0.85em;
+            color: #000;
         }
         
-        .status-healthy { background: var(--accent-green); }
-        .status-warning { background: var(--accent-yellow); color: #000; }
+        .status-healthy { background: var(--accent-blue); }
+        .status-warning { background: var(--accent-yellow); }
         
         /* Tabs */
         .tabs {
@@ -209,9 +213,9 @@ def get_dashboard_html() -> str:
         
         .tab:hover { background: var(--bg-tertiary); }
         .tab.active {
-            background: var(--accent-blue);
-            color: white;
-            border-color: var(--accent-blue);
+            background: var(--accent-green);
+            color: #000;
+            border-color: var(--accent-green);
         }
         
         .tab-content { display: none; }
@@ -233,7 +237,7 @@ def get_dashboard_html() -> str:
         }
         
         .card h2 {
-            color: var(--accent-blue);
+            color: var(--accent-green);
             margin-bottom: 15px;
             font-size: 1.1em;
         }
@@ -265,7 +269,7 @@ def get_dashboard_html() -> str:
         
         .progress-fill {
             height: 100%;
-            background: var(--accent-blue);
+            background: var(--accent-green);
             transition: width 0.3s ease;
         }
         
@@ -297,7 +301,7 @@ def get_dashboard_html() -> str:
         
         .process-table th {
             background: var(--bg-tertiary);
-            color: var(--accent-blue);
+            color: var(--accent-green);
         }
         
         .process-table tr:hover { background: var(--bg-tertiary); }
@@ -326,7 +330,10 @@ def get_dashboard_html() -> str:
             cursor: pointer;
         }
         
-        .chart-controls button:hover { background: var(--accent-blue); }
+        .chart-controls button:hover { 
+            background: var(--accent-green); 
+            color: #000;
+        }
         
         /* Export */
         .export-section {
@@ -337,16 +344,21 @@ def get_dashboard_html() -> str:
         
         .export-btn {
             padding: 12px 25px;
-            background: var(--accent-blue);
+            background: var(--accent-green);
             border: none;
             border-radius: 8px;
-            color: white;
+            color: #000;
             cursor: pointer;
             font-size: 1em;
+            font-weight: bold;
         }
         
         .export-btn:hover { opacity: 0.9; }
-        .export-btn.secondary { background: var(--bg-tertiary); border: 1px solid var(--border-color); }
+        .export-btn.secondary { 
+            background: var(--bg-tertiary); 
+            border: 1px solid var(--border-color); 
+            color: var(--text-primary);
+        }
         
         footer {
             text-align: center;
@@ -404,12 +416,12 @@ def get_dashboard_html() -> str:
             <div class="chart-container">
                 <div class="chart-controls">
                     <select id="metric-select">
-                        <option value="gpu_0_utilization">GPU Utilization</option>
-                        <option value="gpu_0_memory_used">GPU Memory</option>
-                        <option value="gpu_0_temperature">GPU Temperature</option>
-                        <option value="gpu_0_power">GPU Power</option>
-                        <option value="cpu_percent">CPU Usage</option>
-                        <option value="memory_percent">RAM Usage</option>
+                        <option value="gpu_0_utilization">GPU Utilization (%)</option>
+                        <option value="gpu_0_memory_used">GPU Memory (MB)</option>
+                        <option value="gpu_0_temperature">GPU Temperature (°C)</option>
+                        <option value="gpu_0_power">GPU Power (W)</option>
+                        <option value="cpu_percent">CPU Usage (%)</option>
+                        <option value="memory_percent">RAM Usage (%)</option>
                     </select>
                     <select id="hours-select">
                         <option value="1">Last 1 hour</option>
@@ -564,32 +576,87 @@ def get_dashboard_html() -> str:
             const hours = document.getElementById('hours-select').value;
             
             try {
-                const response = await fetch(`/api/history?metric=${metric}&hours=${hours}`);
-                const data = await response.json();
+                const historyResponse = await fetch(`/api/history?metric=${metric}&hours=${hours}`);
+                const historyData = await historyResponse.json();
                 
                 const ctx = document.getElementById('historyChart').getContext('2d');
                 
                 if (historyChart) historyChart.destroy();
+
+                const getUnit = (metric) => {
+                    if (metric.includes('utilization') || metric.includes('percent')) return '%';
+                    if (metric.includes('memory_used')) return 'MB';
+                    if (metric.includes('temperature')) return '°C';
+                    if (metric.includes('power')) return 'W';
+                    return '';
+                }
+
+                const unit = getUnit(metric);
+
+                const yAxisOptions = {
+                    ticks: { color: '#a0a0a0' },
+                    grid: { color: '#4a4a4a' },
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: unit,
+                        color: '#a0a0a0',
+                        font: {
+                            size: 14,
+                            weight: 'bold'
+                        }
+                    }
+                };
+
+                if (metric.includes('utilization') || metric.includes('percent')) {
+                    yAxisOptions.suggestedMax = 100;
+                }
+                if (metric.includes('temperature')) {
+                    yAxisOptions.suggestedMax = 100;
+                }
+
+                if (metric.startsWith('gpu_') && metric.includes('_memory_used')) {
+                    const statusResponse = await fetch('/api/status');
+                    const statusData = await statusResponse.json();
+                    const gpuIndex = parseInt(metric.split('_')[1]);
+                    const gpu = statusData.metrics.gpus[gpuIndex];
+                    if (gpu && gpu.memory_total) {
+                        yAxisOptions.max = gpu.memory_total;
+                    }
+                }
                 
                 historyChart = new Chart(ctx, {
                     type: 'line',
                     data: {
-                        labels: data.data.map(d => new Date(d.timestamp).toLocaleTimeString()),
+                        labels: historyData.data.map(d => new Date(d.timestamp).toLocaleTimeString()),
                         datasets: [{
-                            label: metric.replace(/_/g, ' '),
-                            data: data.data.map(d => d.value),
-                            borderColor: '#58a6ff',
-                            backgroundColor: 'rgba(88, 166, 255, 0.1)',
+                            label: document.getElementById('metric-select').selectedOptions[0].text,
+                            data: historyData.data.map(d => d.value),
+                            borderColor: '#76b900',
+                            backgroundColor: 'rgba(118, 185, 0, 0.1)',
                             fill: true,
                             tension: 0.3
                         }]
                     },
                     options: {
                         responsive: true,
-                        plugins: { legend: { labels: { color: '#c9d1d9' } } },
+                        plugins: { 
+                            legend: { 
+                                display: true,
+                                labels: { 
+                                    color: '#f0f0f0',
+                                    font: {
+                                        size: 14
+                                    }
+                                } 
+                            } 
+                        },
                         scales: {
-                            x: { ticks: { color: '#8b949e', maxTicksLimit: 10 }, grid: { color: '#30363d' } },
-                            y: { ticks: { color: '#8b949e' }, grid: { color: '#30363d' } }
+                            x: { 
+                                ticks: { color: '#a0a0a0', maxTicksLimit: 10 }, 
+                                grid: { color: '#4a4a4a' } 
+                            },
+                            y: yAxisOptions
                         }
                     }
                 });
