@@ -132,10 +132,10 @@ def create_app(config: Dict[str, Any]) -> FastAPI:
         }
     
     @app.get("/api/features")
-    async def get_features():
-        """Get available features (cached)."""
-        from monitor.utils import get_features
-        return get_features()
+    async def get_features_endpoint():
+        """Get available features (always fresh to detect newly installed packages)."""
+        from monitor.utils.features import detect_features
+        return detect_features(force=True)
     
     @app.post("/api/update/check")
     async def check_update():
