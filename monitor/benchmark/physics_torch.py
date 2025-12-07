@@ -48,14 +48,20 @@ def run_particle_physics_torch(gpu_arrays, params, torch):
     initial_balls = int(params['initial_balls'])
     max_balls_cap = int(params['max_balls_cap'])
     split_enabled = params['split_enabled']
-    active_count = params['active_count']
-    small_ball_count = params['small_ball_count']
+    
+    # Recalculate active_count from actual active array (in case balls were spawned externally)
+    old_active_count = params.get('active_count', 0)
+    active_count = int(torch.sum(active).item())
+    small_ball_count = int(torch.sum((mass < 100.0) & active).item())
+    big_ball_count = active_count - small_ball_count
     drop_timer = params['drop_timer']
     
     # Drop small balls until initial_balls reached
     if small_ball_count < initial_balls:
         if drop_timer <= 0:
-            inactive_indices = torch.where(~active)[0]
+            # Find inactive slots that are NOT big balls (mass < 1000)
+            inactive_and_small = ~active & (mass < 1000.0)
+            inactive_indices = torch.where(inactive_and_small)[0]
             if len(inactive_indices) > 0:
                 idx = int(inactive_indices[0])
                 x[idx] = 500.0

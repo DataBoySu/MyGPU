@@ -1,0 +1,35 @@
+
+Traceback (most recent call last):
+  File "D:\Anshu\Projects\Vibe_Programming\cluster-health-monitor\health_monitor.py", line 349, in <module>
+    cli()
+  File "C:\Python3106\lib\site-packages\click\core.py", line 1161, in __call__
+    return self.main(*args, **kwargs)
+  File "C:\Python3106\lib\site-packages\click\core.py", line 1082, in main
+    rv = self.invoke(ctx)
+  File "C:\Python3106\lib\site-packages\click\core.py", line 1697, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+  File "C:\Python3106\lib\site-packages\click\core.py", line 1443, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+  File "C:\Python3106\lib\site-packages\click\core.py", line 788, in invoke
+    return __callback(*args, **kwargs)
+  File "D:\Anshu\Projects\Vibe_Programming\cluster-health-monitor\monitor\cli\benchmark_cli.py", line 33, in benchmark_cli
+    console.print(BANNER, style="bold cyan")
+  File "C:\Python3106\lib\site-packages\rich\console.py", line 1692, in print
+    with self:
+  File "C:\Python3106\lib\site-packages\rich\console.py", line 866, in __exit__
+    self._exit_buffer()
+  File "C:\Python3106\lib\site-packages\rich\console.py", line 824, in _exit_buffer
+    self._check_buffer()
+  File "C:\Python3106\lib\site-packages\rich\console.py", line 2033, in _check_buffer
+    self._write_buffer()
+  File "C:\Python3106\lib\site-packages\rich\console.py", line 2069, in _write_buffer
+    legacy_windows_render(buffer, LegacyWindowsTerm(self.file))
+  File "C:\Python3106\lib\site-packages\rich\_windows_renderer.py", line 17, in legacy_windows_render
+    term.write_styled(text, style)
+  File "C:\Python3106\lib\site-packages\rich\_win32_console.py", line 441, in write_styled
+    self.write_text(text)
+  File "C:\Python3106\lib\site-packages\rich\_win32_console.py", line 402, in write_text
+    self.write(text)
+  File "C:\Python3106\lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+UnicodeEncodeError: 'charmap' codec can't encode characters in position 0-51: character maps to <undefined>

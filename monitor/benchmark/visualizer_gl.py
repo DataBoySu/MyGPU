@@ -40,16 +40,17 @@ class GLParticleVisualizer:
             'gravity': {'value': 500.0, 'min': 0.0, 'max': 10000.0, 'pos': (50, 700), 'width': 220, 'label': 'Big Ball Gravity'},
             'small_ball_speed': {'value': 300.0, 'min': 50.0, 'max': 600.0, 'pos': (300, 700), 'width': 220, 'label': 'Small Ball Speed'},
             'initial_balls': {'value': 1.0, 'min': 1.0, 'max': 10.0, 'pos': (550, 700), 'width': 220, 'label': 'Initial Balls', 'is_int': True, 'base_max': 10.0},
+            'big_ball_count': {'value': 4.0, 'min': 1.0, 'max': 20.0, 'pos': (800, 700), 'width': 220, 'label': 'Big Balls', 'is_int': True},
         }
         self.dragging_slider = None
         
         self.max_balls_cap = {
-            'pos': (800, 700), 'width': 100, 'height': 30,
+            'pos': (1050, 700), 'width': 100, 'height': 30,
             'value': '100000', 'active': False, 'label': 'Max Cap'
         }
         
-        self.multiplier_button = {'pos': (920, 700), 'width': 80, 'height': 30, 'label': 'x1'}
-        self.split_button = {'pos': (1020, 700), 'width': 160, 'height': 30, 'label': 'Ball Splitting: OFF'}
+        self.multiplier_button = {'pos': (50, 750), 'width': 80, 'height': 30, 'label': 'x1'}
+        self.split_button = {'pos': (150, 750), 'width': 160, 'height': 30, 'label': 'Ball Splitting: OFF'}
         
         self.slider_multiplier = 1
         self.multiplier_levels = [1, 10, 100, 1000]
@@ -213,6 +214,46 @@ class GLParticleVisualizer:
                 (self._circle_vbo, '2f', 'vertex'),
                 (self._circle_instance_vbo, '3f /i', 'instance'),  # /i = per-instance
             ]
+        )
+        
+        # ========== UI RENDERING (Simple rectangles for sliders) ==========
+        ui_vert = """
+        #version 450 core
+        
+        layout (location = 0) in vec2 position;
+        layout (location = 1) in vec4 color;
+        
+        out vec4 v_color;
+        
+        void main() {
+            vec2 ndc = (position / vec2(1200.0, 800.0)) * 2.0 - 1.0;
+            ndc.y = -ndc.y;
+            gl_Position = vec4(ndc, 0.0, 1.0);
+            v_color = color;
+        }
+        """
+        
+        ui_frag = """
+        #version 450 core
+        
+        in vec4 v_color;
+        out vec4 fragColor;
+        
+        void main() {
+            fragColor = v_color;
+        }
+        """
+        
+        self._ui_program = self._ctx.program(
+            vertex_shader=ui_vert,
+            fragment_shader=ui_frag
+        )
+        
+        # UI buffer for drawing rectangles (sliders, buttons, etc)
+        self._ui_vbo = self._ctx.buffer(reserve=10000 * 6 * 4)  # Many vertices
+        self._ui_vao = self._ctx.vertex_array(
+            self._ui_program,
+            [(self._ui_vbo, '2f 4f', 'position', 'color')]
         )
         
         print(f"[OpenGL] Ultra-optimized renderer initialized (max {self.max_particles:,} particles)")
@@ -408,10 +449,75 @@ class GLParticleVisualizer:
             print(f"[GPU] Active:{active_particles:,} Total:{total_particles:,} FPS:{fps:.1f} GPU:{gpu_util:.0f}% Time:{elapsed_time:.1f}s Perf:{perf}{skip_info}{render_info}")
             
             if self._frame_counter % 120 == 0:
-                print(f"[Ctrl] Grav:{self.sliders['gravity']['value']:.0f} Speed:{self.sliders['small_ball_speed']['value']:.0f} Balls:{int(self.sliders['initial_balls']['value'])} Cap:{self.max_balls_cap['value']} Split:{'ON' if self.split_enabled else 'OFF'}")
+                print(f"[Ctrl] Grav:{self.sliders['gravity']['value']:.0f} Speed:{self.sliders['small_ball_speed']['value']:.0f} Balls:{int(self.sliders['initial_balls']['value'])} BigBalls:{int(self.sliders['big_ball_count']['value'])} Cap:{self.max_balls_cap['value']} Split:{'ON' if self.split_enabled else 'OFF'}")
+        
+        # Draw UI overlay (sliders and buttons)
+        self._draw_ui()
         
         glfw.swap_buffers(self._window)
         glfw.poll_events()
+    
+    def _draw_ui(self):
+        """Draw simple UI overlay (sliders, buttons, labels)."""
+        ui_verts = []
+        
+        # Helper to add a rectangle
+        def add_rect(x, y, w, h, r, g, b, a):
+            # Two triangles for rectangle
+            ui_verts.extend([
+                x, y, r, g, b, a,
+                x+w, y, r, g, b, a,
+                x, y+h, r, g, b, a,
+                
+                x+w, y, r, g, b, a,
+                x+w, y+h, r, g, b, a,
+                x, y+h, r, g, b, a,
+            ])
+        
+        # Draw sliders
+        for key, slider in self.sliders.items():
+            x, y = slider['pos']
+            width = slider['width']
+            
+            # Background track (dark gray)
+            add_rect(x, y, width, 8, 0.2, 0.2, 0.2, 0.8)
+            
+            # Value indicator (bright color based on value)
+            t = (slider['value'] - slider['min']) / (slider['max'] - slider['min'])
+            handle_x = x + t * width
+            
+            # Filled portion (cyan)
+            add_rect(x, y, t * width, 8, 0.2, 0.8, 1.0, 0.9)
+            
+            # Handle (white circle approximated as small rect)
+            add_rect(handle_x - 5, y - 4, 10, 16, 1.0, 1.0, 1.0, 1.0)
+        
+        # Draw buttons
+        for button_data in [self.multiplier_button, self.split_button]:
+            bx, by = button_data['pos']
+            bw, bh = button_data['width'], button_data['height']
+            
+            # Button background (semi-transparent)
+            add_rect(bx, by, bw, bh, 0.3, 0.3, 0.3, 0.7)
+            
+            # Border (bright)
+            add_rect(bx, by, bw, 2, 0.8, 0.8, 0.8, 1.0)  # Top
+            add_rect(bx, by+bh-2, bw, 2, 0.8, 0.8, 0.8, 1.0)  # Bottom
+            add_rect(bx, by, 2, bh, 0.8, 0.8, 0.8, 1.0)  # Left
+            add_rect(bx+bw-2, by, 2, bh, 0.8, 0.8, 0.8, 1.0)  # Right
+        
+        # Text input box
+        tx, ty = self.max_balls_cap['pos']
+        tw, th = self.max_balls_cap['width'], self.max_balls_cap['height']
+        
+        color = (0.5, 0.7, 1.0) if self.max_balls_cap['active'] else (0.3, 0.3, 0.3)
+        add_rect(tx, ty, tw, th, color[0], color[1], color[2], 0.8)
+        
+        # Upload and render
+        if len(ui_verts) > 0:
+            ui_data = np.array(ui_verts, dtype=np.float32)
+            self._ui_vbo.write(ui_data.tobytes())
+            self._ui_vao.render(mgl.TRIANGLES, vertices=len(ui_verts) // 6)
     
     def get_slider_values(self):
         """Get current control values."""

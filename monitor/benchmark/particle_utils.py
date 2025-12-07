@@ -136,3 +136,136 @@ def get_influence_boundaries(gpu_arrays, method, gravity_strength=500.0):
         
     except Exception:
         return []
+
+
+def spawn_big_balls(gpu_arrays, method, x, y, count, current_active_count):
+    """Spawn big ball(s) at specified position."""
+    import random
+    
+    spawned = 0
+    if method == 'cupy':
+        import cupy as cp
+        active = gpu_arrays['active']
+        
+        for i in range(count):
+            inactive_indices = cp.where(~active)[0]
+            if len(inactive_indices) == 0:
+                print(f"[Spawn] No inactive slots available!")
+                break
+            
+            idx = int(inactive_indices[0])
+            offset_x = random.uniform(-20, 20) if count > 1 else 0
+            offset_y = random.uniform(-20, 20) if count > 1 else 0
+            color = cp.array([random.uniform(0.3, 1.0), random.uniform(0.3, 1.0), random.uniform(0.3, 1.0)], dtype=cp.float32)
+            
+            gpu_arrays['x'][idx] = x + offset_x
+            gpu_arrays['y'][idx] = y + offset_y
+            gpu_arrays['vx'][idx] = 0.0
+            gpu_arrays['vy'][idx] = 0.0
+            gpu_arrays['mass'][idx] = 1000.0
+            gpu_arrays['radius'][idx] = 36.0
+            gpu_arrays['active'][idx] = True
+            gpu_arrays['ball_color'][idx] = color
+            current_active_count += 1
+            spawned += 1
+    
+    elif method == 'torch':
+        import torch
+        
+        for i in range(count):
+            # Use LAST inactive index instead of first to avoid conflict with small ball drop logic
+            inactive_indices = torch.where(~gpu_arrays['active'])[0]
+            if len(inactive_indices) == 0:
+                break
+            
+            idx = int(inactive_indices[-1])
+            offset_x = random.uniform(-20, 20) if count > 1 else 0
+            offset_y = random.uniform(-20, 20) if count > 1 else 0
+            final_x = x + offset_x
+            final_y = y + offset_y
+            color = torch.tensor([random.uniform(0.3, 1.0), random.uniform(0.3, 1.0), random.uniform(0.3, 1.0)], 
+                                device=gpu_arrays['x'].device, dtype=torch.float32)
+            
+            # Set all properties
+            gpu_arrays['x'][idx] = final_x
+            gpu_arrays['y'][idx] = final_y
+            gpu_arrays['vx'][idx] = 0.0
+            gpu_arrays['vy'][idx] = 0.0
+            gpu_arrays['mass'][idx] = 1000.0
+            gpu_arrays['radius'][idx] = 36.0
+            gpu_arrays['ball_color'][idx] = color
+            gpu_arrays['active'][idx] = True
+            
+            current_active_count += 1
+            spawned += 1
+    
+    return current_active_count
+
+
+def update_big_ball_count(gpu_arrays, method, target_count, current_active_count):
+    """Dynamically adjust the number of big balls."""
+    import random
+    
+    target_count = max(1, min(100, target_count))
+    
+    if method == 'cupy':
+        import cupy as cp
+        mass = gpu_arrays['mass']
+        active = gpu_arrays['active']
+        big_ball_mask = (mass >= 100.0) & active
+        current_big_balls = int(cp.sum(big_ball_mask))
+        
+        if target_count > current_big_balls:
+            to_spawn = target_count - current_big_balls
+            for i in range(to_spawn):
+                inactive_indices = cp.where(~active)[0]
+                if len(inactive_indices) == 0:
+                    break
+                
+                idx = int(inactive_indices[0])
+                x = random.uniform(100, 900)
+                y = random.uniform(100, 700)
+                color = cp.array([random.uniform(0.3, 1.0), random.uniform(0.3, 1.0), random.uniform(0.3, 1.0)], dtype=cp.float32)
+                
+                gpu_arrays['x'][idx] = x
+                gpu_arrays['y'][idx] = y
+                gpu_arrays['vx'][idx] = 0.0
+                gpu_arrays['vy'][idx] = 0.0
+                gpu_arrays['mass'][idx] = 1000.0
+                gpu_arrays['radius'][idx] = 36.0
+                gpu_arrays['active'][idx] = True
+                gpu_arrays['ball_color'][idx] = color
+                current_active_count += 1
+    
+    elif method == 'torch':
+        import torch
+        mass = gpu_arrays['mass']
+        active = gpu_arrays['active']
+        big_ball_mask = (mass >= 100.0) & active
+        current_big_balls = int(torch.sum(big_ball_mask))
+        
+        if target_count > current_big_balls:
+            to_spawn = target_count - current_big_balls
+            for i in range(to_spawn):
+                inactive_indices = torch.where(~active)[0]
+                if len(inactive_indices) == 0:
+                    break
+                
+                idx = int(inactive_indices[0])
+                x = random.uniform(100, 900)
+                y = random.uniform(100, 700)
+                color = torch.tensor([random.uniform(0.3, 1.0), random.uniform(0.3, 1.0), random.uniform(0.3, 1.0)], 
+                                    device=gpu_arrays['x'].device, dtype=torch.float32)
+                
+                gpu_arrays['x'][idx] = x
+                gpu_arrays['y'][idx] = y
+                gpu_arrays['vx'][idx] = 0.0
+                gpu_arrays['vy'][idx] = 0.0
+                gpu_arrays['mass'][idx] = 1000.0
+                gpu_arrays['radius'][idx] = 36.0
+                gpu_arrays['active'][idx] = True
+                gpu_arrays['ball_color'][idx] = color
+                current_active_count += 1
+    
+    return current_active_count
+

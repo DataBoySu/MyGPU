@@ -10,6 +10,7 @@ from . import gpu_setup
 from . import physics_cupy
 from . import physics_torch
 from . import particle_utils
+from .backend_stress import BackendStressManager
 
 
 class GPUStressWorker:
@@ -26,6 +27,7 @@ class GPUStressWorker:
         self.total_steps = 0
         self._gpu_arrays = {}
         self._counters = {}
+        self._backend_stress = BackendStressManager()  # Use dedicated backend manager
         self._detect_and_setup()
     
     def _detect_and_setup(self):
@@ -40,7 +42,8 @@ class GPUStressWorker:
             return
         except ImportError:
             pass
-        except Exception:
+        except Exception as e:
+            print(f"[DEBUG] CuPy setup failed: {e}")
             pass
         
         # Try torch
@@ -54,7 +57,10 @@ class GPUStressWorker:
                 return
         except ImportError:
             pass
-        except Exception:
+        except Exception as e:
+            print(f"[DEBUG] PyTorch setup failed: {e}")
+            import traceback
+            traceback.print_exc()
             pass
         
         # Fallback: passive monitoring
@@ -76,6 +82,10 @@ class GPUStressWorker:
             
             # Use modular GPU setup
             self._gpu_arrays, self._counters = gpu_setup.setup_cupy_arrays(n, cp)
+            
+            # Initialize backend stress manager for offscreen GPU arrays
+            backend_mult = self.config.backend_multiplier
+            self._backend_stress.initialize('cupy', cp, n, backend_mult)
             
             # Initialize instance variables from counters
             self._initial_particle_count = n
@@ -105,6 +115,10 @@ class GPUStressWorker:
             
             # Use modular GPU setup
             self._gpu_arrays, self._counters = gpu_setup.setup_torch_arrays(n, torch)
+            
+            # Initialize backend stress manager for offscreen GPU arrays
+            backend_mult = self.config.backend_multiplier
+            self._backend_stress.initialize('torch', torch, n, backend_mult)
             
             # Initialize instance variables from counters
             self._initial_particle_count = n
@@ -168,7 +182,7 @@ class GPUStressWorker:
         }
         
         if self._method == 'cupy':
-            # Use modular CuPy physics engine
+            # Use modular CuPy physics engine on main (visual) arrays
             result = physics_cupy.run_particle_physics_cupy(
                 self._gpu_arrays,
                 params,
@@ -181,11 +195,14 @@ class GPUStressWorker:
             self._drop_timer = result['drop_timer']
             self._split_enabled = result['split_enabled']
             
+            # Run physics on backend (offscreen) arrays using backend stress manager
+            self._backend_stress.run_physics(physics_cupy, params, self._cp)
+            
             self._cp.cuda.Stream.null.synchronize()
             self.total_steps += 1
             
         elif self._method == 'torch':
-            # Use modular PyTorch physics engine
+            # Use modular PyTorch physics engine on main (visual) arrays
             result = physics_torch.run_particle_physics_torch(
                 self._gpu_arrays,
                 params,
@@ -198,13 +215,18 @@ class GPUStressWorker:
             self._drop_timer = result['drop_timer']
             self._split_enabled = result['split_enabled']
             
+            # Run physics on backend (offscreen) arrays using backend stress manager
+            self._backend_stress.run_physics(physics_torch, params, self._torch)
+            
             self._torch.cuda.synchronize()
             self.total_steps += 1
     
     def update_physics_params(self, gravity_strength: Optional[float] = None, 
                              small_ball_speed: Optional[float] = None,
                              initial_balls: Optional[int] = None,
-                             max_balls_cap: Optional[int] = None):
+                             max_balls_cap: Optional[int] = None,
+                             big_ball_count: Optional[int] = None,
+                             backend_multiplier: Optional[int] = None):
         """Update physics parameters from UI sliders."""
         if gravity_strength is not None:
             self._gravity_strength = gravity_strength
@@ -214,10 +236,39 @@ class GPUStressWorker:
             self._initial_balls = initial_balls
         if max_balls_cap is not None:
             self._max_balls_cap = max_balls_cap
+        if big_ball_count is not None:
+            self._update_big_ball_count(big_ball_count)
+        if backend_multiplier is not None and hasattr(self, '_initial_particle_count'):
+            # Use backend stress manager to update multiplier (only for particle mode)
+            self._backend_stress.update_multiplier(backend_multiplier, self._initial_particle_count)
     
     def update_split_enabled(self, enabled: bool):
         """Enable or disable particle splitting."""
         self._split_enabled = enabled
+    
+    def spawn_big_balls(self, x: float, y: float, count: int):
+        """Spawn big ball(s) at specified position."""
+        if not self._initialized or self.benchmark_type != "particle":
+            return
+        
+        self._active_count = particle_utils.spawn_big_balls(
+            self._gpu_arrays,
+            self._method,
+            x, y, count,
+            self._active_count
+        )
+    
+    def _update_big_ball_count(self, target_count: int):
+        """Dynamically adjust the number of big balls."""
+        if not self._initialized or self.benchmark_type != "particle":
+            return
+        
+        self._active_count = particle_utils.update_big_ball_count(
+            self._gpu_arrays,
+            self._method,
+            target_count,
+            self._active_count
+        )
     
     def get_particle_sample(self, max_samples: int = 2000):
         """
@@ -288,36 +339,14 @@ class GPUStressWorker:
                 cp = self._cp
                 self._gpu_arrays['A'] = cp.random.rand(new_size, new_size, dtype=cp.float32)
                 self._gpu_arrays['B'] = cp.random.rand(new_size, new_size, dtype=cp.float32)
-                self._flops_per_iter = 2.0 * (new_size ** 3)
             elif self._method == 'torch':
                 torch = self._torch
                 device = torch.device('cuda')
                 self._gpu_arrays['A'] = torch.randn(new_size, new_size, device=device, dtype=torch.float32)
                 self._gpu_arrays['B'] = torch.randn(new_size, new_size, device=device, dtype=torch.float32)
-                self._flops_per_iter = 2.0 * (new_size ** 3)
             
+            self._flops_per_iter = 2.0 * (new_size ** 3)
             self.workload_type = f"GEMM {new_size}x{new_size} ({self._method})"
-            
-        elif self.benchmark_type == "particle":
-            old_count = self.config.num_particles
-            new_count = int(old_count * scale_factor)
-            self.config.num_particles = new_count
-            
-            if self._method == 'cupy':
-                cp = self._cp
-                self._gpu_arrays['x'] = cp.random.rand(new_count, dtype=cp.float32) * 1000.0
-                self._gpu_arrays['y'] = cp.random.rand(new_count, dtype=cp.float32) * 1000.0
-                self._gpu_arrays['vx'] = (cp.random.rand(new_count, dtype=cp.float32) - 0.5) * 10.0
-                self._gpu_arrays['vy'] = (cp.random.rand(new_count, dtype=cp.float32) - 0.5) * 10.0
-            elif self._method == 'torch':
-                torch = self._torch
-                device = torch.device('cuda')
-                self._gpu_arrays['x'] = torch.rand(new_count, device=device, dtype=torch.float32) * 1000.0
-                self._gpu_arrays['y'] = torch.rand(new_count, device=device, dtype=torch.float32) * 1000.0
-                self._gpu_arrays['vx'] = (torch.rand(new_count, device=device, dtype=torch.float32) - 0.5) * 10.0
-                self._gpu_arrays['vy'] = (torch.rand(new_count, device=device, dtype=torch.float32) - 0.5) * 10.0
-            
-            self.workload_type = f"Particle Sim ({new_count:,} particles, {self._method})"
     
     def get_performance_stats(self, elapsed_seconds: float) -> Dict[str, Any]:
         """Get performance statistics."""
@@ -340,82 +369,3 @@ class GPUStressWorker:
         
         return stats
 
-
-class PyTorchStressWorker:
-    """PyTorch-specific stress workload (CPU fallback)."""
-    
-    def __init__(self):
-        import torch
-        self.torch = torch
-        self.iterations = 0
-        self.workload_type = "PyTorch CPU Stress"
-        
-        # Create large tensors for stress test
-        self.tensor_a = torch.randn(2000, 2000)
-        self.tensor_b = torch.randn(2000, 2000)
-    
-    def run_iteration(self) -> float:
-        """Run one iteration."""
-        start = time.perf_counter()
-        result = torch.matmul(self.tensor_a, self.tensor_b)
-        elapsed = time.perf_counter() - start
-        self.iterations += 1
-        return elapsed
-    
-    def reset(self):
-        """Reset iteration counter."""
-        self.iterations = 0
-    
-    def cleanup(self):
-        """Free memory."""
-        del self.tensor_a
-        del self.tensor_b
-    
-    def get_performance_stats(self, elapsed_seconds: float) -> Dict[str, Any]:
-        """Get performance stats."""
-        return {
-            'iterations': self.iterations,
-            'workload_type': self.workload_type,
-        }
-
-
-class SystemStressWorker:
-    """Generic system stress worker using external tools."""
-    
-    def __init__(self):
-        self.iterations = 0
-        self.workload_type = "System Stress (stress-ng)"
-        self.process = None
-    
-    def run_iteration(self) -> float:
-        """Run stress iteration."""
-        if self.process is None:
-            try:
-                self.process = subprocess.Popen(
-                    ['stress-ng', '--cpu', '4', '--timeout', '60s'],
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.DEVNULL
-                )
-            except FileNotFoundError:
-                self.workload_type = "System Stress (unavailable)"
-                return 0.0
-        
-        self.iterations += 1
-        return 0.01  # Nominal time
-    
-    def reset(self):
-        """Reset counter."""
-        self.iterations = 0
-    
-    def cleanup(self):
-        """Stop stress process."""
-        if self.process:
-            self.process.terminate()
-            self.process = None
-    
-    def get_performance_stats(self, elapsed_seconds: float) -> Dict[str, Any]:
-        """Get stats."""
-        return {
-            'iterations': self.iterations,
-            'workload_type': self.workload_type,
-        }
