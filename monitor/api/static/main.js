@@ -582,154 +582,32 @@ async function pollBenchmarkStatus() {
             document.getElementById('start-bench-btn').disabled = false;
             document.getElementById('start-bench-btn').textContent = 'Start Benchmark';
             document.getElementById('stop-bench-btn').style.display = 'none';
-            document.getElementById('bench-status').textContent = 'Completed';
-            
-            const resultsResponse = await fetch('/api/benchmark/results');
-            const results = await resultsResponse.json();
-            displayBenchmarkResults(results);
-            
-            // Reload baseline if saved
-            loadBaseline();
-        }
-    } catch (error) {
-        console.error('Error polling benchmark:', error);
-    }
-}
+                // Prefer the fancy renderer if available to maintain consistent styling
+                if (typeof window !== 'undefined' && typeof window.renderFancyBenchmarkResults === 'function') {
+                    try { window.renderFancyBenchmarkResults(results); return; } catch (e) { console.debug('renderFancyBenchmarkResults failed', e); }
+                }
 
-function displayBenchmarkResults(results) {
-    if (!results || results.status === 'no_results') {
-        document.getElementById('benchmark-results').innerHTML = '<p style="color: var(--text-secondary);">No results available</p>';
-        return;
-    }
-    
-    const gpuInfo = results.gpu_info || {};
-    const config = results.config || {};
-    const scores = results.scores || {};
-    const baseline = results.baseline;
-    const perf = results.performance || {};
-    
-    // Show stop reason if benchmark was stopped early
-    if (results.stop_reason && results.stop_reason !== 'Duration completed') {
-        document.getElementById('bench-stop-reason').textContent = 'Stopped: ' + results.stop_reason;
-    }
-    
-    // Baseline comparison
-    let baselineComparison = '';
-    if (baseline) {
-        const iterDiff = results.iterations_completed - baseline.iterations_completed;
-        const iterPct = ((iterDiff / baseline.iterations_completed) * 100).toFixed(1);
-        const iterColor = iterDiff >= 0 ? 'var(--accent-green)' : 'var(--accent-red)';
-        baselineComparison = `
-            <div class="gpu-card" style="margin-bottom: 15px; border-left: 4px solid var(--accent-blue);">
-                <h3 style="color: var(--accent-blue); margin-bottom: 10px;">vs Baseline</h3>
-                <div class="metric-row">
-                    <span class="metric-label">Iterations</span>
-                    <span class="metric-value" style="color: ${iterColor};">${iterDiff >= 0 ? '+' : ''}${iterDiff} (${iterPct}%)</span>
-                </div>
-                <div class="metric-row">
-                    <span class="metric-label">Baseline Iterations</span>
-                    <span class="metric-value">${baseline.iterations_completed}</span>
-                </div>
-            </div>
-        `;
-    }
-    
-    // Performance results section - varies by benchmark type
-    let perfMetrics = '';
-    if (results.benchmark_type === 'gemm' || perf.tflops !== undefined) {
-        perfMetrics = `
-            <div>
-                <span style="font-size: 2.5em; font-weight: bold;">${perf.tflops || 0}</span>
-                <span style="font-size: 1em;"> TFLOPS</span>
-            </div>
-            <div>
-                <span style="font-size: 1.5em; font-weight: bold;">${perf.gflops || 0}</span>
-                <span style="font-size: 0.9em;"> GFLOPS</span>
-            </div>
-            <div>
-                <span style="font-size: 1.5em; font-weight: bold;">${results.iterations_completed || 0}</span>
-                <span style="font-size: 0.9em;"> iterations</span>
-            </div>
-        `;
-    } else if (results.benchmark_type === 'particle' || perf.steps_per_second !== undefined) {
-        const particlesPerSec = perf.particles_updated_per_second || 0;
-        const formattedParticles = particlesPerSec >= 1e9 
-            ? (particlesPerSec / 1e9).toFixed(2) + 'B'
-            : particlesPerSec >= 1e6 
-                ? (particlesPerSec / 1e6).toFixed(2) + 'M'
-                : particlesPerSec.toLocaleString();
-        perfMetrics = `
-            <div>
-                <span style="font-size: 2.5em; font-weight: bold;">${(perf.steps_per_second || 0).toLocaleString()}</span>
-                <span style="font-size: 1em;"> steps/sec</span>
-            </div>
-            <div>
-                <span style="font-size: 1.5em; font-weight: bold;">${formattedParticles}</span>
-                <span style="font-size: 0.9em;"> particles/sec</span>
-            </div>
-            <div>
-                <span style="font-size: 1.5em; font-weight: bold;">${(perf.total_steps || 0).toLocaleString()}</span>
-                <span style="font-size: 0.9em;"> total steps</span>
-            </div>
-        `;
-    } else {
-        perfMetrics = `
-            <div>
-                <span style="font-size: 2.5em; font-weight: bold;">${results.iterations_completed || 0}</span>
-                <span style="font-size: 1em;"> iterations</span>
-            </div>
-            <div>
-                <span style="font-size: 1.5em; font-weight: bold;">${results.avg_iteration_time_ms || 0}</span>
-                <span style="font-size: 0.9em;"> ms/iter</span>
-            </div>
-            <div>
-                <span style="font-size: 1.5em; font-weight: bold;">${results.iterations_per_second || 0}</span>
-                <span style="font-size: 0.9em;"> iter/sec</span>
-            </div>
-        `;
-    }
-    
-    let html = `
-        <div class="gpu-card" style="margin-bottom: 15px;">
-            <h3 style="color: var(--accent-green); margin-bottom: 10px;">GPU Info</h3>
-            <div class="metric-row"><span class="metric-label">Name</span><span class="metric-value">${gpuInfo.name || 'N/A'}</span></div>
-            <div class="metric-row"><span class="metric-label">Memory</span><span class="metric-value">${gpuInfo.memory_total_mb ? Math.round(gpuInfo.memory_total_mb) + ' MB' : 'N/A'}</span></div>
-            <div class="metric-row"><span class="metric-label">Driver</span><span class="metric-value">${gpuInfo.driver_version || 'N/A'}</span></div>
-        </div>
-        
-        <div class="gpu-card" style="margin-bottom: 15px; background: var(--accent-green); color: #000;">
-            <h3 style="margin-bottom: 5px;">Performance Results</h3>
-            <div style="display: flex; gap: 30px; align-items: center; flex-wrap: wrap;">
-                ${perfMetrics}
-            </div>
-            ${results.saved_as_baseline ? '<p style="margin-top: 10px; font-size: 0.9em;">Saved as new baseline</p>' : ''}
-        </div>
-        
-        ${baselineComparison}
-        
-        <div class="gpu-card" style="margin-bottom: 15px;">
-            <h3 style="color: var(--accent-blue); margin-bottom: 10px;">Test Config</h3>
-            <div class="metric-row"><span class="metric-label">Workload</span><span class="metric-value">${results.workload_type || 'N/A'}</span></div>
-            <div class="metric-row"><span class="metric-label">Mode</span><span class="metric-value">${config.mode || 'N/A'}</span></div>
-            <div class="metric-row"><span class="metric-label">Type</span><span class="metric-value">${config.benchmark_type || 'N/A'}</span></div>
-            <div class="metric-row"><span class="metric-label">Duration</span><span class="metric-value">${results.duration_actual_sec || 0}s / ${config.duration_seconds || 0}s</span></div>
-            <div class="metric-row"><span class="metric-label">Stop Reason</span><span class="metric-value">${results.stop_reason || 'N/A'}</span></div>
-        </div>
-        
-        <h3 style="color: var(--accent-green); margin: 20px 0 10px;">Metrics Summary</h3>
-    `;
-    
-    const metrics = [
-        { key: 'utilization', label: 'Utilization', unit: '%' },
-        { key: 'temperature_c', label: 'Temperature', unit: 'C' },
-        { key: 'memory_used_mb', label: 'Memory Used', unit: 'MB' },
-        { key: 'power_w', label: 'Power Draw', unit: 'W' }
-    ];
-    
-    metrics.forEach(m => {
-        const data = results[m.key];
-        if (data) {
-            html += `
+                // Fallback to previous plain rendering if fancy renderer isn't available
+                if (!results || results.status === 'no_results') {
+                    document.getElementById('benchmark-results').innerHTML = '<p style="color: var(--text-secondary);">No results available</p>';
+                    return;
+                }
+
+                // Minimal fallback: show key metrics in structured blocks
+                const r = results;
+                const html = `
+                    <div class="gpu-card"><h3 style="color: var(--accent-green);">Benchmark Results</h3>
+                        <div class="metric-row"><span class="metric-label">Average TFLOPS</span><span class="metric-value">${(r.avg_tflops || r.performance && r.performance.tflops || 0).toFixed(2)}</span></div>
+                        <div class="metric-row"><span class="metric-label">Peak TFLOPS</span><span class="metric-value">${(r.peak_tflops || r.performance && r.performance.peak_tflops || 0).toFixed(2)}</span></div>
+                        <div class="metric-row"><span class="metric-label">Avg Temperature</span><span class="metric-value">${(r.avg_temperature || 0).toFixed(1)}°C</span></div>
+                        <div class="metric-row"><span class="metric-label">Avg GPU Utilization</span><span class="metric-value">${(r.avg_gpu_utilization || 0).toFixed(1)}%</span></div>
+                        <div class="metric-row"><span class="metric-label">Avg Memory Usage</span><span class="metric-value">${(r.avg_memory_usage || 0).toFixed(1)}%</span></div>
+                        <div class="metric-row"><span class="metric-label">Avg Power Draw</span><span class="metric-value">${(r.avg_power_draw || 0).toFixed(1)}W</span></div>
+                        <div class="metric-row"><span class="metric-label">Duration</span><span class="metric-value">${(r.duration || 0).toFixed(1)}s</span></div>
+                        <div class="metric-row"><span class="metric-label">Iterations</span><span class="metric-value">${r.total_iterations || r.iterations_completed || 0}</span></div>
+                    </div>
+                `;
+                document.getElementById('benchmark-results').innerHTML = html;
                 <div class="gpu-card" style="margin-bottom: 10px;">
                     <div class="gpu-header">
                         <span class="gpu-name">${m.label}</span>
@@ -752,43 +630,70 @@ async function checkForUpdates() {
     btn.disabled = true;
     btn.textContent = 'Checking...';
     btn.removeAttribute('data-tooltip');
-    
+    const GITHUB_REPO = 'DataBoySu/cluster-monitor';
+
+    function parseVersion(text) {
+        if (!text) return '0.0.0';
+        const m = /v?(\d+\.\d+\.\d+)/.exec(text);
+        return m ? m[1] : text.trim();
+    }
+
+    function compareVer(a, b) {
+        const pa = a.split('.').map(n => parseInt(n)||0);
+        const pb = b.split('.').map(n => parseInt(n)||0);
+        for (let i=0;i<3;i++){
+            if ((pa[i]||0) > (pb[i]||0)) return 1;
+            if ((pa[i]||0) < (pb[i]||0)) return -1;
+        }
+        return 0;
+    }
+
     try {
-        const response = await fetch('/api/update/check', { method: 'POST' });
-        const data = await response.json();
-        
-        if (data.available) {
-            btn.textContent = `Update: ${data.latest}`;
+        // Read current version from footer (rendered server-side as {{VERSION}})
+        let currentText = '';
+        try { currentText = document.querySelector('footer').textContent || ''; } catch(e){}
+        const currentVersion = parseVersion(currentText);
+
+        const apiUrl = `https://api.github.com/repos/${GITHUB_REPO}/releases/latest`;
+        const resp = await fetch(apiUrl, { headers: { Accept: 'application/vnd.github.v3+json' } });
+        if (!resp.ok) throw new Error('GitHub API error: ' + resp.status);
+        const json = await resp.json();
+        const latestTag = parseVersion(json.tag_name || json.name || '0.0.0');
+
+        const cmp = compareVer(latestTag, currentVersion);
+        if (cmp > 0) {
+            btn.textContent = `Update: ${latestTag}`;
             btn.classList.remove('success', 'error');
             btn.disabled = false;
-            btn.setAttribute('data-tooltip', `Current: ${data.current} → Latest: ${data.latest}`);
-            
+            btn.setAttribute('data-tooltip', `Current: ${currentVersion} → Latest: ${latestTag}`);
+
             btn.onclick = async () => {
                 btn.textContent = 'Installing...';
                 btn.disabled = true;
-                const install = await fetch('/api/update/install', { method: 'POST' });
-                const result = await install.json();
-                
-                if (result.status === 'success') {
-                    btn.textContent = 'Restart App';
-                    btn.classList.add('success');
-                    btn.setAttribute('data-tooltip', 'Update installed - restart application');
-                } else {
-                    btn.textContent = 'Update Failed';
+                try {
+                    const install = await fetch('/api/update/install', { method: 'POST' });
+                    const result = await install.json();
+                    if (result.status === 'success') {
+                        btn.textContent = 'Restart App';
+                        btn.classList.add('success');
+                        btn.setAttribute('data-tooltip', 'Update installed - restart application');
+                    } else {
+                        btn.textContent = 'Update Failed';
+                        btn.classList.add('error');
+                        btn.setAttribute('data-tooltip', result.message || 'Failed to install');
+                        btn.disabled = false;
+                    }
+                } catch (e) {
+                    btn.textContent = 'Install Error';
                     btn.classList.add('error');
-                    btn.setAttribute('data-tooltip', result.message);
+                    btn.setAttribute('data-tooltip', e && e.message ? e.message : 'Install failed');
                     btn.disabled = false;
                 }
             };
-        } else if (data.error) {
-            btn.textContent = 'Check Failed';
-            btn.classList.add('error');
-            btn.setAttribute('data-tooltip', data.error);
-            btn.disabled = false;
         } else {
             btn.textContent = 'Latest Version';
             btn.classList.add('success');
-            btn.setAttribute('data-tooltip', `Version ${data.current}`);
+            btn.setAttribute('data-tooltip', `Version ${currentVersion}`);
             setTimeout(() => {
                 btn.textContent = 'Check for Updates';
                 btn.classList.remove('success');
@@ -799,7 +704,7 @@ async function checkForUpdates() {
     } catch (error) {
         btn.textContent = 'Network Error';
         btn.classList.add('error');
-        btn.setAttribute('data-tooltip', 'Could not connect to update server');
+        btn.setAttribute('data-tooltip', 'Could not check GitHub releases');
         btn.disabled = false;
     }
 }

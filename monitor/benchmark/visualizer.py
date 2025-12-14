@@ -75,6 +75,9 @@ class ParticleVisualizer:
     def _init_pygame(self):
         """Initialize pygame (optional dependency)."""
         try:
+            # Suppress known deprecation warning from pkg_resources used by pygame internals
+            import warnings
+            warnings.filterwarnings("ignore", category=UserWarning, message="pkg_resources is deprecated.*")
             import pygame
             import os
             # Set SDL video driver for Windows to allow background thread display

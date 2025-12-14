@@ -8,6 +8,52 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="/static/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Sliding error window */
+        #error-window {
+            position: fixed;
+            right: 20px;
+            top: 80px;
+            width: 320px;
+            max-width: calc(100% - 40px);
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        .error-item {
+            pointer-events: auto;
+            background: linear-gradient(90deg,#5b0000,#a80000);
+            color: #fff;
+            padding: 12px 14px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+            transform: translateX(110%);
+            transition: transform 360ms cubic-bezier(.2,.9,.2,1), opacity 300ms;
+            opacity: 0;
+            font-size: 13px;
+            line-height: 1.3;
+        }
+
+        .error-item.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .error-item .close-btn {
+            float: right;
+            margin-left: 8px;
+            background: transparent;
+            border: none;
+            color: rgba(255,255,255,0.9);
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        @media (max-width: 480px) {
+            #error-window { left: 10px; right: 10px; top: 70px; width: auto; }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -17,17 +63,19 @@
                 <span style="font-size: 0.8em; opacity: 0.8;">Auto-refresh: <span id="countdown">5</span>s</span>
             </div>
             <div class="header-right">
-                <button class="update-btn" onclick="checkForUpdates()" id="update-btn">Check for Updates</button>
-                <button class="update-btn" onclick="shutdownServer()" id="shutdown-btn" style="background: var(--accent-red);">Exit</button>
+                <button class="update-btn" onclick="checkForUpdates()" id="update-btn" data-tooltip="Check latest release on GitHub">Check for Updates</button>
+                <button class="update-btn" onclick="shutdownServer()" id="shutdown-btn" data-tooltip="Shut down the server" style="background: var(--accent-red);">Exit</button>
                 <div id="status-badge" class="status-badge status-healthy">HEALTHY</div>
             </div>
         </header>
+            <!-- Error window (sliding notifications) -->
+            <div id="error-window" aria-live="polite" aria-atomic="true"></div>
         
         <div class="tabs">
             <div class="tab active" data-tab="home">Home</div>
             <div class="tab" data-tab="history">History</div>
             <div class="tab" data-tab="processes">Processes</div>
-            <div class="tab" data-tab="benchmark">Benchmark</div>
+                <div class="tab" data-tab="benchmark">Benchmark</div>
             <div class="tab" data-tab="export">Export</div>
         </div>
         
@@ -130,7 +178,17 @@
             <div class="card">
                 <h2>GPU Benchmark</h2>
                 <p style="margin-bottom: 10px; color: var(--text-secondary);">Stress test using matrix multiplication workload. Faster GPUs complete more iterations.</p>
-                <p id="workload-info" style="margin-bottom: 20px; color: var(--accent-blue); font-size: 0.9em;"></p>
+                <p id="workload-info" style="margin-bottom: 8px; color: var(--accent-blue); font-size: 0.9em;"></p>
+                <label style="display: inline-flex; align-items: center; gap:8px; margin-bottom: 20px;">
+                    <span style="font-size:0.9em; color: var(--text-secondary);">Backend</span>
+                    <select id="benchmark-backend-select" onchange="onBackendChange(this.value)" disabled style="padding:6px; border-radius:6px; background:var(--bg-secondary); color:var(--text-primary);">
+                            <option value="disabled" selected>Not implemented</option>
+                            <option value="auto">Auto</option>
+                            <option value="cupy">CuPy</option>
+                            <option value="torch">PyTorch</option>
+                        </select>
+                    <span style="margin-left:8px; color:var(--text-secondary); font-size:0.85em;">Feature disabled</span>
+                </label>
                 
                 <div id="baseline-info" style="display: none; background: var(--bg-tertiary); padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid var(--accent-green);">
                     <h4 style="color: var(--accent-green); margin-bottom: 10px;">Baseline Saved</h4>
@@ -198,9 +256,9 @@
                         </div>
                     </div>
                     
-                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                        <button class="export-btn" onclick="startBenchmark()" id="start-bench-btn">Start Benchmark</button>
-                        <button class="export-btn" onclick="startSimulation()" id="start-sim-btn" title="Start particle simulation with visualization">Start Simulation</button>
+                        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                            <button class="export-btn" onclick="startBenchmark()" id="start-bench-btn" disabled data-tooltip="Not implemented">Start Benchmark</button>
+                            <button class="export-btn" onclick="startSimulation()" id="start-sim-btn" title="Start particle simulation with visualization" disabled data-tooltip="Not implemented">Start Simulation</button>
                         <button class="export-btn secondary" onclick="stopBenchmark()" id="stop-bench-btn" style="display: none;">Stop</button>
                         <span id="iteration-counter" style="display: none; font-size: 1.2em; color: var(--accent-green); font-weight: bold; margin-left: 20px;"></span>
                     </div>
@@ -252,6 +310,15 @@
     </div>
     
     <!-- Load modules in correct order -->
+    <script>
+        // Ensure global selectedBackend exists before other static scripts run
+        window.selectedBackend = window.selectedBackend || 'auto';
+        // Called by inline select onchange to immediately update global and preview
+        window.onBackendChange = function(val){
+            try { window.selectedBackend = val || 'auto'; } catch(e){}
+            try { if (typeof updateWorkloadPreview === 'function') updateWorkloadPreview(); } catch(e){}
+        };
+    </script>
     <script src="/static/utils.js"></script>
     <script src="/static/charts.js"></script>
     <script src="/static/benchmark.js"></script>
@@ -278,6 +345,91 @@
             // The UI will update the "Last update" only when the client
             // receives fresh metrics from the server and calls this.
             window.setLastUpdate = setLastUpdate;
+
+            // Error notification helper: shows a red sliding error bubble with exact message
+            // auto-hides after a timeout (default 8s). Multiple errors queue vertically.
+            window.showError = function(message, timeoutMs) {
+                try {
+                    timeoutMs = typeof timeoutMs === 'number' ? timeoutMs : 8000;
+                    var container = document.getElementById('error-window');
+                    if (!container) return;
+
+                    var item = document.createElement('div');
+                    item.className = 'error-item';
+
+                    var close = document.createElement('button');
+                    close.className = 'close-btn';
+                    close.innerHTML = '&times;';
+                    close.onclick = function(e){ e.stopPropagation(); hide(); };
+
+                    var text = document.createElement('div');
+                    text.textContent = message;
+
+                    item.appendChild(close);
+                    item.appendChild(text);
+
+                    container.insertBefore(item, container.firstChild);
+
+                    // force layout then show
+                    requestAnimationFrame(function(){
+                        item.classList.add('show');
+                    });
+
+                    var hideTimeout = setTimeout(hide, timeoutMs);
+
+                    function hide(){
+                        clearTimeout(hideTimeout);
+                        item.classList.remove('show');
+                        // wait for transition, then remove
+                        setTimeout(function(){
+                            if (item && item.parentNode) item.parentNode.removeChild(item);
+                        }, 420);
+                    }
+
+                    return {dismiss: hide};
+                } catch (e){
+                    // silently ignore small UI errors
+                    console.debug('showError failed', e);
+                }
+            };
+
+            // Success/info notification helper (green)
+            window.showSuccess = function(message, timeoutMs) {
+                try {
+                    timeoutMs = typeof timeoutMs === 'number' ? timeoutMs : 5000;
+                    var container = document.getElementById('error-window');
+                    if (!container) return;
+
+                    var item = document.createElement('div');
+                    item.className = 'error-item';
+                    item.style.background = 'linear-gradient(90deg,#0b6623,#1e9b5b)';
+
+                    var close = document.createElement('button');
+                    close.className = 'close-btn';
+                    close.innerHTML = '&times;';
+                    close.onclick = function(e){ e.stopPropagation(); hide(); };
+
+                    var text = document.createElement('div');
+                    text.textContent = message;
+
+                    item.appendChild(close);
+                    item.appendChild(text);
+
+                    container.insertBefore(item, container.firstChild);
+
+                    requestAnimationFrame(function(){ item.classList.add('show'); });
+
+                    var hideTimeout = setTimeout(hide, timeoutMs);
+
+                    function hide(){
+                        clearTimeout(hideTimeout);
+                        item.classList.remove('show');
+                        setTimeout(function(){ if (item && item.parentNode) item.parentNode.removeChild(item); }, 420);
+                    }
+
+                    return {dismiss: hide};
+                } catch (e) { console.debug('showSuccess failed', e); }
+            };
         })();
     </script>
 </body>

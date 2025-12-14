@@ -191,11 +191,25 @@ def create_app(config: Dict[str, Any]) -> FastAPI:
         await storage.store(metrics)
         
         alerts = alert_engine.check(metrics)
-        
+        # Also surface recent benchmark state/errors to the UI so clients can display notifications
+        try:
+            benchmark_instance = benchmark_runner.get_benchmark_instance()
+            bench_status = benchmark_instance.get_status()
+            benchmark_error = None
+            # If benchmark finished with a stop reason containing 'Error' or results contain error, surface it
+            if bench_status and bench_status.get('stop_reason'):
+                benchmark_error = bench_status.get('stop_reason')
+            elif getattr(benchmark_instance, 'results', None) and isinstance(benchmark_instance.results, dict) and benchmark_instance.results.get('error'):
+                benchmark_error = benchmark_instance.results.get('error')
+        except Exception:
+            benchmark_error = None
+
         return {
             'status': 'healthy' if not alerts else 'warning',
             'metrics': metrics,
             'alerts': alerts,
+            'benchmark_status': bench_status if 'bench_status' in locals() else None,
+            'benchmark_error': benchmark_error,
         }
     
     @app.get("/api/gpus")

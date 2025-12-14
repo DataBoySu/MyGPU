@@ -8,6 +8,9 @@ let benchmarkPollInterval = null;
 let benchCharts = {};
 let selectedMode = 'quick';
 let selectedBenchType = 'gemm';
+if (typeof selectedBackend === 'undefined') {
+    var selectedBackend = 'auto';
+}
 
 // Tab switching
 document.querySelectorAll('.tab').forEach(tab => {
@@ -17,6 +20,10 @@ document.querySelectorAll('.tab').forEach(tab => {
         tab.classList.add('active');
         document.getElementById(tab.dataset.tab).classList.add('active');
         
+        // Clear benchmark results when leaving the benchmark tab to avoid stale/plain-text output
+        if (tab.dataset.tab !== 'benchmark') {
+            try { const br = document.getElementById('benchmark-results'); if (br) br.innerHTML = ''; } catch(e){}
+        }
         if (tab.dataset.tab === 'history') loadHistory();
         if (tab.dataset.tab === 'processes') loadProcesses();
         if (tab.dataset.tab === 'benchmark') { loadBenchmarkResults(); loadBaseline(); }
@@ -41,16 +48,39 @@ async function fetchStatus() {
         console.log('Response status:', response.status);
         
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            // try to extract server-provided error message
+            let errText = `HTTP ${response.status}`;
+            try {
+                const txt = await response.text();
+                if (txt) {
+                    try { const j = JSON.parse(txt); errText = j.error || j.message || txt; }
+                    catch(e){ errText = txt; }
+                }
+            } catch (e) {}
+            if (window.showError) window.showError(`Status fetch failed: ${errText}`);
+            throw new Error(errText);
         }
-        
+
         const data = await response.json();
         console.log('Received data:', data);
         updateDashboard(data);
+        // Update footer last-update with server timestamp if provided
+        if (data && data.metrics && data.metrics.timestamp && window.setLastUpdate) {
+            try { window.setLastUpdate(data.metrics.timestamp); } catch(e){ console.debug('setLastUpdate failed', e); }
+        }
+        // If server reported a recent benchmark error, surface it as a sliding notification
+        if (data && data.benchmark_error) {
+            try {
+                if (window.showError) window.showError(data.benchmark_error, 15000);
+            } catch (e) { console.debug('showError call failed', e); }
+        }
     } catch (error) {
         console.error('Error fetching status:', error);
         document.getElementById('gpu-list').innerHTML = '<div class="gpu-card" style="color: #ef4444;">Error: Failed to fetch GPU data. Check console for details.</div>';
         document.getElementById('system-info').innerHTML = '<div style="color: #ef4444;">Error loading system info</div>';
+        if (window.showError) {
+            window.showError(typeof error === 'string' ? error : (error && error.message) ? error.message : 'Unknown error while fetching status');
+        }
     }
 }
 
@@ -87,9 +117,11 @@ async function shutdownServer() {
 // Initialize dashboard
 fetchStatus();
 setInterval(fetchStatus, 5000);
+// Load server feature detection and update UI (disables unavailable backends)
+if (typeof loadFeatures === 'function') loadFeatures();
 
-// Initialize benchmark tab
-selectBenchType('gemm');
-selectMode('quick');
+// Initialize benchmark tab (disabled)
+try { if (typeof selectBenchType === 'function') selectBenchType('gemm'); } catch(e){}
+try { if (typeof selectMode === 'function') selectMode('quick'); } catch(e){}
 
 console.log('Dashboard initialized - all modules loaded');
