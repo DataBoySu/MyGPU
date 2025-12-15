@@ -1,4 +1,12 @@
-"""GPU benchmark orchestration and metrics collection."""
+"""GPU benchmark orchestration and metrics collection.
+
+Maintenance:
+- Purpose: coordinate benchmark execution, collect samples and expose runtime
+    status to the API/UI. This is the central orchestration class for stress
+    tests and particle simulations.
+- Debug: use `get_status()`, `get_samples()` and `get_results()` to inspect
+    runtime state; long-running threads indicate worker shutdown or join issues.
+"""
 
 import time
 from typing import Dict, Any, List, Optional

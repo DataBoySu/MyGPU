@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
-"""Cluster Health Monitor - Real-time GPU cluster monitoring."""
+"""Cluster Health Monitor - Real-time GPU cluster monitoring.
+
+Maintenance:
+- Purpose: CLI entrypoint and small web/server launcher for the project.
+- Debug: run `python health_monitor.py web` to start the server; check
+    `config.yaml` for configuration. If debugging collectors, import and
+    instantiate `monitor.collectors` classes directly.
+"""
 
 import asyncio
 import sys

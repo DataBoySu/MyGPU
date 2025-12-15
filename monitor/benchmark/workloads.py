@@ -1,4 +1,11 @@
 """GPU workload implementations for benchmarking - REFACTORED."""
+"""GPU workload implementations for benchmarking - REFACTORED.
+
+Maintenance:
+- Purpose: provide workload implementations (GEMM, particle sim) used by
+    the benchmark runner. Keep compute-heavy loops separate for easier profiling.
+- Debug: to profile workloads, run them standalone and measure CPU/GPU usage.
+"""
 
 import time
 import subprocess

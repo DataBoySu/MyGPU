@@ -1,4 +1,12 @@
-"""FastAPI server for REST API and web dashboard."""
+"""FastAPI server for REST API and web dashboard.
+
+Maintenance:
+- Purpose: defines the web endpoints and WebSocket handlers used by the
+    dashboard UI and simulation features.
+- Debug: enable request logging and inspect `/api/*` endpoints; WebSocket
+    simulation frames are sent from the benchmark runner. If server fails to
+    start, check dependency imports (FastAPI, uvicorn) and configuration paths.
+"""
 
 from datetime import datetime, timedelta
 from pathlib import Path

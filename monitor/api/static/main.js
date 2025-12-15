@@ -801,7 +801,21 @@ function selectBenchType(type) {
     document.getElementById('gemm-settings').style.display = type === 'gemm' ? 'block' : 'none';
     document.getElementById('particle-settings').style.display = type === 'particle' ? 'block' : 'none';
     
-    // Simulation button is always enabled
+    // Update simulation button enabled state depending on mode
+    const startSimBtn = document.getElementById('start-sim-btn');
+    if (startSimBtn) {
+        if (selectedMode === 'stress-test' || selectedMode === 'custom') {
+            startSimBtn.disabled = true;
+            startSimBtn.title = 'Simulation disabled for stress-test and custom modes';
+            startSimBtn.style.opacity = '0.5';
+            startSimBtn.style.cursor = 'not-allowed';
+        } else {
+            startSimBtn.disabled = false;
+            startSimBtn.title = '';
+            startSimBtn.style.opacity = '';
+            startSimBtn.style.cursor = '';
+        }
+    }
 }
 
 function selectMode(mode) {
@@ -820,6 +834,22 @@ function selectMode(mode) {
         'custom': 'Custom configuration - set your own duration, limits, and workload parameters'
     };
     document.getElementById('mode-description').textContent = descriptions[mode] || '';
+
+    // When in stress-test or custom modes the Simulation view is not supported
+    const simBtn = document.getElementById('start-sim-btn');
+    if (simBtn) {
+        if (mode === 'stress-test' || mode === 'custom') {
+            simBtn.disabled = true;
+            simBtn.title = 'Simulation disabled for stress-test and custom modes';
+            simBtn.style.opacity = '0.5';
+            simBtn.style.cursor = 'not-allowed';
+        } else {
+            simBtn.disabled = false;
+            simBtn.title = '';
+            simBtn.style.opacity = '';
+            simBtn.style.cursor = '';
+        }
+    }
 }
 
 function updateSliderValue(type) {

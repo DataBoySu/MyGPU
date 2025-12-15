@@ -2,6 +2,11 @@
 
 Renders a sampled subset of particles for visual feedback during benchmarking.
 GPU computes millions, screen renders thousands for smooth 60 FPS display.
+    
+        Maintenance:
+        - Purpose: provide a simple, non-GPU visualizer for environments without
+            ModernGL or for debugging rendering issues.
+        - Debug: keep visualization code slow-path and isolated from core logic.
 """
 
 import time

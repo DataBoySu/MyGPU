@@ -1,4 +1,10 @@
-"""API router for benchmark-related endpoints."""
+"""API router for benchmark-related endpoints.
+
+Maintenance:
+- Purpose: expose HTTP endpoints used by the UI to start/stop benchmarks.
+- Debug: if endpoints are not responding, ensure the router is included in the
+    FastAPI app and that the server startup initialized the benchmark instance.
+"""
 
 import threading
 from fastapi import APIRouter

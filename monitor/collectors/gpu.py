@@ -1,4 +1,11 @@
-"""GPU metrics collector using NVML or nvidia-smi."""
+"""GPU metrics collector using NVML or nvidia-smi.
+
+Maintenance:
+- Purpose: collect per-GPU metrics and process info. Prefers pynvml when
+    available and falls back to parsing `nvidia-smi` output.
+- Debug: enable `nvidia-smi` and NVML logging to diagnose GPU read failures.
+    The collector tolerates missing tools and returns `error` fields where needed.
+"""
 
 import subprocess
 import os
