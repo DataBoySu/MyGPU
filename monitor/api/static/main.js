@@ -27,6 +27,31 @@ function ensureZoomPlugin() {
     } catch (e) { console.debug('ensureZoomPlugin error', e); }
 }
 
+// Notifications are provided by /static/toast.js (loaded before main.js)
+
+function showRestartSuccessPage() {
+    try {
+        // stop intervals
+        try { if (refreshInterval) clearInterval(refreshInterval); } catch (e) {}
+        try { if (benchmarkPollInterval) clearInterval(benchmarkPollInterval); } catch (e) {}
+
+        document.documentElement.style.height = '100%';
+        document.body.style.margin = '0';
+        document.body.innerHTML = `
+            <div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#062b00;color:#d1fae5;font-family:Roboto,Segoe UI,Arial,sans-serif;">
+                <div style="text-align:center;max-width:720px;padding:24px;">
+                    <h1 style="font-size:38px;margin-bottom:12px;color:#bbf7d0;">Server restarted successfully</h1>
+                    <p style="color:#bbf7d0;margin-bottom:18px;">The server restart was initiated with elevated privileges. If the UI does not reconnect automatically, refresh this page after a few seconds.</p>
+                    <div style="display:flex;gap:8px;justify-content:center;">
+                        <button onclick="location.reload()" style="padding:10px 16px;border-radius:6px;border:none;background:#0b6623;color:#fff;cursor:pointer;">Refresh</button>
+                        <button onclick="window.close()" style="padding:10px 16px;border-radius:6px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:#d1fae5;cursor:pointer;">Close Window</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    } catch (e) { console.debug('showRestartSuccessPage error', e); }
+}
+
 // Shutdown helper called by the Exit button in the header
 async function shutdownServer() {
     try {
@@ -1256,3 +1281,43 @@ refreshInterval = setInterval(tick, 1000);
 
 // Initialize benchmark type on load
 selectBenchType('gemm');
+
+// Inject Restart as Admin button next to the Update button (no confirmation required)
+try {
+    const updateBtn = document.getElementById('update-btn');
+    if (updateBtn && !document.getElementById('restart-elevated-btn')) {
+        const btn = document.createElement('button');
+        btn.id = 'restart-elevated-btn';
+        btn.textContent = 'ADMIN';
+        btn.style.padding = '8px 12px';
+        btn.style.borderRadius = '6px';
+        btn.style.border = '2px solid #76b900';
+        btn.style.background = '#0b0b0b';
+        btn.style.color = '#76b900';
+        btn.style.cursor = 'pointer';
+        btn.style.marginRight = '8px';
+        btn.title = 'Restart the server with elevated privileges (UAC prompt)';
+
+        btn.onclick = async function() {
+            try {
+                // Detection-only: query server for elevation status and show minimal toast
+                const resp = await fetch('/api/is_elevated');
+                if (!resp.ok) { window.showToast('', { level: 'red' }); return; }
+                const json = await resp.json().catch(() => ({}));
+                const elevated = Boolean(json && (json.elevated || json.started_with_flag));
+                if (elevated) {
+                    window.showSuccess('Running with admin');
+                } else {
+                    // Give the user concise instruction to start server with admin
+                    const cmd = "python health_monitor.py web --admin";
+                    window.showToast(`Run with admin: ${cmd}`, { level: 'yellow', duration: 12000 });
+                }
+            } catch (e) {
+                window.showToast('', { level: 'red' });
+            }
+        };
+
+        // insert to the left of updateBtn
+        updateBtn.parentNode.insertBefore(btn, updateBtn);
+    }
+} catch (e) { console.debug('inject restart button error', e); }
