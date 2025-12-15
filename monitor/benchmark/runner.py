@@ -374,6 +374,7 @@ class GPUBenchmark:
             'memory_used_mb': calc_stats('memory_used_mb'),
             'temperature_c': calc_stats('temperature_c'),
             'power_w': calc_stats('power_w'),
+            'backend': getattr(self.stress_worker, '_method', 'unknown'),
         }
         
         perf_stats = self.stress_worker.get_performance_stats(elapsed_sec)
@@ -423,7 +424,7 @@ class GPUBenchmark:
             results['peak_steps_per_sec'] = perf.get('peak_steps_per_second', perf.get('steps_per_second', 0))
         elif results.get('benchmark_type') == 'gemm':
             perf = results.get('performance', {})
-            results['avg_tflops'] = perf.get('tflops', 0)
+            results['avg_tflops'] = perf.get('avg_tflops', perf.get('tflops', 0))
             results['peak_tflops'] = perf.get('peak_tflops', perf.get('tflops', 0))
     
     def run(self, config: BenchmarkConfig, visualize: bool = False) -> Dict[str, Any]:

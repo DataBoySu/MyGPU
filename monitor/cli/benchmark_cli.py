@@ -154,11 +154,21 @@ Implementation: see monitor/benchmark/ for the workload implementations and conf
 
     perf = results.get('performance', {})
     if 'tflops' in perf:
-        baseline_tflops = baseline.get('full_results', {}).get('performance', {}).get('tflops', 0) if baseline else 0
-        table.add_row("TFLOPS", f"{perf['tflops']:.3f}",
-                     f"{baseline_tflops:.3f}" if baseline_tflops else "",
-                     f"{((perf['tflops'] - baseline_tflops) / baseline_tflops * 100):+.1f}%" if baseline_tflops else "")
-        table.add_row("GFLOPS", f"{perf['gflops']:.1f}")
+        baseline_perf = baseline.get('full_results', {}).get('performance', {}) if baseline else {}
+        baseline_avg_tflops = baseline_perf.get('avg_tflops', baseline_perf.get('tflops', 0)) if baseline else 0
+        avg_tflops = perf.get('avg_tflops', perf.get('tflops', 0))
+        peak_tflops = perf.get('peak_tflops', perf.get('tflops', 0))
+        # If backend not GPU-backed, show N/A
+        backend = results.get('backend', '')
+        if backend not in ('cupy','torch'):
+            table.add_row("Avg TFLOPS", "N/A")
+            table.add_row("Peak TFLOPS", "N/A")
+        else:
+            table.add_row("Avg TFLOPS", f"{avg_tflops:.3f}",
+                          f"{baseline_avg_tflops:.3f}" if baseline_avg_tflops else "",
+                          f"{((avg_tflops - baseline_avg_tflops) / baseline_avg_tflops * 100):+.1f}%" if baseline_avg_tflops else "")
+            table.add_row("Peak TFLOPS", f"{peak_tflops:.3f}")
+        table.add_row("GFLOPS", f"{perf.get('gflops', 0):.1f}")
     elif 'steps_per_second' in perf:
         table.add_row("Steps/sec", f"{perf['steps_per_second']:.1f}")
         table.add_row("Particles/sec", f"{perf['particles_updated_per_second']:,.0f}")

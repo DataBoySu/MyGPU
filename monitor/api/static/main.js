@@ -1083,8 +1083,8 @@ async function pollBenchmarkStatus() {
                     const r = results || {};
                     const html = `
                         <div class="gpu-card"><h3 style="color: var(--accent-green);">Benchmark Results</h3>
-                            <div class="metric-row"><span class="metric-label">Average TFLOPS</span><span class="metric-value">${(r.avg_tflops || (r.performance && r.performance.tflops) || 0).toFixed(2)}</span></div>
-                            <div class="metric-row"><span class="metric-label">Peak TFLOPS</span><span class="metric-value">${(r.peak_tflops || (r.performance && r.performance.peak_tflops) || 0).toFixed(2)}</span></div>
+                            <div class="metric-row"><span class="metric-label">Average TFLOPS</span><span class="metric-value">${(r.backend === 'cupy' || r.backend === 'torch') && Number.isFinite(r.avg_tflops) ? r.avg_tflops.toFixed(2) : 'N/A'}</span></div>
+                            <div class="metric-row"><span class="metric-label">Peak TFLOPS</span><span class="metric-value">${(r.backend === 'cupy' || r.backend === 'torch') && Number.isFinite(r.peak_tflops) ? r.peak_tflops.toFixed(2) : 'N/A'}</span></div>
                             <div class="metric-row"><span class="metric-label">Avg Temperature</span><span class="metric-value">${(r.avg_temperature || 0).toFixed(1)}°C</span></div>
                             <div class="metric-row"><span class="metric-label">Avg GPU Utilization</span><span class="metric-value">${(r.avg_gpu_utilization || 0).toFixed(1)}%</span></div>
                             <div class="metric-row"><span class="metric-label">Avg Memory Usage</span><span class="metric-value">${(r.avg_memory_usage || 0).toFixed(1)}%</span></div>

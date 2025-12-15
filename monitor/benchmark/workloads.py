@@ -36,6 +36,8 @@ class GPUStressWorker:
         self._gpu_arrays = {}
         self._counters = {}
         self._backend_stress = BackendStressManager()  # Use dedicated backend manager
+        # Track per-iteration TFLOPS for GEMM to report avg/peak
+        self._tflops_history = []
         self._detect_and_setup()
     
     def _detect_and_setup(self):
@@ -199,6 +201,10 @@ class GPUStressWorker:
         
         elapsed = time.perf_counter() - start
         self.iterations += 1
+        # Record per-iteration TFLOPS for GEMM workloads (if elapsed > 0)
+        if self.benchmark_type == 'gemm' and elapsed > 0 and getattr(self, '_flops_per_iter', 0) > 0:
+            tflops_iter = (self._flops_per_iter / elapsed) / 1e12
+            self._tflops_history.append(tflops_iter)
         return elapsed
     
     def _run_gemm(self):
@@ -369,6 +375,7 @@ class GPUStressWorker:
         self.iterations = 0
         self.total_flops = 0.0
         self.total_steps = 0
+        self._tflops_history = []  # clear recorded per-iteration TFLOPS
     
     def cleanup(self):
         """Free GPU memory."""
@@ -441,6 +448,15 @@ class GPUStressWorker:
         if self.benchmark_type == "gemm" and elapsed_seconds > 0:
             tflops = (self.total_flops / elapsed_seconds) / 1e12
             stats['total_flops'] = self.total_flops
+            # Prefer history-based stats for avg/peak if available
+            if self._tflops_history:
+                avg_tflops = sum(self._tflops_history) / len(self._tflops_history)
+                peak_tflops = max(self._tflops_history)
+                stats['avg_tflops'] = round(avg_tflops, 3)
+                stats['peak_tflops'] = round(peak_tflops, 3)
+            else:
+                stats['avg_tflops'] = round(tflops, 3)
+                stats['peak_tflops'] = round(tflops, 3)
             stats['tflops'] = round(tflops, 3)
             stats['gflops'] = round(tflops * 1000, 2)
         elif self.benchmark_type == "particle" and elapsed_seconds > 0:
