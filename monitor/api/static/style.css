@@ -361,6 +361,12 @@ header h1 {
 .vram-exceeded-badge { display:inline-block; width:10px; height:10px; border-radius:50%; background:var(--accent-red); margin-right:8px; vertical-align:middle; }
 .vram-exceeded-badge.big { width:18px; height:18px; margin-right:10px; }
 
+/* disabled checkbox styling for non-admin */
+.watch-checkbox[disabled] {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
 .process-table th {
     background: var(--bg-tertiary);
     color: var(--accent-green);

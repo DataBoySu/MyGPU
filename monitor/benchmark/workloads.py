@@ -1,10 +1,8 @@
-"""GPU workload implementations for benchmarking - REFACTORED."""
-"""GPU workload implementations for benchmarking - REFACTORED.
+"""GPU workload implementations for benchmarking.
 
-Maintenance:
-- Purpose: provide workload implementations (GEMM, particle sim) used by
-    the benchmark runner. Keep compute-heavy loops separate for easier profiling.
-- Debug: to profile workloads, run them standalone and measure CPU/GPU usage.
+Provides GEMM and particle simulation workloads used by the benchmark runner.
+This module keeps compute-heavy loops separate to simplify profiling and
+reporting (avg/peak TFLOPS, steps/second). Configure via BenchmarkConfig.
 """
 
 import time
@@ -38,6 +36,8 @@ class GPUStressWorker:
         self._backend_stress = BackendStressManager()  # Use dedicated backend manager
         # Track per-iteration TFLOPS for GEMM to report avg/peak
         self._tflops_history = []
+        # Estimated FLOPs per particle update (used to approximate TFLOPS in particle simulation mode)
+        self._flops_per_particle_step = getattr(self.config, 'particle_flops_per_step', 50)
         self._detect_and_setup()
     
     def _detect_and_setup(self):
@@ -259,6 +259,12 @@ class GPUStressWorker:
                 self._backend_stress.run_physics(physics_cupy, params, self._cp)
             
             self._cp.cuda.Stream.null.synchronize()
+            # approximate flops: per active particle update
+            try:
+                particles = int(self._active_count)
+            except Exception:
+                particles = 0
+            self.total_flops += (particles * float(self._flops_per_particle_step))
             self.total_steps += 1
             
         elif self._method == 'torch':
@@ -280,6 +286,11 @@ class GPUStressWorker:
                 self._backend_stress.run_physics(physics_torch, params, self._torch)
             
             self._torch.cuda.synchronize()
+            try:
+                particles = int(self._active_count)
+            except Exception:
+                particles = 0
+            self.total_flops += (particles * float(self._flops_per_particle_step))
             self.total_steps += 1
     
     def update_physics_params(self, gravity_strength: Optional[float] = None, 
@@ -465,6 +476,12 @@ class GPUStressWorker:
             stats['particles_updated_per_second'] = round(
                 (self.total_steps * self._active_count) / elapsed_seconds, 2
             )
+            # If we have accumulated flops (from particle updates or backend stress), report TFLOPS
+            if getattr(self, 'total_flops', 0) > 0:
+                tflops = (self.total_flops / elapsed_seconds) / 1e12
+                stats['tflops'] = round(tflops, 3)
+                stats['avg_tflops'] = round(tflops, 3)
+                stats['peak_tflops'] = round(tflops, 3)
         
         return stats
 

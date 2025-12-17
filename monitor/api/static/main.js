@@ -840,11 +840,13 @@ async function loadProcesses() {
                 const disabledStyle = window.isAdmin ? '' : 'opacity:0.55;cursor:not-allowed;';
                 const combinedStyle = `style="${baseStyle}${disabledStyle}"`;
 
-                const checkedAttr = watchlistSet.has(pid) ? 'checked' : '';
+                // Only show check as checked when server is admin; otherwise unchecked and disabled
+                const checkedAttr = (window.isAdmin && watchlistSet.has(pid)) ? 'checked' : '';
+                const checkboxDisabledAttr = window.isAdmin ? '' : 'disabled';
 
                 return `
                     <tr>
-                        <td><input type="checkbox" class="watch-checkbox" id="watch-${pid}" ${checkedAttr} data-pid="${pid}"></td>
+                        <td><input type="checkbox" class="watch-checkbox" id="watch-${pid}" ${checkedAttr} ${checkboxDisabledAttr} data-pid="${pid}"></td>
                         <td>${badgeHtml}${pid}</td>
                         <td>${p.name || 'N/A'}</td>
                         <td>GPU ${p.gpu_index}</td>

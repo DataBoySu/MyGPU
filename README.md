@@ -58,7 +58,7 @@ The tool supports three installation types:
   cd C:\Tools\local-gpu-monitor
   .\setup.ps1
   ```
-
+  
 3. **Select** installation type (1=Minimal, 2=Standard, 3=Full)
 
 4. **Launch**:
@@ -68,7 +68,7 @@ The tool supports three installation types:
 
   .\.venv\Scripts\python.exe .\health_monitor.py cli
 
-   # For STANDARD or FULL:
+# For STANDARD or FULL
 
   .\.venv\Scripts\python.exe .\health_monitor.py web
 
@@ -165,6 +165,7 @@ If you need the web dashboard to perform privileged actions (terminate processes
 ```powershell
 python health_monitor.py web --port 8890 --admin
 ```
+
 - `POST /api/benchmark/start` - Start benchmark
 - `GET /api/benchmark/status` - Benchmark progress
 - `POST /api/benchmark/stop` - Stop benchmark
@@ -181,14 +182,19 @@ CUDA compatibility errors
 - This project requires CUDA 12.x. If your installed GPU libraries (CuPy or PyTorch) were compiled for a different CUDA major version the app will report them as incompatible and GPU benchmarking/simulation will be disabled.
 - Fix: install CUDA 12.x and the matching Python wheels:
   - CuPy (CUDA 12.x):
+
     ```powershell
     pip install "cupy-cuda12x>=13.0.0"
     ```
+
   - PyTorch (CUDA 12.x): check official instructions; example for CUDA 12.1:
+
     ```powershell
     pip install torch --index-url https://download.pytorch.org/whl/cu121
     ```
+
   - After installing, run:
+
     ```powershell
     python health_monitor.py refresh
     ```
