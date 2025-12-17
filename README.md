@@ -34,10 +34,23 @@
   <div style="display:flex; overflow-x:auto; gap:10px; padding:12px 0; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;">
 
   <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
-      <img src="monitor/api/static/web1.png" style="width:100%; height:100%; object-fit:contain;" />
+      <img src="monitor/api/static/cli1.png" style="width:100%; height:100%; object-fit:contain;" />
   </div>
+  <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
+      <img src="monitor/api/static/cli2.png" style="width:100%; height:100%; object-fit:contain;" />
+    </div>
+    <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
+      <img src="monitor/api/static/cli3.png" style="width:100%; height:100%; object-fit:contain;" />
+    </div>
+    <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
+      <img src="monitor/api/static/cli4.png" style="width:100%; height:100%; object-fit:contain;" />
+    </div>
+    <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
+      <img src="monitor/api/static/cli5.png" style="width:100%; height:100%; object-fit:contain;" />
+    </div>
 
 </details>
+
 ---
 
 ## Overview
@@ -54,7 +67,7 @@ Whether you are a researcher fine-tuning LLMs, a developer testing CUDA kernels,
 - **Developer-Friendly**: Built-in benchmarking and stress-testing tools (GEMM, Particle Physics) to validate system stability.
 
 ---
- 
+
 ## Features
 
 - **Real-time Monitoring**:
@@ -70,7 +83,6 @@ Whether you are a researcher fine-tuning LLMs, a developer testing CUDA kernels,
 - **Benchmarking & Simulation**:
   - **Stress Testing**: Configurable GEMM workloads to test thermal throttling and stability.
   - **Visual Simulation**: Interactive 3D particle physics simulation to visualize GPU load.
-  - **TFLOPS Estimation**: Real-time performance estimation during simulations.
 
 ---
 
@@ -146,35 +158,8 @@ python health_monitor.py web
 python health_monitor.py cli
 ```
 
-Access the dashboard at `http://localhost:8090` when running in web mode.
 ---
 
 ## License
 
 MIT License. See [LICENSE](LICENSE) for details.
-
-## Detailed Modes
-
-### Web Dashboard
-
-The web dashboard runs a FastAPI server that serves a lightweight frontend (vanilla JS). It provides real-time charts, per-process details, and desktop notifications on Windows.
-
-Start the web dashboard with:
-
-```powershell
-python health_monitor.py web
-```
-
-By default the dashboard is available at `http://localhost:8090`.
-
-### CLI Mode
-
-The CLI mode is intended for quick checks and scripted workflows. It provides concise, human-friendly output suitable for headless machines and automation.
-
-Start the CLI with:
-
-```powershell
-python health_monitor.py cli
-```
-
-Use the CLI for cron jobs, automation, or running on machines without a browser.
