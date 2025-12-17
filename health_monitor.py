@@ -14,6 +14,7 @@ import time
 from datetime import datetime
 from pathlib import Path
 from typing import Optional, List
+import shutil
 
 import yaml
 import click
@@ -22,6 +23,7 @@ from rich.live import Live
 from rich.table import Table
 from rich.panel import Panel
 from rich.layout import Layout
+import socket
 
 from monitor.collectors.gpu import GPUCollector
 from monitor.collectors.system import SystemCollector
@@ -37,7 +39,7 @@ console = Console()
 BANNER = f"""
 ╔══════════════════════════════════════════════════╗
 ║             LOCAL GPU MONITOR v{_pkg_version}             ║
-║        Local GPU monitoring and diagnostics      ║
+║               Monitor and Analysis               ║
 ╚══════════════════════════════════════════════════╝
 """
 
@@ -104,29 +106,35 @@ def load_config(config_path: Optional[str]) -> dict:
 
 def collect_metrics() -> dict:
     """Collect metrics from local system."""
-    metrics = {
-        'timestamp': datetime.now().isoformat(),
-        'hostname': None,
-        'gpus': [],
-        'system': {},
-        'status': 'healthy'
-    }
-    
-    # System metrics
-    try:
-        sys_collector = SystemCollector()
-        metrics['system'] = sys_collector.collect()
-        metrics['hostname'] = metrics['system'].get('hostname', 'unknown')
-    except Exception as e:
-        metrics['system'] = {'error': str(e)}
-    
+    metrics = {}
+
     # GPU metrics
     try:
         gpu_collector = GPUCollector()
         metrics['gpus'] = gpu_collector.collect()
     except Exception as e:
         metrics['gpus'] = [{'error': str(e)}]
-    
+
+    # System metrics
+    try:
+        sys_collector = SystemCollector()
+        sys_metrics = sys_collector.collect()
+        metrics['system'] = sys_metrics
+        # Ensure a hostname is present at top-level for header
+        if 'hostname' in sys_metrics and sys_metrics['hostname']:
+            metrics['hostname'] = sys_metrics['hostname']
+    except Exception as e:
+        metrics['system'] = {'error': str(e)}
+
+    # Optionally collect network metrics if collector exists
+    try:
+        from monitor.collectors.network import NetworkCollector
+        net_collector = NetworkCollector()
+        metrics['network'] = net_collector.collect()
+    except Exception:
+        # Network collector is optional; ignore failures
+        pass
+
     return metrics
 
 
@@ -232,32 +240,175 @@ async def run_web_server(config: dict):
 async def run_cli_monitor(config: dict):
     storage = MetricsStorage(config['storage']['path'])
     await storage.initialize()
-    
+
     alert_engine = AlertEngine(config.get('alerts', {}))
-    
-    with Live(console=console, refresh_per_second=1) as live:
-        while True:
-            try:
-                # Collect metrics
-                metrics = collect_metrics()
-                
-                # Check alerts
-                alerts = alert_engine.check(metrics)
-                
-                # Store metrics
-                await storage.store(metrics)
-                
-                # Update dashboard
-                dashboard = create_dashboard(metrics, alerts)
-                live.update(dashboard)
-                
-                await asyncio.sleep(config['monitoring']['interval_seconds'])
-                
-            except KeyboardInterrupt:
-                break
-            except Exception as e:
-                console.print(f"[red]Error: {e}[/red]")
-                await asyncio.sleep(5)
+
+    # Use a fixed-size console for the CLI dashboard so it does not expand
+    # with the user's terminal window. Width/height can be configured via
+    # config['cli'] with keys 'width' and 'height'. Defaults: 120x30.
+    cli_cfg = config.get('cli', {}) if isinstance(config, dict) else {}
+    # Default to the current terminal width when a width is not configured
+    try:
+        term_width = shutil.get_terminal_size().columns
+    except Exception:
+        term_width = 120
+    fixed_width = int(cli_cfg.get('width', term_width))
+    # Use a smaller default height so the terminal dashboard is compact
+    fixed_height = int(cli_cfg.get('height', 18))
+    fixed_console = Console(width=fixed_width, height=fixed_height)
+
+    # Do NOT mutate module-level `console`; use `fixed_console` explicitly.
+    try:
+        # Build an initial dashboard layout once and then update only the
+        # inner renderables (Text and Table). We create mutable Text
+        # objects for header/system/footer so updating their contents does
+        # not recreate the top-level panels, minimizing redraw flicker.
+        initial_metrics = collect_metrics()
+        initial_alerts = alert_engine.check(initial_metrics)
+
+        # Create layout
+        dashboard = Layout()
+        dashboard.split_column(
+            Layout(name="header", size=3),
+            Layout(name="main"),
+            Layout(name="footer", size=3)
+        )
+
+        # Mutable text objects for in-place updates (use markup-aware Text)
+        from rich.text import Text
+
+        # Helper: format GPU list as a fixed-width monospaced text grid
+        # Use stable fixed column widths to ensure all columns are visible
+        def _format_gpu_grid(gpus, total_width: int = None):
+            label_w = 6
+            util_w = 8
+            mem_w = 18
+            temp_w = 8
+            power_w = 8
+
+            header = f"{ 'GPU':<{label_w}}{ 'Util':>{util_w}}{ 'Memory':>{mem_w}}{ 'Temp':>{temp_w}}{ 'Power':>{power_w}}"
+            sep = "-" * (label_w + util_w + mem_w + temp_w + power_w)
+            lines = [header, sep]
+
+            for gpu in gpus:
+                if 'error' in gpu:
+                    lines.append(f"ERR    {str(gpu['error'])}")
+                    continue
+                idx = f"GPU{gpu.get('index', '?')}"
+                util = f"{gpu.get('utilization', 0)}%"
+                mem_used = gpu.get('memory_used', 0)
+                mem_total = gpu.get('memory_total', 1)
+                mem = f"{mem_used/1024:.1f}/{mem_total/1024:.1f}GB"
+                temp = f"{gpu.get('temperature', 0)}C"
+                power = f"{gpu.get('power', 0):.0f}W"
+                lines.append(f"{idx:<{label_w}}{util:>{util_w}}{mem:>{mem_w}}{temp:>{temp_w}}{power:>{power_w}}")
+
+            return Text("\n".join(lines), no_wrap=True)
+
+        # Initial GPU text grid (use dashboard width)
+        gpu_text = _format_gpu_grid(initial_metrics.get('gpus', []), fixed_width - 6)
+
+        # Initialize header, system and footer text using markup-aware Text
+        node_name = initial_metrics.get('hostname') or socket.gethostname()
+        header_text = Text.from_markup(
+            f"[bold cyan]LOCAL GPU MONITOR[/bold cyan] | Node: [green]{node_name}[/green] | "
+            f"Last Update: {datetime.now().strftime('%H:%M:%S')} | Alerts: [{'red' if initial_alerts else 'green'}]{len(initial_alerts)}[/]"
+        )
+
+        sys_info = initial_metrics.get('system', {})
+        system_text = Text.from_markup(
+            f"[bold]CPU:[/bold] {sys_info.get('cpu_percent', 0):.1f}%\n"
+            f"[bold]RAM:[/bold] {sys_info.get('memory_used_gb', 0):.1f}/{sys_info.get('memory_total_gb', 0):.1f} GB\n"
+            f"[bold]Disk:[/bold] {sys_info.get('disk_used_gb', 0):.1f}/{sys_info.get('disk_total_gb', 0):.1f} GB"
+        )
+
+        if initial_alerts:
+            footer_text = Text.from_markup(" | ".join([f"[red]{a['message']}[/red]" for a in initial_alerts[:3]]))
+        else:
+            footer_text = Text.from_markup("[green]All systems healthy[/green]")
+
+        dashboard["header"].update(Panel(header_text, style="bold"))
+        # Main split: left=GPUs, right=(system over help)
+        dashboard["main"].split_row(Layout(name="gpus", ratio=2), Layout(name="right", ratio=1))
+        # Allocate explicit sizes so Help panel has visible vertical space
+        # Give Help a larger area so the full benchmark flags list is visible
+        dashboard["right"].split_column(Layout(name="system", size=6), Layout(name="help", size=12))
+        dashboard["gpus"].update(Panel(gpu_text, title="GPU Metrics"))
+        dashboard["right"]["system"].update(Panel(system_text, title="System"))
+        # Help panel with available CLI commands and flags (populated from repo)
+        # Replace Help panel with a focused Benchmark panel (key options only)
+        benchmark_text = Text.from_markup(
+            "[bold]Benchmark (quick reference)[/bold]\n"
+            "Run with: [cyan]python health_monitor.py benchmark -v[/cyan]\n"
+            "[bold]Options:[/bold]\n"
+            "  [cyan]-t, --type[/cyan]       : gemm | particle \n"
+            "  [cyan]-v, --visualize[/cyan]   : Show simulation"
+        )
+        dashboard["right"]["help"].update(Panel(benchmark_text, title="Benchmark"))
+        dashboard["footer"].update(Panel(footer_text, title="Status"))
+
+        with Live(console=fixed_console, refresh_per_second=1) as live:
+            # Render initial frame
+            live.update(dashboard)
+
+            while True:
+                try:
+                    # Collect metrics
+                    metrics = collect_metrics()
+
+                    # Check alerts
+                    alerts = alert_engine.check(metrics)
+
+                    # Store metrics
+                    await storage.store(metrics)
+
+                    # Rebuild only the inner renderables (text grid and strings)
+                    gpu_text = _format_gpu_grid(metrics.get('gpus', []), fixed_width - 6)
+
+                    # System Info (omit Load)
+                    sys_info = metrics.get('system', {})
+                    system_content = (
+                        f"[bold]CPU:[/bold] {sys_info.get('cpu_percent', 0):.1f}%\n"
+                        f"[bold]RAM:[/bold] {sys_info.get('memory_used_gb', 0):.1f}/{sys_info.get('memory_total_gb', 0):.1f} GB\n"
+                        f"[bold]Disk:[/bold] {sys_info.get('disk_used_gb', 0):.1f}/{sys_info.get('disk_total_gb', 0):.1f} GB"
+                    )
+
+                    # Replace header/system/footer panels with updated Text
+                    node_name = metrics.get('hostname') or socket.gethostname()
+                    new_header = Text.from_markup(
+                        f"[bold cyan]LOCAL GPU MONITOR[/bold cyan] | Node: [green]{node_name}[/green] | "
+                        f"Last Update: {datetime.now().strftime('%H:%M:%S')} | Alerts: [{'red' if alerts else 'green'}]{len(alerts)}[/]"
+                    )
+                    dashboard["header"].update(Panel(new_header, style="bold"))
+
+                    new_system = Text.from_markup(system_content)
+                    dashboard["right"]["system"].update(Panel(new_system, title="System"))
+
+                    if alerts:
+                        new_footer = Text.from_markup(" | ".join([f"[red]{a['message']}[/red]" for a in alerts[:3]]))
+                    else:
+                        new_footer = Text.from_markup("[green]All systems healthy[/green]")
+                    # keep the benchmark panel static (no per-iteration rebuild)
+                    dashboard["right"]["help"].update(Panel(benchmark_text, title="Benchmark"))
+                    dashboard["footer"].update(Panel(new_footer, title="Status"))
+
+                    # Update GPU panel (text grid)
+                    dashboard["gpus"].update(Panel(gpu_text, title="GPU Metrics"))
+
+                    # Push diffs to the live display
+                    live.update(dashboard)
+
+                    await asyncio.sleep(config['monitoring']['interval_seconds'])
+
+                except KeyboardInterrupt:
+                    break
+                except Exception as e:
+                    # Print exceptions to the fixed console in-place
+                    fixed_console.print(f"[red]Error: {e}[/red]")
+                    await asyncio.sleep(5)
+    finally:
+        # Clean exit from CLI loop (no global console mutation to restore)
+        pass
 
 
 def _run_app(config_path, port, nodes, once, web_mode=False, cli_mode=False):
@@ -318,10 +469,9 @@ def _run_app(config_path, port, nodes, once, web_mode=False, cli_mode=False):
     except Exception:
         pass
 
-    console.print(BANNER, style="bold cyan")
-    
-    # Load configuration
+    # Load configuration (print comes from load_config)
     cfg = load_config(config_path)
+    console.print(BANNER, style="bold cyan")
     
     # CLI port overrides config only if explicitly specified
     if port is not None:

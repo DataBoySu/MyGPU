@@ -10,14 +10,34 @@
 
 ## Gallery
 
-```markdown
-<!-- Web dashboard demo GIF -->
-![Web Dashboard Demo](assets/gallery/web-dashboard-demo.gif)
+<details>
+  <summary>Web Dashboard</summary>
+  <div style="display:flex; overflow-x:auto; gap:10px; padding:12px 0; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;">
+    <!-- Use first image aspect ratio 1624x675 for slide frame; images fit inside using object-fit:contain -->
+    <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
+      <img src="monitor/api/static/web1.png" style="width:100%; height:100%; object-fit:contain;" />
+    </div>
+    <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
+      <img src="monitor/api/static/web2.png" style="width:100%; height:100%; object-fit:contain;" />
+    </div>
+    <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
+      <img src="monitor/api/static/web3.png" style="width:100%; height:100%; object-fit:contain;" />
+    </div>
+    <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
+      <img src="monitor/api/static/web4.png" style="width:100%; height:100%; object-fit:contain;" />
+    </div>
+  </div>
 
-<!-- CLI mode screenshot -->
-![CLI Mode](assets/gallery/cli-mode.png)
-```
+</details>
+<details>
+  <summary>CLI</summary>
+  <div style="display:flex; overflow-x:auto; gap:10px; padding:12px 0; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;">
 
+  <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
+      <img src="monitor/api/static/web1.png" style="width:100%; height:100%; object-fit:contain;" />
+  </div>
+
+</details>
 ---
 
 ## Overview

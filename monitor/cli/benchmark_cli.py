@@ -103,22 +103,39 @@ Implementation: see monitor/benchmark/ for the workload implementations and conf
     ) as progress:
         task = progress.add_task(f"[cyan]{bench_type.upper()} Benchmark", total=100)
 
-        bench_thread = threading.Thread(target=lambda: bench.start(config, visualize=visualize))
+        # Run benchmark in a daemon thread so interpreter shutdown won't hang
+        bench_thread = threading.Thread(target=lambda: bench.start(config, visualize=visualize), daemon=True)
         bench_thread.start()
 
-        while bench.running:
-            status = bench.get_status()
-            fps = status.get('fps', 0.0)
-            gpu = status.get('gpu_util', 0)
-            workload = status.get('workload_type', bench_type)
-            iters = status['iterations']
+        try:
+            while bench.running:
+                status = bench.get_status()
+                fps = status.get('fps', 0.0)
+                gpu = status.get('gpu_util', 0)
+                workload = status.get('workload_type', bench_type)
+                iters = status.get('iterations', 0)
 
-            desc = f"[cyan]FPS:{fps:5.1f} GPU:{gpu:3.0f}%  {workload} - {iters} iterations"
-            progress.update(task, completed=status['progress'], description=desc)
-            time.sleep(0.5)
-
-        bench_thread.join()
-        progress.update(task, completed=100)
+                desc = f"[cyan]FPS:{fps:5.1f} GPU:{gpu:3.0f}%  {workload} - {iters} iterations"
+                progress.update(task, completed=status.get('progress', 0), description=desc)
+                time.sleep(0.5)
+        except KeyboardInterrupt:
+            console.print('\n[yellow]Keyboard interrupt received, stopping benchmark...[/yellow]')
+            try:
+                # Attempt graceful stop
+                if hasattr(bench, 'stop') and callable(bench.stop):
+                    bench.stop()
+                else:
+                    # Fallback: flip running flag if present
+                    setattr(bench, 'running', False)
+            except Exception:
+                pass
+        finally:
+            # Ensure thread is not left blocking; join briefly
+            try:
+                bench_thread.join(timeout=2)
+            except Exception:
+                pass
+            progress.update(task, completed=100)
 
     results = bench.get_results()
 
