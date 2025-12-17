@@ -6,8 +6,9 @@
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
-![Tag](https://img.shields.io/badge/tag-v1.2.3-blue.svg)
+![Version](https://img.shields.io/badge/version-1.2.3-blue)
 ![Platform](https://img.shields.io/badge/platform-Windows-lightgrey)
+![cuda 12.x](https://img.shields.io/badge/CUDA-12.x-0f9d58?logo=nvidia)
 
 ## Gallery
 
@@ -52,8 +53,6 @@
 
 </details>
 
-
-
 ### Why use this?
 
 - **Lightweight**: Minimal resource footprint. It gets out of your way.
@@ -67,7 +66,7 @@
 
 - **Real-time Monitoring**:
   - Detailed GPU metrics (Utilization, VRAM, Power, Temp, Fan Speed).
-  - System metrics (CPU, RAM, Disk I/O).
+  - System metrics (CPU, RAM, etc.).
   - Per-process VRAM usage tracking.
 
 - **Admin & Enforcement**:
@@ -83,7 +82,7 @@
 
 ## Roadmap & Future Work
 
-We are actively working on expanding the capabilities of Cluster Health Monitor. Contributions are welcome!
+Contributions are welcome! Main future points to cover would be:
 
 - **Multi-GPU Support**: Enhanced handling for multi-card setups and NVLink topologies.
 - **Containerization**: Official Docker support for easy deployment in containerized environments.
@@ -139,6 +138,7 @@ Best for development and stress testing.
 
 1. **Download** the latest release or clone the repo.
 2. **Run Setup**:
+
   ```powershell
   .\setup.ps1
   ```
