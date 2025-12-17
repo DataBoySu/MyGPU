@@ -356,12 +356,21 @@ header h1 {
     border-bottom: 1px solid var(--border-color);
 }
 
+/* Watchlist checkbox and cap-exceeded badge */
+.watch-checkbox { width: 18px; height: 18px; }
+.vram-exceeded-badge { display:inline-block; width:10px; height:10px; border-radius:50%; background:var(--accent-red); margin-right:8px; vertical-align:middle; }
+.vram-exceeded-badge.big { width:18px; height:18px; margin-right:10px; }
+
 .process-table th {
     background: var(--bg-tertiary);
     color: var(--accent-green);
 }
 
 .process-table tr:hover { background: var(--bg-tertiary); }
+
+/* VRAM cap exceeded: color only the text in the affected row red (keep background unchanged)
+   Keep the small red-dot badge as the visual indicator. */
+/* removed full-row/row-text coloring; only a big red dot indicates exceed */
 
 /* Chart */
 .chart-container {
@@ -398,6 +407,25 @@ header h1 {
     gap: 15px;
     flex-wrap: wrap;
 }
+
+/* VRAM bar and cap controls */
+.vram-gpu-card { margin-bottom: 12px; padding: 8px; background: var(--bg-tertiary); border-radius: 8px; border: 1px solid var(--border-color); }
+.vram-gpu-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; font-size:0.9em; color:var(--text-secondary); }
+.vram-gpu-label { font-weight:700; color:var(--accent-blue); }
+.vram-bar-outer { width:100%; height:28px; background:var(--bg-secondary); border-radius:6px; overflow:hidden; margin-bottom:8px; }
+.vram-bar-used { height:100%; background: var(--accent-green); transition: width 0.25s ease; }
+.vram-cap-controls { display:flex; gap:8px; align-items:center; }
+.vram-cap-input { width:90px; padding:6px; background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:6px; color:var(--text-primary); }
+.vram-cap-display { font-weight:700; color:var(--accent-green); }
+#vram-bars-wrapper { display:flex; flex-direction:column; gap:8px; }
+#clear-vram-caps { font-size:0.85em; }
+
+/* Overlay slider on top of bar */
+.vram-bar-outer { position: relative; }
+.vram-overlay-slider { position: absolute; left: 0; top: 0; width: 100%; height: 100%; -webkit-appearance: none; appearance: none; background: transparent; cursor: pointer; }
+.vram-overlay-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 24px; height: 16px; border-radius: 4px; background: #ffffff; box-shadow: 0 0 0 4px rgba(108,194,74,0.14); border: 2px solid rgba(0,0,0,0.25); }
+.vram-overlay-slider::-moz-range-thumb { width: 24px; height: 16px; border-radius: 4px; background: #ffffff; border: 2px solid rgba(0,0,0,0.25); }
+.vram-overlay-slider:focus { outline: none; }
 
 .export-btn {
     padding: 12px 25px;

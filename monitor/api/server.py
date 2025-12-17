@@ -8,7 +8,7 @@ Maintenance:
     start, check dependency imports (FastAPI, uvicorn) and configuration paths.
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 from typing import Dict, Any, Optional
 import json
@@ -17,7 +17,7 @@ import io
 import asyncio
 import threading
 
-from fastapi import FastAPI, HTTPException, BackgroundTasks, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse, StreamingResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -43,7 +43,6 @@ def create_app(config: Dict[str, Any]) -> FastAPI:
     # Determine if the process is running with admin/elevated rights or was started with --admin
     try:
         import sys
-        # Only Windows elevation is supported; POSIX fallbacks removed.
         try:
             import ctypes
             is_elev = bool(ctypes.windll.shell32.IsUserAnAdmin())
@@ -63,14 +62,327 @@ def create_app(config: Dict[str, Any]) -> FastAPI:
     
     # Include routers
     app.include_router(benchmark_router.router)
+    # VRAM cap persistence helpers (simple JSON file next to package)
+    def _vram_caps_file() -> Path:
+        return Path(__file__).parent.parent / "vram_caps.json"
+
+    def _vram_watchlist_file() -> Path:
+        return Path(__file__).parent.parent / "vram_watchlist.json"
+
+    def _load_vram_watchlist() -> list:
+        p = _vram_watchlist_file()
+        if not p.exists():
+            return []
+        try:
+            data = json.loads(p.read_text(encoding='utf-8'))
+            if isinstance(data, list):
+                return [int(x) for x in data]
+        except Exception:
+            pass
+        return []
+
+    def _save_vram_watchlist(wl: list):
+        try:
+            p = _vram_watchlist_file()
+            p.write_text(json.dumps([int(x) for x in wl], indent=2), encoding='utf-8')
+        except Exception:
+            pass
+
+    def _load_vram_caps() -> Dict[int, Any]:
+        p = _vram_caps_file()
+        if not p.exists():
+            return {}
+        try:
+            data = json.loads(p.read_text(encoding='utf-8'))
+            # keys are stored as strings in JSON, convert to ints
+            return {int(k): v for k, v in data.items()}
+        except Exception:
+            return {}
+
+    def _save_vram_caps(caps: Dict[int, Any]):
+        try:
+            p = _vram_caps_file()
+            p.write_text(json.dumps({str(k): v for k, v in caps.items()}, indent=2), encoding='utf-8')
+        except Exception:
+            pass
+
+    # initialize in-memory caps
+    app.state.vram_caps = _load_vram_caps()
+    # load persisted watchlist
+    app.state.vram_watchlist = _load_vram_watchlist()
+    # initialize enforcer singleton (best-effort)
+    try:
+        from monitor.enforcer import get_enforcer
+        app.state.vram_enforcer = get_enforcer()
+    except Exception:
+        app.state.vram_enforcer = None
+
+    # Helper: re-check GPUs after a delay and terminate watched PIDs if still exceeded
+    async def _vram_recheck_and_terminate_task(gpus_to_check, watchlist_snapshot, caps_snapshot):
+        await asyncio.sleep(5)
+        try:
+            collector = GPUCollector()
+            gnow = collector.collect()
+            try:
+                procs2 = collector.collect_processes()
+            except Exception:
+                procs2 = []
+            import psutil as _ps
+            for gpu2 in gnow:
+                if gpu2.get('error'):
+                    continue
+                gi = gpu2.get('index')
+                if gi not in gpus_to_check:
+                    continue
+                total_mb = float(gpu2.get('memory_total', 0))
+                used_mb = float(gpu2.get('memory_used', 0))
+                entry2 = caps_snapshot.get(gi) if isinstance(caps_snapshot, dict) else None
+                still_exceeded = False
+                try:
+                    if entry2:
+                        if 'cap_mb' in entry2 and entry2['cap_mb'] is not None:
+                            if used_mb > float(entry2['cap_mb']):
+                                still_exceeded = True
+                        elif 'cap_percent' in entry2 and entry2['cap_percent'] is not None and total_mb > 0:
+                            used_pct = (used_mb / total_mb) * 100.0
+                            if used_pct > float(entry2['cap_percent']):
+                                still_exceeded = True
+                except Exception:
+                    still_exceeded = False
+
+                if still_exceeded:
+                    try:
+                        for proc in procs2:
+                            try:
+                                pid = int(proc.get('pid'))
+                            except Exception:
+                                continue
+                            if pid not in watchlist_snapshot:
+                                continue
+                            if proc.get('gpu_index') == gi:
+                                try:
+                                    p = _ps.Process(pid)
+                                    try:
+                                        p.terminate()
+                                        try:
+                                            p.wait(timeout=5)
+                                        except Exception:
+                                            p.kill()
+                                    except Exception:
+                                        try:
+                                            p.kill()
+                                        except Exception:
+                                            pass
+                                    alert_engine.active_alerts.append({
+                                        'timestamp': datetime.now().isoformat(),
+                                        'hostname': 'local',
+                                        'name': f'pid_{pid}_terminated_after_retry',
+                                        'severity': 'info',
+                                        'message': f'Auto-terminated PID {pid} (retry) on GPU {gi} due to VRAM cap'
+                                    })
+                                except Exception:
+                                    pass
+                    except Exception:
+                        pass
+        except Exception:
+            pass
     
     @app.on_event("startup")
     async def startup():
         await storage.initialize()
+        # start vram cap watcher task
+        async def _vram_cap_watcher():
+            from monitor.alerting.toaster import send_toast
+            from datetime import datetime
+            while True:
+                try:
+                    caps = getattr(app.state, 'vram_caps', {}) or {}
+                    if not caps:
+                        await asyncio.sleep(config.get('monitoring', {}).get('interval_seconds', 5))
+                        continue
+
+                    # collect current GPU metrics
+                    try:
+                        collector = GPUCollector()
+                        gpus = collector.collect()
+                    except Exception:
+                        gpus = []
+
+                    for gpu in gpus:
+                        if gpu.get('error'):
+                            continue
+                        idx = gpu.get('index')
+                        if idx is None:
+                            continue
+                        if idx not in caps:
+                            continue
+                        entry = caps[idx]
+                        total_mb = float(gpu.get('memory_total', 0))
+                        used_mb = float(gpu.get('memory_used', 0))
+
+                        exceeded = False
+                        reason = None
+                        if 'cap_mb' in entry and entry['cap_mb'] is not None:
+                            try:
+                                cap_mb = float(entry['cap_mb'])
+                                if used_mb > cap_mb:
+                                    exceeded = True
+                                    reason = f"used {int(used_mb)} MB > cap {int(cap_mb)} MB"
+                            except Exception:
+                                pass
+                        elif 'cap_percent' in entry and entry['cap_percent'] is not None and total_mb > 0:
+                            try:
+                                cap_pct = float(entry['cap_percent'])
+                                used_pct = (used_mb / total_mb) * 100.0
+                                if used_pct > cap_pct:
+                                    exceeded = True
+                                    reason = f"used {used_pct:.0f}% > cap {cap_pct:.0f}%"
+                            except Exception:
+                                pass
+
+                        if exceeded:
+                            # build alert
+                            ts = datetime.now().isoformat()
+                            msg = f"GPU {idx} VRAM cap exceeded: {reason}"
+                            alert = {
+                                'timestamp': ts,
+                                'hostname': gpu.get('name', 'local'),
+                                'name': f'gpu_{idx}_vram_cap_exceeded',
+                                'severity': 'warning',
+                                'message': msg,
+                            }
+                            try:
+                                alert_engine.active_alerts.append(alert)
+                            except Exception:
+                                pass
+                            # send a prominent red toast for exceeded VRAM
+                            try:
+                                send_toast('VRAM Exceeded', f'VRAM of GPU {idx} exceeded ({reason})', duration=8, severity='critical')
+                            except Exception:
+                                pass
+                            # attempt auto-terminate of watched PIDs on this GPU (admin-only)
+                            try:
+                                if getattr(app.state, 'is_admin', False):
+                                    watchlist = set(getattr(app.state, 'vram_watchlist', []) or [])
+                                    if watchlist:
+                                        # collect processes and terminate those on this GPU and in watchlist
+                                        try:
+                                            proc_list = collector.collect_processes()
+                                            import psutil
+                                            for proc in proc_list:
+                                                try:
+                                                    pid = int(proc.get('pid'))
+                                                except Exception:
+                                                    continue
+                                                if pid not in watchlist:
+                                                    continue
+                                                if proc.get('gpu_index') == idx:
+                                                    try:
+                                                        p = psutil.Process(pid)
+                                                        pname = None
+                                                        try:
+                                                            pname = p.name()
+                                                        except Exception:
+                                                            pname = None
+                                                        # attempt graceful terminate then kill if needed
+                                                        try:
+                                                            p.terminate()
+                                                            try:
+                                                                p.wait(timeout=5)
+                                                            except Exception:
+                                                                p.kill()
+                                                        except Exception:
+                                                            try:
+                                                                p.kill()
+                                                            except Exception:
+                                                                pass
+
+                                                        # also attempt to terminate/kill any children
+                                                        try:
+                                                            for child in p.children(recursive=True):
+                                                                try:
+                                                                    child.terminate()
+                                                                except Exception:
+                                                                    pass
+                                                        except Exception:
+                                                            pass
+
+                                                        # break out results
+                                                        alert_engine.active_alerts.append({
+                                                            'timestamp': datetime.now().isoformat(),
+                                                            'hostname': 'local',
+                                                            'name': f'pid_{pid}_terminated',
+                                                            'severity': 'info',
+                                                            'message': f'Auto-terminated PID {pid} (name={pname}) on GPU {idx} due to VRAM cap'
+                                                        })
+
+                                                        # additionally try to find running processes with same name on this GPU and kill them (best-effort)
+                                                        if pname:
+                                                            for p2 in proc_list:
+                                                                try:
+                                                                    pid2 = int(p2.get('pid'))
+                                                                except Exception:
+                                                                    continue
+                                                                if pid2 == pid:
+                                                                    continue
+                                                                if p2.get('gpu_index') != idx:
+                                                                    continue
+                                                                try:
+                                                                    if str(p2.get('exe') or '').endswith(pname) or str(p2.get('name') or '') == pname:
+                                                                        try:
+                                                                            p_other = psutil.Process(pid2)
+                                                                            p_other.terminate()
+                                                                            try:
+                                                                                p_other.wait(timeout=3)
+                                                                            except Exception:
+                                                                                p_other.kill()
+                                                                            alert_engine.active_alerts.append({
+                                                                                'timestamp': datetime.now().isoformat(),
+                                                                                'hostname': 'local',
+                                                                                'name': f'pid_{pid2}_terminated',
+                                                                                'severity': 'info',
+                                                                                'message': f'Also terminated PID {pid2} (name={pname}) on GPU {idx}'
+                                                                            })
+                                                                        except Exception:
+                                                                            pass
+                                                                except Exception:
+                                                                    pass
+                                                    except Exception:
+                                                        # record failure
+                                                        alert_engine.active_alerts.append({
+                                                            'timestamp': datetime.now().isoformat(),
+                                                            'hostname': 'local',
+                                                            'name': f'pid_{pid}_terminate_failed',
+                                                            'severity': 'warning',
+                                                            'message': f'Failed to terminate PID {pid} on GPU {idx}'
+                                                        })
+                                        except Exception:
+                                            pass
+                            except Exception:
+                                pass
+                except asyncio.CancelledError:
+                    break
+                except Exception:
+                    # swallow per-iteration errors to keep watcher alive
+                    pass
+                await asyncio.sleep(config.get('monitoring', {}).get('interval_seconds', 5))
+
+        # Schedule watcher
+        try:
+            app.state._vram_watcher_task = asyncio.create_task(_vram_cap_watcher())
+        except Exception:
+            app.state._vram_watcher_task = None
     
     @app.on_event("shutdown")
     async def shutdown():
         storage.close()
+        # cancel watcher task
+        try:
+            t = getattr(app.state, '_vram_watcher_task', None)
+            if t:
+                t.cancel()
+        except Exception:
+            pass
     
     @app.get("/", response_class=HTMLResponse)
     async def read_dashboard():
@@ -245,20 +557,335 @@ def create_app(config: Dict[str, Any]) -> FastAPI:
         gpus = collector.collect()
         processes = collector.collect_processes()
         
-        # Calculate total VRAM usage from processes
+        # Calculate total VRAM usage from processes and compute cap exceed status
         gpu_memory_stats = {}
+        vram_cap_exceeded = {}
+        caps = getattr(app.state, 'vram_caps', {}) or {}
         for gpu in gpus:
             if not gpu.get('error'):
-                gpu_memory_stats[gpu['index']] = {
-                    'total': gpu.get('memory_total', 0),
-                    'used': gpu.get('memory_used', 0),
-                    'free': gpu.get('memory_free', 0)
-                }
-        
+                idx = gpu['index']
+                total = gpu.get('memory_total', 0)
+                used = gpu.get('memory_used', 0)
+                free = gpu.get('memory_free', 0)
+                gpu_memory_stats[idx] = {'total': total, 'used': used, 'free': free}
+                exceeded = False
+                reason = None
+                if idx in caps:
+                    entry = caps[idx]
+                    try:
+                        if 'cap_mb' in entry and entry['cap_mb'] is not None:
+                            if used > float(entry['cap_mb']):
+                                exceeded = True
+                                reason = f"used {int(used)} MB > cap {int(entry['cap_mb'])} MB"
+                        elif 'cap_percent' in entry and entry['cap_percent'] is not None and total > 0:
+                            used_pct = (used / total) * 100.0
+                            if used_pct > float(entry['cap_percent']):
+                                exceeded = True
+                                reason = f"used {used_pct:.0f}% > cap {float(entry['cap_percent']):.0f}%"
+                    except Exception:
+                        exceeded = False
+                vram_cap_exceeded[idx] = {'exceeded': bool(exceeded), 'reason': reason}
+
         return {
             'processes': processes,
-            'gpu_memory': gpu_memory_stats
+            'gpu_memory': gpu_memory_stats,
+            'vram_caps': caps,
+            'vram_cap_exceeded': vram_cap_exceeded,
         }
+
+    @app.get('/api/vram_caps')
+    async def get_vram_caps():
+        """Return currently configured per-GPU VRAM caps.
+
+        Response: { "vram_caps": { "0": {"cap_mb": 8192} } }
+        """
+        return {'vram_caps': getattr(app.state, 'vram_caps', {})}
+
+    @app.get('/api/processes/watchlist')
+    async def get_processes_watchlist():
+        return {'watchlist': list(getattr(app.state, 'vram_watchlist', []))}
+
+    @app.post('/api/processes/watchlist')
+    async def update_processes_watchlist(payload: Dict[str, Any]):
+        """Add or remove a pid from the watchlist.
+
+        JSON: { "pid": 1234, "action": "add"|"remove" }
+        """
+        try:
+            pid = int(payload.get('pid'))
+        except Exception:
+            return {'status': 'error', 'error': 'invalid_pid'}
+        action = str(payload.get('action', '')).lower()
+        watch = set(getattr(app.state, 'vram_watchlist', []) or [])
+        if action == 'add':
+            watch.add(pid)
+        elif action == 'remove':
+            watch.discard(pid)
+        else:
+            return {'status': 'error', 'error': 'invalid_action'}
+        app.state.vram_watchlist = list(watch)
+        try:
+            _save_vram_watchlist(app.state.vram_watchlist)
+        except Exception:
+            pass
+        return {'status': 'ok', 'watchlist': app.state.vram_watchlist}
+
+    @app.post('/api/vram_caps')
+    async def set_vram_cap(payload: Dict[str, Any]):
+        """Set a cap for a GPU. Accepts JSON with either `cap_mb` or `cap_percent`.
+
+        Example: {"gpu_index": 0, "cap_mb": 8192}
+                 {"gpu_index": 1, "cap_percent": 80}
+        """
+        try:
+            if not isinstance(payload, dict):
+                raise ValueError('invalid_payload')
+            gpu_index = int(payload.get('gpu_index'))
+        except Exception:
+            return {'status': 'error', 'error': 'invalid_gpu_index'}
+
+        cap_entry: Dict[str, Any] = {}
+        if 'cap_mb' in payload:
+            try:
+                cap_entry['cap_mb'] = int(payload.get('cap_mb'))
+            except Exception:
+                return {'status': 'error', 'error': 'invalid_cap_mb'}
+        elif 'cap_percent' in payload:
+            try:
+                pct = float(payload.get('cap_percent'))
+                if pct <= 0 or pct > 100:
+                    raise ValueError()
+                cap_entry['cap_percent'] = float(pct)
+            except Exception:
+                return {'status': 'error', 'error': 'invalid_cap_percent'}
+        else:
+            return {'status': 'error', 'error': 'missing_cap_value'}
+
+        caps = getattr(app.state, 'vram_caps', {}) or {}
+        caps[gpu_index] = cap_entry
+        app.state.vram_caps = caps
+        _save_vram_caps(caps)
+
+        # Immediate evaluation and termination (admin-only)
+        exceeded_gpus = []
+        try:
+            if getattr(app.state, 'is_admin', False):
+                from monitor.alerting.toaster import send_toast
+                gcoll = GPUCollector()
+                try:
+                    gpus = gcoll.collect()
+                except Exception:
+                    gpus = []
+
+                watchlist = set(getattr(app.state, 'vram_watchlist', []) or [])
+                if watchlist and gpus:
+                    try:
+                        proc_list = gcoll.collect_processes()
+                    except Exception:
+                        proc_list = []
+
+                    import psutil
+                    for gpu in gpus:
+                        if gpu.get('error'):
+                            continue
+                        idx = gpu.get('index')
+                        if idx is None or idx not in caps:
+                            continue
+                        entry = caps[idx]
+                        total_mb = float(gpu.get('memory_total', 0))
+                        used_mb = float(gpu.get('memory_used', 0))
+                        exceeded = False
+                        reason = None
+                        try:
+                            if entry.get('cap_mb') is not None:
+                                cap_mb = float(entry['cap_mb'])
+                                if used_mb > cap_mb:
+                                    exceeded = True
+                                    reason = f"used {int(used_mb)} MB > cap {int(cap_mb)} MB"
+                            elif entry.get('cap_percent') is not None and total_mb > 0:
+                                used_pct = (used_mb / total_mb) * 100.0
+                                if used_pct > float(entry['cap_percent']):
+                                    exceeded = True
+                                    reason = f"used {used_pct:.0f}% > cap {float(entry['cap_percent']):.0f}%"
+                        except Exception:
+                            exceeded = False
+
+                        if exceeded:
+                            exceeded_gpus.append(idx)
+                            # send Windows toast (no emojis)
+                            try:
+                                send_toast(f'VRAM of GPU {idx} exceeded', reason or 'VRAM cap exceeded', duration=8, severity='critical')
+                            except Exception:
+                                pass
+
+                            # terminate watched PIDs immediately
+                            for proc in proc_list:
+                                try:
+                                    pid = int(proc.get('pid'))
+                                except Exception:
+                                    continue
+                                if pid not in watchlist:
+                                    continue
+                                if proc.get('gpu_index') != idx:
+                                    continue
+                                try:
+                                    p = psutil.Process(pid)
+                                    pname = None
+                                    try:
+                                        pname = p.name()
+                                    except Exception:
+                                        pname = None
+                                    try:
+                                        p.terminate()
+                                        try:
+                                            p.wait(timeout=5)
+                                        except Exception:
+                                            p.kill()
+                                    except Exception:
+                                        try:
+                                            p.kill()
+                                        except Exception:
+                                            pass
+
+                                    try:
+                                        for child in p.children(recursive=True):
+                                            try:
+                                                child.terminate()
+                                            except Exception:
+                                                pass
+                                    except Exception:
+                                        pass
+
+                                    alert_engine.active_alerts.append({
+                                        'timestamp': datetime.now().isoformat(),
+                                        'hostname': 'local',
+                                        'name': f'pid_{pid}_terminated',
+                                        'severity': 'info',
+                                        'message': f'Auto-terminated PID {pid} (name={pname}) on GPU {idx} due to VRAM cap'
+                                    })
+                                except Exception:
+                                    alert_engine.active_alerts.append({
+                                        'timestamp': datetime.now().isoformat(),
+                                        'hostname': 'local',
+                                        'name': f'pid_{pid}_terminate_failed',
+                                        'severity': 'warning',
+                                        'message': f'Failed to terminate PID {pid} on GPU {idx}'
+                                    })
+
+                    # schedule retry after 5s to handle respawns
+                    if exceeded_gpus:
+                        snap = set(watchlist)
+                        try:
+                            asyncio.create_task(_vram_recheck_and_terminate_task(list(exceeded_gpus), snap, dict(caps)))
+                        except Exception:
+                            try:
+                                loop = asyncio.get_event_loop()
+                                loop.create_task(_vram_recheck_and_terminate_task(list(exceeded_gpus), snap, dict(caps)))
+                            except Exception:
+                                pass
+        except Exception:
+            pass
+
+        # Optional enforcement: if payload includes enforce=true and server has admin
+        if payload.get('enforce') and getattr(app.state, 'is_admin', False):
+            enforcer = getattr(app.state, 'vram_enforcer', None)
+            if enforcer is None:
+                return {'status': 'error', 'error': 'no_enforcer_available', 'vram_caps': caps}
+            # determine mb to reserve
+            if 'cap_mb' in cap_entry:
+                mb_to_reserve = int(cap_entry['cap_mb'])
+            elif 'cap_percent' in cap_entry and gpu_index in caps:
+                # need GPU total to convert percent->MB; attempt to collect
+                try:
+                    g = GPUCollector()
+                    gpustats = {gg['index']: gg for gg in g.collect() if not gg.get('error')}
+                    total_mb = int(gpustats[gpu_index]['memory_total']) if gpu_index in gpustats else None
+                    if total_mb is None:
+                        return {'status': 'error', 'error': 'could_not_determine_total_mb'}
+                    mb_to_reserve = int((float(cap_entry['cap_percent']) / 100.0) * total_mb)
+                except Exception:
+                    return {'status': 'error', 'error': 'could_not_determine_total_mb'}
+            else:
+                return {'status': 'error', 'error': 'missing_cap_for_enforce'}
+
+            # Ask enforcer to allocate reserve to achieve cap: we allocate that amount (best-effort)
+            try:
+                res = enforcer.allocate_reserve(gpu_index, mb_to_reserve)
+                # include reserve result in response
+                return {'status': 'ok', 'vram_caps': caps, 'enforce_result': res}
+            except Exception as e:
+                return {'status': 'error', 'error': str(e), 'vram_caps': caps}
+
+        # Also return immediate vram exceed status so clients can update UI without waiting
+        vram_cap_exceeded_now = {}
+        try:
+            collector = GPUCollector()
+            gpus_now = collector.collect()
+            for gpu in gpus_now:
+                if gpu.get('error'):
+                    continue
+                gi = gpu.get('index')
+                if gi is None:
+                    continue
+                total = gpu.get('memory_total', 0)
+                used = gpu.get('memory_used', 0)
+                exceeded = False
+                reason = None
+                if gi in caps:
+                    entry = caps[gi]
+                    try:
+                        if entry.get('cap_mb') is not None:
+                            if used > float(entry['cap_mb']):
+                                exceeded = True
+                                reason = f"used {int(used)} MB > cap {int(entry['cap_mb'])} MB"
+                        elif entry.get('cap_percent') is not None and total > 0:
+                            used_pct = (used / total) * 100.0
+                            if used_pct > float(entry['cap_percent']):
+                                exceeded = True
+                                reason = f"used {used_pct:.0f}% > cap {float(entry['cap_percent']):.0f}%"
+                    except Exception:
+                        exceeded = False
+                vram_cap_exceeded_now[gi] = {'exceeded': bool(exceeded), 'reason': reason}
+        except Exception:
+            vram_cap_exceeded_now = {}
+
+        return {'status': 'ok', 'vram_caps': caps, 'vram_cap_exceeded': vram_cap_exceeded_now}
+
+    @app.delete('/api/vram_caps')
+    async def clear_vram_caps(gpu_index: Optional[int] = None):
+        """Clear configured VRAM caps. If `gpu_index` query param is provided, clears that GPU only."""
+        caps = getattr(app.state, 'vram_caps', {}) or {}
+        if gpu_index is None:
+            # release any reserves
+            enforcer = getattr(app.state, 'vram_enforcer', None)
+            if enforcer is not None:
+                for gi in list(caps.keys()):
+                    try:
+                        enforcer.release_reserve(int(gi))
+                    except Exception:
+                        pass
+            app.state.vram_caps = {}
+            _save_vram_caps({})
+            return {'status': 'ok', 'vram_caps': {}}
+
+        try:
+            gi = int(gpu_index)
+        except Exception:
+            return {'status': 'error', 'error': 'invalid_gpu_index'}
+
+        if gi in caps:
+            caps.pop(gi, None)
+            app.state.vram_caps = caps
+            _save_vram_caps(caps)
+        # release reserve for this gpu if present
+        enforcer = getattr(app.state, 'vram_enforcer', None)
+        if enforcer is not None:
+            try:
+                enforcer.release_reserve(gi)
+            except Exception:
+                pass
+
+        return {'status': 'ok', 'vram_caps': caps}
 
     @app.post("/api/processes/terminate")
     async def terminate_process(payload: Dict[str, int]):
@@ -298,7 +925,13 @@ def create_app(config: Dict[str, Any]) -> FastAPI:
         Returns: {status: 'started'|'error', ...}
         """
         try:
-            import platform, sys, os, subprocess, shlex, threading, time
+            import platform
+            import sys
+            import os
+            import subprocess
+                # shlex not needed here; kept parameters safely quoted manually
+            import threading
+            import time
 
             def _log(msg):
                 try:
@@ -371,8 +1004,10 @@ def create_app(config: Dict[str, Any]) -> FastAPI:
                     try:
                         threading.Timer(0.8, lambda: os._exit(0)).start()
                     except Exception:
-                        try: os._exit(0)
-                        except Exception: pass
+                        try:
+                            os._exit(0)
+                        except Exception:
+                            pass
                     return {'status': 'started', 'method': 'shellexecute', 'code': int(h) if isinstance(h, int) else str(h)}
                 else:
                     _log('ShellExecuteW indicated failure; falling back to PowerShell Start-Process')
@@ -397,8 +1032,10 @@ def create_app(config: Dict[str, Any]) -> FastAPI:
                     try:
                         threading.Timer(0.8, lambda: os._exit(0)).start()
                     except Exception:
-                        try: os._exit(0)
-                        except Exception: pass
+                        try:
+                            os._exit(0)
+                        except Exception:
+                            pass
                     return {'status': 'started', 'method': 'powershell', 'stdout': proc.stdout, 'stderr': proc.stderr}
                 else:
                     return {'status': 'error', 'error': 'powershell_failed', 'code': proc.returncode, 'stderr': proc.stderr}

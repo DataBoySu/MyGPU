@@ -69,6 +69,36 @@ function updateDashboard(data) {
     } else {
         alertsList.innerHTML = '<div style="color: var(--accent-green);">No active alerts</div>';
     }
+    // Show client toasts for new alerts (dedupe by alert name/timestamp)
+    try {
+        // track seen alerts and cooldowns to avoid spamming users
+        if (!window._seenAlerts) window._seenAlerts = new Set();
+        if (!window._lastAlertAt) window._lastAlertAt = {};
+        const COOLDOWN_MS = 10000; // 10 seconds cooldown per alert
+        if (data.alerts && data.alerts.length > 0) {
+            for (const a of data.alerts) {
+                const aid = a.name || (a.timestamp ? a.timestamp + '|' + a.message : a.message);
+                // dedupe: skip if we've shown this exact alert before
+                if (window._seenAlerts.has(aid)) continue;
+                // cooldown: skip if shown recently
+                const now = Date.now();
+                const last = window._lastAlertAt[aid] || 0;
+                if (now - last < COOLDOWN_MS) continue;
+                window._seenAlerts.add(aid);
+                window._lastAlertAt[aid] = now;
+                try {
+                    // If this is a GPU VRAM cap exceed alert, show a red toast with GPU number
+                    const m = /gpu_(\d+)_vram_cap_exceeded/.exec(a.name || '');
+                    if (m) {
+                        if (typeof showToast === 'function') showToast(`VRAM of GPU ${m[1]} exceeded`, { level: 'red', duration: 8000 });
+                    } else {
+                        const level = (a.severity === 'warning' || a.severity === 'critical' || a.severity === 'error') ? 'red' : 'yellow';
+                        if (typeof showToast === 'function') showToast(a.message || (a.name || 'Alert'), { level, duration: 8000 });
+                    }
+                } catch (e) { console.debug('show alert toast failed', e); }
+            }
+        }
+    } catch (e) { console.debug('alert toast processing failed', e); }
     
     document.getElementById('last-update').textContent = 'Last update: ' + new Date().toLocaleTimeString();
 }

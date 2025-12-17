@@ -658,35 +658,165 @@ async function loadProcesses() {
         const response = await fetch('/api/processes');
         const data = await response.json();
         
-        // Update VRAM bar if we have GPU memory stats
-        if (data.gpu_memory && Object.keys(data.gpu_memory).length > 0) {
-            const gpuKeys = Object.keys(data.gpu_memory);
-            const gpu0 = data.gpu_memory[gpuKeys[0]];
-            
-            if (gpu0 && gpu0.total > 0) {
-                const usedGB = (gpu0.used / 1024).toFixed(1);
-                const totalGB = (gpu0.total / 1024).toFixed(1);
-                const freeGB = (gpu0.free / 1024).toFixed(1);
-                const usedPct = ((gpu0.total - gpu0.free) / gpu0.total) * 100;
-                
+        // Render per-GPU VRAM bars and controls (fetch current caps)
+        try {
+            const vramWrapper = document.getElementById('vram-bars-wrapper');
+            const clearBtn = document.getElementById('clear-vram-caps');
+            let caps = {};
+            try {
+                const capsResp = await fetch('/api/vram_caps');
+                const capsJson = await capsResp.json();
+                caps = capsJson.vram_caps || {};
+            } catch (e) { caps = {}; }
+
+            if (data.gpu_memory && Object.keys(data.gpu_memory).length > 0) {
                 document.getElementById('vram-bar-container').style.display = 'block';
-                document.getElementById('vram-used-bar').style.width = usedPct + '%';
-                document.getElementById('vram-free').textContent = `${usedGB} / ${totalGB} GB (${freeGB} GB Free)`;
-                
-                // Change color based on usage - solid colors only
-                const bar = document.getElementById('vram-used-bar');
-                if (usedPct > 90) {
-                    bar.style.background = 'var(--accent-red)';
-                } else if (usedPct > 70) {
-                    bar.style.background = 'var(--accent-yellow)';
-                } else {
-                    bar.style.background = 'var(--accent-green)';
+                vramWrapper.innerHTML = '';
+
+                const keys = Object.keys(data.gpu_memory).sort((a,b)=>Number(a)-Number(b));
+                for (const k of keys) {
+                    const stats = data.gpu_memory[k];
+                    const idx = Number(k);
+                    const total = Number(stats.total || 0);
+                    const used = Number(stats.used || 0);
+                    const free = Number(stats.free || 0);
+                    const usedPct = total ? ((used / total) * 100) : 0;
+                    const usedGB = (used/1024).toFixed(1);
+                    const totalGB = (total/1024).toFixed(1);
+                    const freeGB = (free/1024).toFixed(1);
+                    const cap = caps[idx] || {};
+                    const capDisplay = cap.cap_mb ? `${(cap.cap_mb/1024).toFixed(1)} GB` : (cap.cap_percent ? `${cap.cap_percent}%` : 'No cap');
+
+                        // compute initial MB and slider percent (collector uses MB units)
+                        const initialMb = (cap.cap_mb != null) ? Number(cap.cap_mb) : Math.round(total * ((cap.cap_percent != null) ? Number(cap.cap_percent) / 100 : (usedPct/100)));
+                        const sliderPercent = (cap.cap_percent != null) ? Number(cap.cap_percent) : Math.round(usedPct);
+
+                        vramWrapper.insertAdjacentHTML('beforeend', `
+                            <div class="vram-gpu-card" id="vram-gpu-${idx}">
+                                <div class="vram-gpu-header"><span class="vram-gpu-label">GPU ${idx}</span><span class="vram-gpu-free">${usedGB} / ${totalGB} GB (${freeGB} GB Free) • Cap: <span class="vram-cap-display" id="vram-cap-display-${idx}">${capDisplay}</span></span></div>
+                                <div class="vram-bar-outer" id="vram-bar-outer-${idx}">
+                                    <div class="vram-bar-used" id="vram-used-${idx}" style="width:${usedPct}%"></div>
+                                    <input type="range" min="1" max="100" value="${sliderPercent}" class="vram-overlay-slider" id="vram-overlay-${idx}">
+                                </div>
+                                <div style="display:flex; justify-content:flex-end; margin-top:8px; gap:8px; align-items:center;">
+                                    <input type="number" min="0" max="${Math.max(0, Math.floor(total))}" value="${initialMb}" class="vram-cap-input" id="vram-cap-input-${idx}" placeholder="MB">
+                                </div>
+                            </div>
+                        `);
+
+                        // attach listeners for overlay slider and MB input
+                        try {
+                            const overlay = document.getElementById(`vram-overlay-${idx}`);
+                            const usedEl = document.getElementById(`vram-used-${idx}`);
+                            const capDisplayEl = document.getElementById(`vram-cap-display-${idx}`);
+                            if (overlay) {
+                                overlay.oninput = (ev) => {
+                                    const val = Number(ev.target.value);
+                                    if (usedEl) usedEl.style.width = val + '%';
+                                    if (capDisplayEl) capDisplayEl.textContent = val + '%';
+                                    // update MB input to reflect exact MB value of percent
+                                    try {
+                                        const mbInputEl = document.getElementById(`vram-cap-input-${idx}`);
+                                        if (mbInputEl) mbInputEl.value = Math.round((Number(total) * val) / 100);
+                                    } catch (e) { /* ignore */ }
+                                };
+                                overlay.onchange = async (ev) => {
+                                    const val = Number(ev.target.value);
+                                    try {
+                                        const resp = await fetch('/api/vram_caps', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ gpu_index: idx, cap_percent: val }) });
+                                        const body = await resp.json().catch(() => null);
+                                        if (typeof showSuccess === 'function') showSuccess('VRAM cap saved');
+                                        // show immediate in-app toast if server reports exceed
+                                        try {
+                                            if (body && body.vram_cap_exceeded) {
+                                                for (const [g, info] of Object.entries(body.vram_cap_exceeded)) {
+                                                    if (info && info.exceeded) {
+                                                        if (typeof showToast === 'function') showToast(`VRAM of GPU ${g} exceeded`, { level: 'red', duration: 8000 });
+                                                    }
+                                                }
+                                            }
+                                        } catch (e) {}
+                                        loadProcesses();
+                                    } catch (e) { if (typeof showError === 'function') showError('Save failed'); }
+                                };
+                            }
+
+                            const mbInput = document.getElementById(`vram-cap-input-${idx}`);
+                            if (mbInput) {
+                                // on Enter key or blur, save MB cap
+                                mbInput.addEventListener('keydown', async (ev) => {
+                                    if (ev.key === 'Enter') {
+                                        ev.preventDefault();
+                                        const mb = parseInt(mbInput.value);
+                                        if (isNaN(mb) || mb <= 0) { if (typeof showError === 'function') showError('Invalid MB value'); return; }
+                                        try {
+                                            const resp = await fetch('/api/vram_caps', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ gpu_index: idx, cap_mb: mb }) });
+                                            const body = await resp.json().catch(() => null);
+                                            if (typeof showSuccess === 'function') showSuccess('VRAM cap saved');
+                                            try { const overlayEl = document.getElementById(`vram-overlay-${idx}`); if (overlayEl) overlayEl.value = Math.round((mb / Number(total)) * 100); } catch(e){}
+                                            try {
+                                                if (body && body.vram_cap_exceeded) {
+                                                    for (const [g, info] of Object.entries(body.vram_cap_exceeded)) {
+                                                        if (info && info.exceeded) {
+                                                            if (typeof showToast === 'function') showToast(`VRAM of GPU ${g} exceeded`, { level: 'red', duration: 8000 });
+                                                        }
+                                                    }
+                                                }
+                                            } catch (e) {}
+                                            loadProcesses();
+                                        } catch (e) { if (typeof showError === 'function') showError('Save failed'); }
+                                    }
+                                });
+                                mbInput.addEventListener('blur', async () => {
+                                    const mb = parseInt(mbInput.value);
+                                    if (isNaN(mb) || mb <= 0) return;
+                                        try {
+                                            const resp = await fetch('/api/vram_caps', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ gpu_index: idx, cap_mb: mb }) });
+                                            const body = await resp.json().catch(() => null);
+                                            if (typeof showSuccess === 'function') showSuccess('VRAM cap saved');
+                                            try { const overlayEl = document.getElementById(`vram-overlay-${idx}`); if (overlayEl) overlayEl.value = Math.round((mb / Number(total)) * 100); } catch(e){}
+                                            try {
+                                                if (body && body.vram_cap_exceeded) {
+                                                    for (const [g, info] of Object.entries(body.vram_cap_exceeded)) {
+                                                        if (info && info.exceeded) {
+                                                            if (typeof showToast === 'function') showToast(`VRAM of GPU ${g} exceeded`, { level: 'red', duration: 8000 });
+                                                        }
+                                                    }
+                                                }
+                                            } catch (e) {}
+                                            loadProcesses();
+                                        } catch (e) { if (typeof showError === 'function') showError('Save failed'); }
+                                });
+                            }
+                        } catch (e) { console.debug('attach vram listeners failed', e); }
                 }
+
+                // clear all caps button
+                if (clearBtn) {
+                    clearBtn.onclick = async () => {
+                        try {
+                            await fetch('/api/vram_caps', { method: 'DELETE' });
+                            if (typeof showSuccess === 'function') showSuccess('Cleared VRAM caps');
+                            loadProcesses();
+                        } catch (e) { if (typeof showError === 'function') showError('Clear failed'); }
+                    };
+                }
+            } else {
+                document.getElementById('vram-bar-container').style.display = 'none';
+                vramWrapper.innerHTML = '';
             }
-        }
+        } catch (e) { console.error('VRAM render error', e); }
         
+        // load current watchlist so checkboxes can be initialized
+        let watchlistSet = new Set();
+        try {
+            const wresp = await fetch('/api/processes/watchlist');
+            const wjson = await wresp.json();
+            (wjson.watchlist || []).forEach(p => watchlistSet.add(Number(p)));
+        } catch (e) { watchlistSet = new Set(); }
+
         if (!data.processes || data.processes.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" style="color: var(--text-secondary);">No GPU processes running</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" style="color: var(--text-secondary);">No GPU processes running</td></tr>';
         } else {
             // Sort by GPU utilization (descending). Fall back to gpu_utilization_percent or 0.
             const sorted = (data.processes || []).slice().sort((a, b) => {
@@ -694,19 +824,28 @@ async function loadProcesses() {
                 const bu = Number(b.gpu_utilization ?? b.gpu_utilization_percent ?? 0) || 0;
                 return bu - au;
             });
-
             tbody.innerHTML = sorted.map(p => {
                 const userDisplay = p.username || p.user || 'N/A';
-                const pid = p.pid;
+                const pid = Number(p.pid);
+                // badge if this process's GPU has exceeded cap
+                const gpuIdx = p.gpu_index;
+                const exceededInfo = (data.vram_cap_exceeded && data.vram_cap_exceeded[gpuIdx]) ? data.vram_cap_exceeded[gpuIdx] : null;
+                    const badgeHtml = (exceededInfo && exceededInfo.exceeded && watchlistSet.has(pid)) ? '<span class="vram-exceeded-badge big"></span>' : '';
+                    const rowClass = '';
+
                 // Disable terminate button and add tooltip when the server is not running elevated
                 const disabledAttr = (window.isAdmin ? '' : 'disabled');
                 const tooltipAttr = (window.isAdmin ? '' : ' data-hover="Run as admin"');
                 const baseStyle = 'padding:6px 10px;border-radius:6px;border:none;background:var(--accent-red);color:#fff;';
                 const disabledStyle = window.isAdmin ? '' : 'opacity:0.55;cursor:not-allowed;';
                 const combinedStyle = `style="${baseStyle}${disabledStyle}"`;
+
+                const checkedAttr = watchlistSet.has(pid) ? 'checked' : '';
+
                 return `
                     <tr>
-                        <td>${pid}</td>
+                        <td><input type="checkbox" class="watch-checkbox" id="watch-${pid}" ${checkedAttr} data-pid="${pid}"></td>
+                        <td>${badgeHtml}${pid}</td>
                         <td>${p.name || 'N/A'}</td>
                         <td>GPU ${p.gpu_index}</td>
                         <td>${userDisplay}</td>
@@ -714,6 +853,22 @@ async function loadProcesses() {
                     </tr>
                 `;
             }).join('');
+
+            // attach checkbox listeners
+            try {
+                (data.processes || []).forEach(p => {
+                    const pid = Number(p.pid);
+                    const cb = document.getElementById(`watch-${pid}`);
+                    if (!cb) return;
+                    cb.onchange = async (ev) => {
+                        const action = ev.target.checked ? 'add' : 'remove';
+                        try {
+                            await fetch('/api/processes/watchlist', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ pid, action }) });
+                            if (ev.target.checked) watchlistSet.add(pid); else watchlistSet.delete(pid);
+                        } catch (e) { console.debug('watchlist update failed', e); }
+                    };
+                });
+            } catch (e) { console.debug('attach watch checkbox listeners failed', e); }
         }
     } catch (error) {
         console.error('Error loading processes:', error);
