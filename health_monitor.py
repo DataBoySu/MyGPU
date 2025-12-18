@@ -28,8 +28,8 @@ console = Console()
 
 BANNER = f"""
 ╔══════════════════════════════════════════════════╗
-║             LOCAL GPU MONITOR v{_pkg_version}             ║
-║               Monitor and Analysis               ║
+║                   MyGPU v{_pkg_version}                   ║
+║             A GPU Management Utility             ║
 ╚══════════════════════════════════════════════════╝
 """
 
@@ -134,7 +134,7 @@ def create_dashboard(metrics: dict, alerts: list) -> Layout:
     )
     
     layout["header"].update(Panel(
-        f"[bold cyan]LOCAL GPU MONITOR[/bold cyan] | "
+        f"[bold cyan]MyGPU[/bold cyan] | "
         f"Node: [green]{metrics.get('hostname', 'N/A')}[/green] | "
         f"Last Update: {datetime.now().strftime('%H:%M:%S')} | "
         f"Alerts: [{'red' if alerts else 'green'}]{len(alerts)}[/]",
@@ -292,7 +292,7 @@ async def run_cli_monitor(config: dict):
         # Initialize header, system and footer text using markup-aware Text
         node_name = initial_metrics.get('hostname') or socket.gethostname()
         header_text = Text.from_markup(
-            f"[bold cyan]LOCAL GPU MONITOR[/bold cyan] | Node: [green]{node_name}[/green] | "
+            f"[bold cyan]MyGPU[/bold cyan] | Node: [green]{node_name}[/green] | "
             f"Last Update: {datetime.now().strftime('%H:%M:%S')} | Alerts: [{'red' if initial_alerts else 'green'}]{len(initial_alerts)}[/]"
         )
 
@@ -352,7 +352,7 @@ async def run_cli_monitor(config: dict):
                     # Replace header/system/footer panels with updated Text
                     node_name = metrics.get('hostname') or socket.gethostname()
                     new_header = Text.from_markup(
-                        f"[bold cyan]LOCAL GPU MONITOR[/bold cyan] | Node: [green]{node_name}[/green] | "
+                        f"[bold cyan]MyGPU[/bold cyan] | Node: [green]{node_name}[/green] | "
                         f"Last Update: {datetime.now().strftime('%H:%M:%S')} | Alerts: [{'red' if alerts else 'green'}]{len(alerts)}[/]"
                     )
                     dashboard["header"].update(Panel(new_header, style="bold"))
@@ -483,7 +483,7 @@ def _run_app(config_path, port, nodes, once, web_mode=False, cli_mode=False):
 @click.option('--admin', is_flag=True, help='Start in administrative mode (enables privileged dashboard actions).')
 @click.pass_context
 def cli(ctx, config, port, update, admin):
-    """Local GPU Monitor: Real-time GPU and system health monitoring."""
+    """MyGPU: Real-time GPU and system health monitoring."""
     # If the user requested admin mode, attempt to relaunch this process elevated
     # on platforms that support elevation (Windows -> UAC, POSIX -> sudo).
     def _is_elevated():

@@ -1,8 +1,8 @@
 <div style="text-align:center; margin:18px 0;">
-  <img src="monitor/api/static/logo.png" alt="logo"/>
+  <img src="monitor/api/static/logo.png" alt="MyGPU logo"/>
 </div>
 
-> *Essentially a complex `nvidia-smi` wrapper which saves your time and gives some cool visuals.*
+> *MyGPU — Lightweight GPU Management Utility: a compact `nvidia-smi` wrapper with a clean web dashboard.*
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)

@@ -26,8 +26,8 @@ STATIC_DIR = Path(__file__).parent / "static"
 def create_app(config: Dict[str, Any]) -> FastAPI:
     
     app = FastAPI(
-        title="Local GPU Monitor",
-        description="Local GPU monitoring and benchmark dashboard",
+        title="MyGPU",
+        description="MyGPU — Lightweight GPU monitoring and benchmark dashboard",
         version=_pkg_version
     )
     # Determine if the process is running with admin/elevated rights or was started with --admin

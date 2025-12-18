@@ -1,4 +1,4 @@
-"""Top-level package for Local GPU Monitor.
+"""Top-level package for MyGPU (Lightweight GPU Management Utility).
 
 Expose high-level package metadata and commonly-used helpers so callers
 can import from ``monitor`` conveniently. Keep this file minimal to avoid

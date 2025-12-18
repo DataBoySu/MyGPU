@@ -1,4 +1,4 @@
-# Contributing to Local GPU Monitor
+# Contributing to MyGPU
 
 First off, thanks for taking the time to go through my project!
 
@@ -21,7 +21,7 @@ Choose one of the options below — both end with running the included `setup.ps
 Option A — Install from Releases (ZIP)
 -------------------------------------
 
-1. Download the latest release ZIP from the Releases page: https://github.com/DataBoySu/Local-GPUMonitor/releases
+1. Download the latest release ZIP from the Releases page: https://github.com/yourusername/mygpu/releases
 2. Extract the ZIP to a local folder.
 3. Open PowerShell, `cd` into the extracted folder and run:
 
@@ -36,8 +36,8 @@ Option B — Clone the repository (for development)
 1. Clone the repository and `cd` into it:
 
 ```bash
-git clone https://github.com/DataBoySu/Local-GPUMonitor.git
-cd Local-GPUMonitor
+git clone https://github.com/yourusername/mygpu.git
+cd mygpu
 ```
 
 2. Run the setup script to install dependencies and prepare the environment:

@@ -1,4 +1,4 @@
-# Local GPU Monitor Configuration
+# MyGPU Configuration
 
 cluster:
   name: "My GPU Cluster"
