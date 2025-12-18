@@ -316,7 +316,7 @@ async function checkForUpdates() {
             if (m) current = m[1];
         }
 
-        const apiUrl = 'https://api.github.com/repos/DataBoySu/cluster-monitor/releases/latest';
+        const apiUrl = 'https://api.github.com/repos/DataBoySu/MyGPU/releases/latest';
         const resp = await fetch(apiUrl, { headers: { 'Accept': 'application/vnd.github.v3+json' } });
         if (!resp.ok) {
             const txt = await resp.text();
@@ -344,7 +344,7 @@ async function checkForUpdates() {
         const comp = cmpVer(current, latest);
         if (comp < 0) {
             // newer available
-            const url = data.html_url || ('https://github.com/DataBoySu/cluster-monitor/releases');
+            const url = data.html_url || ('https://github.com/DataBoySu/MyGPU/releases');
             if (window.showError) window.showError('Update available: ' + latest + ' — ' + url, 20000);
         } else {
             if (window.showSuccess) window.showSuccess('You are up-to-date (' + current + ')');

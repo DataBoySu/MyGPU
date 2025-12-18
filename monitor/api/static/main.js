@@ -1308,7 +1308,7 @@ async function checkForUpdates() {
     btn.disabled = true;
     btn.textContent = 'Checking...';
     btn.removeAttribute('data-hover');
-    const GITHUB_REPO = 'DataBoySu/cluster-monitor';
+    const GITHUB_REPO = 'DataBoySu/MyGPU';
 
     function parseVersion(text) {
         if (!text) return '0.0.0';

@@ -12,7 +12,7 @@ import zipfile
 from pathlib import Path
 from typing import Optional, Dict
 
-GITHUB_API = "https://api.github.com/repos/DataBoySu/cluster-monitor/releases/latest"
+GITHUB_API = "https://api.github.com/repos/DataBoySu/MyGPU/releases/latest"
 try:
     from monitor.__version__ import __version__ as CURRENT_VERSION
 except Exception:
@@ -105,7 +105,12 @@ def apply_update(zip_path: Path) -> bool:
         with zipfile.ZipFile(zip_path, 'r') as zf:
             zf.extractall(temp_dir)
         
+        # Extracted archive may name the folder after the repo; accept common variants
         extracted = list(temp_dir.glob("local-gpu-monitor*"))
+        if not extracted:
+            extracted = list(temp_dir.glob("mygpu*"))
+        if not extracted:
+            extracted = list(temp_dir.glob("MyGPU*"))
         if not extracted:
             return False
         

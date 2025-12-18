@@ -287,7 +287,8 @@ class GPUCollector:
         Returns empty string if resolution fails.
         """
         try:
-            import platform, subprocess
+            import platform
+            import subprocess
             system = platform.system()
             if system == 'Windows':
                 # Use WMI via PowerShell to get the process owner
