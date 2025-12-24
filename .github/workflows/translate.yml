@@ -5,9 +5,14 @@ on:
   push:
     paths:
       - 'README.md'
- 
+
 permissions:
   contents: write
+
+# Prevent race conditions if you trigger the action multiple times
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   translate:
@@ -15,6 +20,10 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          # FIX 1: Fetch all history so git can resolve divergence
+          fetch-depth: 0 
+          ref: main
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -26,7 +35,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ./models
-          key: qwen3-1.7b-v1
+          key: qwen3-1.7b-v2 # New key to ensure a fresh cache
 
       - name: Install Dependencies
         run: |
@@ -46,3 +55,5 @@ jobs:
         with:
           commit_message: "docs: automated german translation [skip ci]"
           file_pattern: 'translated_readme.md'
+          # FIX 2: Force the push since we are the only ones touching 'translated_readme.md'
+          push_options: '--force-with-lease'
