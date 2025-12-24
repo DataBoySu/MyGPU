@@ -27,17 +27,17 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ./models
-          key: qwen3-4b-instruct-2507-v1
+          key: aya-expanse-8b-q4ks-v1
 
       - name: Install Dependencies
         run: |
           pip install llama-cpp-python
           mkdir -p models
 
-      - name: Download High-Fidelity Translation Model
+      - name: Download Aya Expanse Translation Model
         run: |
-          # Downloading Qwen3-4B-Instruct-2507 for strict 1:1 technical translation
-          wget -O models/qwen3-4b-instruct.gguf https://huggingface.co/unsloth/Qwen3-4B-Instruct-2507-GGUF/resolve/main/Qwen3-4B-Instruct-2507-Q4_K_M.gguf
+          # Downloading Aya Expanse 8B (Q4_K_S) for superior multilingual technical translation
+          wget -O models/aya-expanse-8b-q4_k_s.gguf https://huggingface.co/matrixportal/aya-expanse-8b-GGUF/resolve/main/aya-expanse-8b-Q4_K_S.gguf
 
       - name: Run Translation Script
         run: python scripts/translate.py
