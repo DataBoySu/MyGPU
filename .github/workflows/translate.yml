@@ -46,5 +46,5 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "docs: update german translation [skip ci]"
-          file_pattern: 'translated_readme.md'
+          file_pattern: 'locales/translated_readme.md'
           push_options: '--force-with-lease'
