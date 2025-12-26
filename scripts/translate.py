@@ -32,12 +32,23 @@ llm = Llama(model_path=MODEL_PATH, n_ctx=6144, n_threads=2, verbose=False)
 with open(README_PATH, "r", encoding="utf-8") as f:
     original_text = f.read()
 
-# --- PRE-PROCESSING: Protect Navigation Bar ---
-nav_match = re.search(r'(<div align="center">.*?</div>)', original_text, re.DOTALL)
-nav_placeholder = "[NAV_BAR_PROTECTED_BLOCK]"
+# --- PRE-PROCESSING: Protect Sensitive Blocks ---
+# We replace complex blocks with placeholders so the LLM cannot mangle them.
+protected_blocks = []
+
+def protect_match(match):
+    placeholder = f"[PROTECTED_BLOCK_{len(protected_blocks)}]"
+    protected_blocks.append(match.group(0))
+    return placeholder
+
 text_to_translate = original_text
-if nav_match:
-    text_to_translate = text_to_translate.replace(nav_match.group(1), nav_placeholder)
+
+# 1. Protect Navigation Bar (<div align="center">...</div>)
+text_to_translate = re.sub(r'(<div align="center">.*?</div>)', protect_match, text_to_translate, flags=re.DOTALL)
+# 2. Protect Logo Block (<div style="text-align:center...>)
+text_to_translate = re.sub(r'(<div style="text-align:center; margin:18px 0;">.*?</div>)', protect_match, text_to_translate, flags=re.DOTALL)
+# 3. Protect Badges (![...](https://img.shields.io/...)) - Prevents URL translation
+text_to_translate = re.sub(r'(!\[.*?\]\(https://img\.shields\.io/.*?\))', protect_match, text_to_translate)
 
 # Refined Prompt for CJK and Technical Nuance
 prompt = f"""<|START_OF_TURN_TOKEN|><|SYSTEM_TOKEN|>
@@ -49,7 +60,7 @@ CRITICAL RULES:
    - 'Enforcement' = Policy restriction/application (JA: 制限/強制, ZH: 强制执行).
    - 'Headless' = Servers without a display (JA: ヘッドレス, ZH: 无头).
    - 'Agnostic' = Independence (JA: 非依存, ZH: 无关性).
-4. **Placeholders**: Return any text like '{nav_placeholder}' exactly as is.
+4. **Placeholders**: Return any text like '[PROTECTED_BLOCK_X]' exactly as is.
 5. **Output**: ONLY the translation. No conversational filler.<|END_OF_TURN_TOKEN|>
 <|START_OF_TURN_TOKEN|><|USER_TOKEN|>
 {text_to_translate}<|END_OF_TURN_TOKEN|>
@@ -60,21 +71,11 @@ translated_content = response['choices'][0]['text'].strip()
 
 # --- POST-PROCESSING ---
 
-# 1. Restore Navigation Bar
-if nav_match:
-    translated_content = translated_content.replace(nav_placeholder, nav_match.group(1))
+# 1. Restore Protected Blocks
+for i, block in enumerate(protected_blocks):
+    translated_content = translated_content.replace(f"[PROTECTED_BLOCK_{i}]", block)
 
-# 2. Advanced Badge Restoration (Key-based)
-# This handles cases where the LLM translates the URL parameters
-badge_keys = ["license", "python", "version", "platform", "cuda"]
-for key in badge_keys:
-    # Find the original badge line for this key
-    orig_badge = re.search(rf'(!\[.*?\]\(https://img\.shields\.io/badge/{key}.*?\))', original_text, re.I)
-    if orig_badge:
-        # Find and replace the translated version in the output
-        translated_content = re.sub(rf'!\[.*?\]\(https://img\.shields\.io/badge/{key}.*?\)', orig_badge.group(1), translated_content, flags=re.I)
-
-# 3. Path Correction (Support single and double quotes)
+# 2. Path Correction (Support single and double quotes)
 translated_content = re.sub(r'(\[.*?\]\()(?!(?:http|/|#|\.\./|locales/))', r'\1../', translated_content)
 translated_content = re.sub(r'((?:src|href)=["\'])(?!(?:http|/|#|\.\./|locales/))', r'\1../', translated_content)
 translated_content = re.sub(r'(\[.*?\]\()locales/', r'\1', translated_content)
