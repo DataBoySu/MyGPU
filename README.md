@@ -69,7 +69,7 @@
 - **Lightweight**: Minimal resource footprint.
 - **Flexible**: Runs as a CLI tool, or a full-featured Web Dashboard.
 - **Admin-Centric**: Includes features like **VRAM Enforcement** (auto-kill processes exceeding limits) and **Watchlists**.
-- **Developer-Friendly**: Built-in benchmarking and stress-testing tools (GEMM, Particle Physics) to validate system stability.
+- **Developer-Friendly**: Built-in benchmarking and stress-testing tools (GEMM, Particle Physics) to validate system stability with cool visuals.
 
 ---
 
