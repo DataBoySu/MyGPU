@@ -14,8 +14,8 @@
   <img src="../monitor/api/static/logo.png" alt="MyGPU logo"/>
 </div>
 
-> *MyGPU: Utilidad de gestión de GPU ligera: un envoltorio compacto de `nvidia-smi` con un elegante panel web.*
-
+> *MyGPU: Herramienta de gestión de GPU ligera: un envoltorio compacto de `nvidia-smi` con un elegante panel web.*
+<!-- no traducir esta sección de insignias, mantenerla como está -->
 ![Licencia](https://img.shields.io/badge/licencia-MIT-blue.svg)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![Versión](https://img.shields.io/badge/versión-1.2.3-blue)
@@ -27,7 +27,7 @@
 <details>
   <summary>Panel Web</summary>
   <div style="display:flex; overflow-x:auto; gap:10px; padding:12px 0; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;">
-    <!-- Utilizar la relación de aspecto 1624x675 para las imágenes del carrusel -->
+    <!-- Utilizar la relación de aspecto 1624x675 para el marco de la diapositiva; las imágenes se ajustan automáticamente con object-fit:contain -->
     <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
       <img src="../monitor/api/static/web1.png" style="width:100%; height:100%; object-fit:contain;" />
     </div>
@@ -67,9 +67,9 @@
 
 ### ¿Por qué usar esto?
 
-- **Ligero**: Pie de contacto mínimo.
-- **Versátil**: Funciona como herramienta de línea de comandos, o como un panel web completo.
-- **Orientado a la administración**: Incluye características como **límites de VRAM** (terminación automática de procesos que superen los límites) y **listas de vigilancia**.
+- **Ligero**: Bajo consumo de recursos.
+- **Versátil**: Funciona como herramienta de línea de comandos, o como un completo panel web.
+- **Orientado a administradores**: Incluye características como **límites de VRAM** (terminación automática de procesos que superen los límites) y **listas de vigilancia**.
 - **Amigable con el desarrollador**: Herramientas integradas para pruebas de estrés y simulación (GEMM, física de partículas).
 
 ---
@@ -81,13 +81,13 @@
   - Métricas del sistema (CPU, RAM, etc.).
 
 - **Administración y aplicación de políticas**:
-  - **Límites de VRAM**: Establezca límites duros de uso de VRAM por GPU.
-  - **Terminación automática**: Termine automáticamente los procesos que violen las políticas de VRAM (solo para administradores).
-  - **Listas de vigilancia**: Monitoree procesos específicos o nombres.
+  - **Límites de VRAM**: Establecer límites duros de uso de VRAM por GPU.
+  - **Terminación automática**: Terminar automáticamente los procesos que violen las políticas de VRAM (solo para administradores).
+  - **Listas de vigilancia**: Monitorear procesos específicos o nombres de procesos.
 
-- **Simulación y pruebas de estrés**:
-  - **Pruebas de estrés**: Configure cargas de trabajo GEMM configurables para probar la estabilidad y el rendimiento térmico.
-  - **Simulación de física de partículas**: Simulación interactiva para visualizar la carga de trabajo de la GPU.
+- **Pruebas de estrés y simulación**:
+  - **Pruebas de estrés**: Configurar cargas de trabajo GEMM para probar el rendimiento térmico y la estabilidad.
+  - **Simulación visual**: Simulación interactiva de física de partículas para visualizar la carga de trabajo de la GPU.
 
 ---
 
@@ -96,14 +96,14 @@
 Las contribuciones son bienvenidas. Los puntos principales a cubrir serían:
 
 - **Soporte multi-GPU**: Manejo mejorado para configuraciones multi-tarjeta y topologías NVLink.
-- **Contenedorización**: Soporte oficial para Docker para una implementación fácil en entornos contenedorizados.
-- **Acceso remoto**: Integración de túneles SSH y gestión remota segura.
+- **Contenedorización**: Soporte oficial para Docker para una fácil implementación en entornos contenedorizados.
+- **Acceso remoto**: Integración de túneles SSH y gestión segura remota.
 - **Plataforma cruzada**:
-  - [ ] Soporte para macOS (Apple Silicon).
-- **Independencia de hardware**:
+  - [ ] Soporte para macOS (enfocado en monitoreo de Apple Silicon).
+- **Hardware Agnóstico**:
   - [ ] Soporte para AMD ROCm.
   - [ ] Soporte para Intel Arc.
-- ~~**Documentación multilingüe**: Apoyo a los lenguajes más populares de GitHub.~~
+- ~~**Documentación multilingüe**: Apoyar los lenguajes de GitHub más populares.~~
 
 Consulte [CONTRIBUTING.md](../CONTRIBUTING.md) para saber cómo involucrarse.
 
@@ -113,9 +113,9 @@ Consulte [CONTRIBUTING.md](../CONTRIBUTING.md) para saber cómo involucrarse.
 
 - **OS**: Windows 10/11
 - **Python**: 3.10+
-- **Hardware**: GPU NVIDIA con controladores instalados.
-- **CUDA**: CUDA Toolkit 12.x (Requerido estrictamente para las características de simulación y pruebas de estrés).
-  - *Nota: Si CUDA 12.x no se detecta, las características de simulación y benchmarking se desactivarán.*
+- **Hardware**: GPU de NVIDIA con controladores instalados.
+- **CUDA**: Versión 12.x (requerida estrictamente para características de benchmarking/simulación).
+  - *Nota: Si CUDA 12.x no se detecta, las características de benchmarking se desactivarán.*
 
 ---
 
@@ -148,19 +148,19 @@ Ideal para desarrollo y pruebas de estrés.
 
 ### Inicio rápido
 
-1. **Descargue** la última versión o clone el repositorio.
-2. **Ejecute el script de configuración**:
+1. **Descargar** la última versión o clonar el repositorio.
+2. **Ejecutar configuración**:
 
   ```powershell
   .\setup.ps1
   ```
 
-3. **Inicie**:
+3. **Iniciar**:
 
 ```powershell
-# Inicie el panel web (Estándar/Completo)
+# Iniciar el panel web (Estándar/Completo)
 python health_monitor.py web
 
-# Inicie la CLI
+# Iniciar CLI
 python health_monitor.py cli
 ```

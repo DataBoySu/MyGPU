@@ -1,6 +1,28 @@
-# MyGPU: Ein leichtgewichtiges GPU-Verwaltungstool: Eine kompakte `nvidia-smi` Wrapper mit einem eleganten Web-Dashboard
+# Navigation Bar
 
-*MyGPU: Ein leichtgewichtiges GPU-Verwaltungstool: eine kompakte `nvidia-smi` Wrapper mit einem eleganten Web-Dashboard.*
+<div align="center">
+  <a href="../README.md">🇺🇸 English</a> |
+  <a href="../locales/README.de.md">🇩🇪 Deutsch</a> |
+  <a href="../locales/README.fr.md">🇫🇷 Français</a> |
+  <a href="../locales/README.es.md">🇪🇸 Español</a> |
+  <a href="../locales/README.ja.md">🇯🇵 日本語</a> |
+  <a href="../locales/README.zh.md">🇨🇳 中文</a> |
+  <a href="../locales/README.pt.md">🇵🇹 Português</a> |
+  <a href="../locales/README.ko.md">🇰🇷 한국어</a> |
+  <a href="../locales/README.hi.md">🇮🇳 हिंदी</a>
+</div>
+
+# Logo
+
+<div style="text-align:center; margin:18px 0;">
+  <img src="../monitor/api/static/logo.png" alt="MyGPU logo"/>
+</div>
+
+## Zitat
+
+*MyGPU: Ein leichtgewichtiges GPU-Management-Tool: Ein kompakter Wrapper für `nvidia-smi` mit einem eleganten Web-Dashboard.*
+
+## Badges
 
 ![Lizenz](https://img.shields.io/badge/lizenz-MIT-blue.svg)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
@@ -10,78 +32,65 @@
 
 ## Galerie
 
+### Web-Dashboard
+
 <details>
   <summary>Web-Dashboard</summary>
   <div style="display:flex; overflow-x:auto; gap:10px; padding:12px 0; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;">
-    <!-- Verwenden Sie das erste Bild mit einem Seitenverhältnis von 1624x675 für den Folienrahmen; Bilder passen sich mit `object-fit: contain` automatisch an -->
+    <!-- Bilder passend zuschneiden, um das Rasterlayout beizubehalten -->
     <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
       <img src="../monitor/api/static/web1.png" style="width:100%; height:100%; object-fit:contain;" />
     </div>
     <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
       <img src="../monitor/api/static/web2.png" style="width:100%; height:100%; object-fit:contain;" />
     </div>
-    <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
-      <img src="../monitor/api/static/web3.png" style="width:100%; height:100%; object-fit:contain;" />
-    </div>
-    <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
-      <img src="../monitor/api/static/web4.png" style="width:100%; height:100%; object-fit:contain;" />
-    </div>
+    <!-- Weitere Bilder hier einfügen -->
   </div>
 </details>
+
 <details>
   <summary>CLI</summary>
   <div style="display:flex; overflow-x:auto; gap:10px; padding:12px 0; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;">
     <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
       <img src="../monitor/api/static/cli1.png" style="width:100%; height:100%; object-fit:contain;" />
     </div>
-    <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
-      <img src="../monitor/api/static/cli2.png" style="width:100%; height:100%; object-fit:contain;" />
-    </div>
-    <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
-      <img src="../monitor/api/static/cli3.png" style="width:100%; height:100%; object-fit:contain;" />
-    </div>
-    <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
-      <img src="../monitor/api/static/cli4.png" style="width:100%; height:100%; object-fit:contain;" />
-    </div>
-    <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
-      <img src="../monitor/api/static/cli5.png" style="width:100%; height:100%; object-fit:contain;" />
-    </div>
+    <!-- Weitere CLI-Bilder hier einfügen -->
   </div>
 </details>
 
-### Warum dies verwenden?
+## Warum MyGPU?
 
 - **Leichtgewichtig**: Minimale Ressourcenbelastung.
-- **Flexibel**: Als CLI-Tool oder als vollständiges Web-Dashboard ausführbar.
-- **admin-zentriert**: Enthält Funktionen wie **VRAM-Enforcement** (Automatische Beendigung von Prozessen, die VRAM-Richtlinien verletzen) und **Watchlists**.
-- **entwicklerfreundlich**: Integrierte Benchmarking- und Stresstest-Tools (GEMM, Teilchenphysik) zur Validierung der Systemstabilität.
+- **Flexibel**: Verfügbar als CLI-Tool oder voll ausgestattetes Web-Dashboard.
+- **admin-zentriert**: Enthält Funktionen wie VRAM-Enforcement und Watchlists.
+- **Entwicklerfreundlich**: Integrierte Benchmarking- und Stresstest-Tools (GEMM, Teilchenphysik) zur Validierung der Systemstabilität.
 
 ---
 
 ## Funktionen
 
-- **Echtzeitüberwachung**:
-  - Detaillierte GPU-Metriken (Nutzung, VRAM, Leistung, Temperatur).
-  - Systemmetriken (CPU, RAM usw.).
+- **Echtzeit-Überwachung**:
+  - Detaillierte GPU-Metriken (Nutzung, VRAM, Temperatur).
+  - Systemmetriken (CPU, RAM, etc.).
 
 - **Admin- und Durchsetzungsfunktionen**:
-  - **VRAM-Grenzen**: Legen Sie harte VRAM-Nutzungsgrenzen für jede GPU fest.
-  - **Automatische Beendigung**: Automatisch beenden Sie Prozesse, die VRAM-Richtlinien verletzen (nur für Administratoren).
-  - **Watchlists**: Überwachen Sie spezifische PIDs oder Prozessnamen.
+  - **VRAM-Limits**: Festlegen von VRAM-Nutzungsgrenzen pro GPU.
+  - **Automatische Beendigung**: Automatische Beendigung von Prozessen, die VRAM-Richtlinien verletzen (nur für Administratoren).
+  - **Watchlists**: Überwachen spezifischer PIDs oder Prozessnamen.
 
-- **Benchmarking & Simulation**:
-  - **Stresstest**: Konfigurierbare GEMM-Lasten zum Testen der thermischen Throttling und Stabilität.
-  - **Visuelle Simulation**: Interaktive 3D-Teilchenphysik-Simulation zur Visualisierung der GPU-Last.
+- **Benchmarking und Simulation**:
+  - **Stresstest**: Konfigurierbare GEMM-Lasten zum Testen der thermischen Throtting und Stabilität.
+  - **Visuelle Simulation**: Interaktive 3D-Teilchenphysik-Simulation zur Visualisierung der GPU-Belastung.
 
 ---
 
-## Roadmap & zukünftige Arbeit
+## Roadmap und zukünftige Arbeiten
 
-Beiträge sind willkommen! Die Hauptpunkte, die in der Zukunft abgedeckt werden sollen, sind:
+Beiträge sind willkommen! Die wichtigsten zukünftigen Punkte umfassen:
 
-- **Multi-GPU-Unterstützung**: Verbesserte Handhabung für Multi-Karten-Setups und NVLink-Topologien.
+- **Multi-GPU-Unterstützung**: Verbesserte Handhabung für Multi-Card-Setups und NVLink-Topologien.
 - **Containerisierung**: Offizielle Docker-Unterstützung für eine einfache Bereitstellung in Containerumgebungen.
-- **Remote-Zugriff**: SSH-Tunnel-Integration und sicherer Remote-Management.
+- **Remote-Zugriff**: SSH-Tunneling-Integration und sichere Remote-Verwaltung.
 - **Plattformübergreifend**:
   - [ ] Linux-Unterstützung (Ubuntu/Debian-Fokus).
   - [ ] macOS-Unterstützung (Apple Silicon-Überwachung).
@@ -90,7 +99,7 @@ Beiträge sind willkommen! Die Hauptpunkte, die in der Zukunft abgedeckt werden 
   - [ ] Intel Arc-Unterstützung.
 - ~~**Mehrsprachige Dokumentation**: Unterstützung der beliebtesten GitHub-Sprachen.~~
 
-Siehe [CONTRIBUTING.md](../CONTRIBUTING.md), um herauszufinden, wie du dich einbringen kannst.
+Siehe [CONTRIBUTING.md](../CONTRIBUTING.md) für Informationen, wie Sie sich einbringen können.
 
 ---
 
@@ -106,22 +115,22 @@ Siehe [CONTRIBUTING.md](../CONTRIBUTING.md), um herauszufinden, wie du dich einb
 
 ## Installation
 
-Das Tool unterstützt eine modulare Installation, um Ihren Bedürfnissen gerecht zu werden:
+Das Tool unterstützt modulare Installationen, um Ihren Bedürfnissen gerecht zu werden:
 
-### 1. Minimale (CLI nur)
+### 1. Minimal (CLI nur)
 
 Am besten für Headless-Server oder Hintergrundüberwachung geeignet.
 
 - Befehlszeileninterface.
-- Grundlegende System-/GPU-Metriken.
+- Grundlegende System- und GPU-Metriken.
 
 ### 2. Standard (CLI + Web-UI)
 
 Am besten für die meisten Benutzer geeignet.
 
 - Enthält Web-Dashboard.
-- REST-API-Endpunkte.
-- Echtzeitdiagramme.
+- REST-APIs.
+- Echtzeit-Diagramme.
 - Aber keine Simulation oder Benchmarking.
 
 ### 3. Vollständig (Standard + Visualisierung)
@@ -133,19 +142,19 @@ Am besten für Entwicklung und Stresstest geeignet.
 
 ### Schnelle Startanleitung
 
-1. **Laden** Sie die neueste Version herunter oder klonen Sie das Repository.
+1. **Herunterladen** der neuesten Version oder Klonen des Repos.
 2. **Einrichten**:
 
    ```powershell
    .\setup.ps1
    ```
 
-3. **Ausführen**:
+3. **Starten**:
 
 ```powershell
-# Starten Sie das Web-Dashboard (Standard/Vollständig)
+# Starten des Web-Dashboards (Standard/Vollständig)
 python health_monitor.py web
 
-# Starten Sie die CLI
+# Starten der CLI
 python health_monitor.py cli
 ```
