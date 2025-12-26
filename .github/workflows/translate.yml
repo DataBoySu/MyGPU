@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        lang: [de, fr, es, ja, zh, pt, ko, hi] # German, French, Spanish, Japanese, Chinese, Portuguese, Korean, Hindi
+        lang: [de, fr, es, ja, zh, pt, ko] # German, French, Spanish, Japanese, Chinese, Portuguese, Korean
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4

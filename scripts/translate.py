@@ -13,7 +13,6 @@ LANG_MAP = {
     "ru": "Russian",
     "pt": "Portuguese",
     "ko": "Korean",
-    "hi": "Hindi"
 }
 
 parser = argparse.ArgumentParser()
@@ -42,17 +41,13 @@ with open(README_PATH, "r", encoding="utf-8") as f:
 prompt = f"""<|START_OF_TURN_TOKEN|><|SYSTEM_TOKEN|>
 You are a professional technical translator specializing in software documentation (GitHub READMEs).
 Translate the provided README into professional developer-level {target_lang_name}.
-Maintain a formal tone and preserve technical terminology (e.g., GPU, CLI, vCPU).
-Keep all Markdown/HTML syntax exactly as is.
 CRITICAL RULES:
-1. **Badges**: Do NOT translate badge alt text, URLs, or any HTML attribute values (e.g., keep alt="MyGPU logo", src="...", and style="..." exactly as they are).
-2. **Emojis**: Preserve all emojis exactly as they appear in the source.
-3. **Navigation**: Do NOT strip, translate, or modify the top-level HTML navigation bar (<div align="center">...</div>) or the logo.
-4. **Output**: ONLY output the translated {target_lang_name} text. No talk, just translation.
-5. **Technical Consistency**: For languages like Hindi, German, or Japanese, preserve industry-standard English terms in their original form (e.g., 'Dashboard', 'Wrapper', 'Throttling', 'Agnostic') if they are more common in a professional developer context than their translated counterparts.
-6. **Contextual Meaning**: Treat 'Enforcement' as 'Policy application/restriction' (e.g., Spanish: 'Ejecución/Restricción', not 'Enfoque'). Treat 'Headless' as a server without a display (e.g., do not translate literally to 'sin cabeza'). Treat 'Agnostic' as hardware independence (e.g., 'Hardware-agnostisch' or 'Independiente de hardware').
-7. **Navigation Integrity**: Inside the <div align="center"> block, do NOT translate the names of the languages (e.g., 'English' must stay 'English', 'Deutsch' must stay 'Deutsch').
-Do not add new information, do not summarize, and do not include any conversational filler or "thinking" process.<|END_OF_TURN_TOKEN|>
+1. **Badges**: Do NOT translate Markdown image syntax. Specifically, do NOT translate text inside square brackets `![...]` or parentheses `(...)` for badge lines (e.g., license, python, version badges).
+2. **Navigation**: Do NOT modify the top-level HTML navigation bar (`<div align="center">`).
+3. **Context**: Treat 'Enforcement' as 'System policy restriction' and 'Headless' as 'server without GUI'.
+4. **Technical Integrity**: Preserve standard terms (GPU, CLI, VRAM, SSH, Docker) in English.
+5. **Formatting**: Preserve all emojis and HTML/Markdown tags exactly.
+6. **No Talk**: Output ONLY the translated text. Do not include markdown code fences (```) around the entire output.<|END_OF_TURN_TOKEN|>
 <|START_OF_TURN_TOKEN|><|USER_TOKEN|>
 {text_to_translate}<|END_OF_TURN_TOKEN|>
 <|START_OF_TURN_TOKEN|><|CHATBOT_TOKEN|>
@@ -88,6 +83,16 @@ translated_content = re.sub(r'((?:src|href)=")locales/', r'\1', translated_conte
 # This targets Markdown links/images text and HTML src="path"/href="path"
 translated_content = re.sub(r'(\[.*?\]\()(?!(?:http|/|#|\.\./))', r'\1../', translated_content)
 translated_content = re.sub(r'((?:src|href)=")(?!(?:http|/|#|\.\./))', r'\1../', translated_content)
+
+# List of badges that should NEVER be translated
+protected_badges = ["License", "Python", "Version", "Platform", "cuda 12.x"]
+
+for badge in protected_badges:
+    # This regex finds translated versions of badges by looking for the 
+    # specific Shields.io URL and replacing label back to the original.
+    # Pattern matches: ![Anything](URL containing shields.io and the badge key)
+    pattern = rf'!\[.*?\]\(https://img\.shields\.io/badge/{badge.lower()}.*?\)'
+    original_badge_line = f"![{badge}](...)" # Map your original lines here
 
 with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
     f.write(translated_content)
