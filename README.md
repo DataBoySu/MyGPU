@@ -1,3 +1,12 @@
+<div align="center">
+  <a href="README.md">🇺🇸 English</a> |
+  <a href="locales/README.de.md">🇩🇪 Deutsch</a> |
+  <a href="locales/README.fr.md">🇫🇷 Français</a> |
+  <a href="locales/README.es.md">🇪🇸 Español</a> |
+  <a href="locales/README.ja.md">🇯🇵 日本語</a> |
+  <a href="locales/README.zh.md">🇨🇳 中文</a>
+</div>
+
 <div style="text-align:center; margin:18px 0;">
   <img src="monitor/api/static/logo.png" alt="MyGPU logo"/>
 </div>

@@ -1,11 +1,28 @@
 import os
 import re
+import argparse
 from llama_cpp import Llama
+
+# Map language codes to full English names for the system prompt
+LANG_MAP = {
+    "de": "German",
+    "fr": "French",
+    "es": "Spanish",
+    "ja": "Japanese",
+    "zh": "Chinese (Simplified)",
+    "ru": "Russian"
+}
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--lang", type=str, required=True, help="Target language code (e.g., de, fr)")
+args = parser.parse_args()
+
+target_lang_name = LANG_MAP.get(args.lang, "English")
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 README_PATH = os.path.join(BASE_DIR, "README.md")
 OUTPUT_DIR = os.path.join(BASE_DIR, "locales")
-OUTPUT_PATH = os.path.join(OUTPUT_DIR, "translated_readme.md")
+OUTPUT_PATH = os.path.join(OUTPUT_DIR, f"README.{args.lang}.md")
 MODEL_PATH = os.path.join(BASE_DIR, "models", "aya-expanse-8b-q4_k_s.gguf")
 
 # Ensure output directory exists
@@ -21,10 +38,10 @@ with open(README_PATH, "r", encoding="utf-8") as f:
 # Aya Expanse uses a specific header format for system/user/chatbot turns
 prompt = f"""<|START_OF_TURN_TOKEN|><|SYSTEM_TOKEN|>
 You are a professional technical translator. 
-Perform a strict technical translation of the provided README into professional developer-level German. 
+Perform a strict technical translation of the provided README into professional developer-level {target_lang_name}. 
 Maintain a formal tone and preserve technical terminology (e.g., GPU, CLI, vCPU).
 Keep all Markdown/HTML syntax exactly as is. 
-ONLY output the translated German text. No talk, just translation.
+ONLY output the translated {target_lang_name} text. No talk, just translation.
 Do not add new information, do not summarize, and do not include any conversational filler or "thinking" process.<|END_OF_TURN_TOKEN|>
 <|START_OF_TURN_TOKEN|><|USER_TOKEN|>
 {text_to_translate}<|END_OF_TURN_TOKEN|>
@@ -66,4 +83,4 @@ translated_content = re.sub(r'((?:src|href)=")(?!(?:http|/|#|\.\./))', r'\1../',
 with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
     f.write(translated_content)
 
-print("Translation complete.")
+print(f"Translation to {target_lang_name} complete: {OUTPUT_PATH}")

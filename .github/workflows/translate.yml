@@ -1,4 +1,4 @@
-name: AI Readme Translator (German)
+name: AI Readme Translator (Multilingual)
 
 on:
   workflow_dispatch:
@@ -11,7 +11,11 @@ permissions:
 
 jobs:
   translate:
+    name: Translate to ${{ matrix.lang }}
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        lang: [de, fr, es, ja, zh] # German, French, Spanish, Japanese, Chinese
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -40,11 +44,31 @@ jobs:
           wget -O models/aya-expanse-8b-q4_k_s.gguf https://huggingface.co/matrixportalx/aya-expanse-8b-Q4_K_S-GGUF/resolve/main/aya-expanse-8b-q4_k_s.gguf
 
       - name: Run Translation Script
-        run: python scripts/translate.py
+        run: python scripts/translate.py --lang ${{ matrix.lang }}
 
-      - name: Commit and Push
+      - name: Upload Translation Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: readme-${{ matrix.lang }}
+          path: locales/README.${{ matrix.lang }}.md
+
+  commit-translations:
+    needs: translate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Download All Translations
+        uses: actions/download-artifact@v4
+        with:
+          pattern: readme-*
+          path: locales
+          merge-multiple: true
+
+      - name: Commit and Push Changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "docs: update german translation"
-          file_pattern: 'locales/translated_readme.md'
+          commit_message: "docs: update multilingual translations"
+          file_pattern: 'locales/*.md'
           push_options: '--force-with-lease'
