@@ -43,15 +43,20 @@ prompt = f"""<|START_OF_TURN_TOKEN|><|SYSTEM_TOKEN|>
 You are a professional technical translator. 
 Perform a strict technical translation of the provided README into professional developer-level {target_lang_name}. 
 Maintain a formal tone and preserve technical terminology (e.g., GPU, CLI, vCPU).
-Keep all Markdown/HTML syntax exactly as is. 
-IMPORTANT: Do not strip or modify the top-level HTML tags (like <div> or <img>) at the beginning of the file.
-ONLY output the translated {target_lang_name} text. No talk, just translation.
+Keep all Markdown/HTML syntax exactly as is.
+CRITICAL RULES:
+1. **Badges**: Do NOT translate badge alt text or URLs (e.g., keep `!License` exactly as is).
+2. **Emojis**: Preserve all emojis exactly as they appear in the source.
+3. **Navigation**: Do NOT strip, translate, or modify the top-level HTML navigation bar (<div align="center">...</div>) or the logo.
+4. **Output**: ONLY output the translated {target_lang_name} text. No talk, just translation.
 Do not add new information, do not summarize, and do not include any conversational filler or "thinking" process.<|END_OF_TURN_TOKEN|>
 <|START_OF_TURN_TOKEN|><|USER_TOKEN|>
 {text_to_translate}<|END_OF_TURN_TOKEN|>
 <|START_OF_TURN_TOKEN|><|CHATBOT_TOKEN|>
 """
-
+# Do not translate translate badges. Keep them as it is.
+# IMPORTANT: Do not strip or modify the top-level HTML tags (like <div> or <img>) at the beginning of the file.
+# ONLY output the translated {target_lang_name} text. No talk, just translation.
 # max_tokens must be less than n_ctx (6144). 4096 leaves ~2000 tokens for README input.
 response = llm(
     prompt, 
