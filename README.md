@@ -143,7 +143,7 @@ Best for most users.
 
 Best for development and stress testing.
 
-- Includes Particle Simulation.
+- Includes Simulation.
 - PyTorch/CuPy dependencies for benchmarking.
 
 ### Quick Start
