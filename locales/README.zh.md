@@ -1,33 +1,33 @@
 <div align="center">
-  <a href="../README.md">🇺🇸 English</a> |
-  <a href="../README.de.md">🇩🇪 Deutsch</a> |
-  <a href="../README.fr.md">🇫🇷 Français</a> |
-  <a href="../README.es.md">🇪🇸 Español</a> |
-  <a href="../README.ja.md">🇯🇵 日本語</a> |
-  <a href="../README.zh.md">🇨🇳 中文</a> |
-  <a href="../README.pt.md">🇵🇹 Português</a> |
-  <a href="../README.ko.md">🇰🇷 한국어</a> |
-  <a href="../README.hi.md">🇮🇳 Hindi</a>
+  <a href="../README.md">🇺🇸 英语</a> |
+  <a href="../locales/README.de.md">🇩🇪 德语</a> |
+  <a href="../locales/README.fr.md">🇫🇷 法语</a> |
+  <a href="../locales/README.es.md">🇪🇸 西班牙语</a> |
+  <a href="../locales/README.ja.md">🇯🇵 日语</a> |
+  <a href="../locales/README.zh.md">🇨🇳 中文</a> |
+  <a href="../locales/README.pt.md">🇵🇹 葡萄牙语</a> |
+  <a href="../locales/README.ko.md">🇰🇷 韩语</a> |
+  <a href="../locales/README.hi.md">🇮🇳 印地语</a>
 </div>
 
 <div style="text-align:center; margin:18px 0;">
-  <img src="../monitor/api/static/logo.png" alt="MyGPU logo"/>
+  <img src="../monitor/api/static/logo.png" alt="MyGPU 标志"/>
 </div>
 
-> *轻量级GPU管理工具：一个紧凑的`nvidia-smi`包装器，配有一个优雅的网络仪表盘。*
+> *MyGPU：轻量级 GPU 管理工具：一个紧凑的 `nvidia-smi` 包装器，配有一个优雅的网络仪表板。*
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Python](https://img.shields.io/badge/python-3.10%2B-blue)
-![Version](https://img.shields.io/badge/version-1.2.3-blue)
-![Platform](https://img.shields.io/badge/platform-Windows-lightgrey)
+![许可证](https://img.shields.io/badge/许可证-MIT-蓝色.svg)
+![Python](https://img.shields.io/badge/Python-3.10%2B-蓝色)
+![版本](https://img.shields.io/badge/版本-1.2.3-蓝色)
+![平台](https://img.shields.io/badge/平台-Windows-浅灰色)
 ![cuda 12.x](https://img.shields.io/badge/CUDA-12.x-0f9d58?logo=nvidia)
 
-## Gallery
+## 画廊
 
 <details>
-  <summary>Web Dashboard</summary>
+  <summary>网络仪表板</summary>
   <div style="display:flex; overflow-x:auto; gap:10px; padding:12px 0; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;">
-    <!-- Use first image aspect ratio 1624x675 for slide frame; images fit inside using object-fit:contain -->
+    <!-- 使用第一张图片的宽高比例1624x675作为幻灯片框架，图片用`object-fit:contain`填充 -->
     <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
       <img src="../monitor/api/static/web1.png" style="width:100%; height:100%; object-fit:contain;" />
     </div>
@@ -41,16 +41,14 @@
       <img src="../monitor/api/static/web4.png" style="width:100%; height:100%; object-fit:contain;" />
     </div>
   </div>
-
 </details>
 <details>
-  <summary>CLI</summary>
+  <summary>命令行界面 (CLI)</summary>
   <div style="display:flex; overflow-x:auto; gap:10px; padding:12px 0; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;">
-
-  <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
+    <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
       <img src="../monitor/api/static/cli1.png" style="width:100%; height:100%; object-fit:contain;" />
-  </div>
-  <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
+    </div>
+    <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
       <img src="../monitor/api/static/cli2.png" style="width:100%; height:100%; object-fit:contain;" />
     </div>
     <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
@@ -62,32 +60,32 @@
     <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
       <img src="../monitor/api/static/cli5.png" style="width:100%; height:100%; object-fit:contain;" />
     </div>
-
+  </div>
 </details>
 
 ### 为什么使用这个工具？
 
 - **轻量级**：资源占用最小。
-- **灵活**：作为命令行工具运行，或全功能网络仪表盘。
-- **管理员友好**：包含VRAM限制（自动终止超出限制的进程）和监控列表等功能。
-- **开发者友好**：内置基准测试和压力测试工具（GEMM、粒子物理），验证系统稳定性。
+- **灵活**：作为命令行工具、网络仪表板或全功能网络仪表板使用。
+- **管理员友好**：包括 VRAM 限制（超出限制时自动终止进程）和监控列表等功能。
+- **开发人员友好**：内置基准测试和粒子物理模拟，用于验证系统稳定性。
 
 ---
 
 ## 功能
 
 - **实时监控**：
-  - GPU指标（利用率、VRAM、功耗、温度）。
+  - GPU 指标（利用率、VRAM、功耗、温度）。
   - 系统指标（CPU、内存等）。
 
 - **管理员和执行**：
-  - **VRAM限制**：为每个GPU设置VRAM使用硬限制。
-  - **自动终止**（仅管理员可操作）：自动终止违反VRAM策略的进程。
-  - **监控列表**：监控特定PID或进程名称。
+  - **VRAM 限制**：为每个 GPU 设置 VRAM 使用硬限制。
+  - **自动终止**：自动终止违反 VRAM 策略的进程（仅管理员）。
+  - **监控列表**：监控特定 PIDs 或进程名称。
 
 - **基准测试和模拟**：
-  - **压力测试**：配置可配置的GEMM工作负载，测试热量限制和稳定性。
-  - **可视化模拟**：交互式3D粒子物理模拟，可视化GPU负载。
+  - **压力测试**：配置可配置的 GEMM 工作负载，以测试热量限制和稳定性。
+  - **视觉模拟**：交互式 3D 粒子物理模拟，以可视化 GPU 加载。
 
 ---
 
@@ -95,61 +93,61 @@
 
 欢迎贡献！主要未来要点包括：
 
-- **多GPU支持**：增强多卡设置和NVLink拓扑的处理。
-- **容器化**：官方Docker支持，方便在容器环境中部署。
-- **远程访问**：SSH隧道集成和安全远程管理。
+- **多 GPU 支持**：增强多卡设置和 NVLink 拓扑的处理。
+- **容器化**：官方 Docker 支持，以便于在容器环境中部署。
+- **远程访问**：SSH 隧道集成和安全远程管理。
 - **跨平台**：
-  - [ ] Linux支持（Ubuntu/Debian重点）。
-  - [ ] macOS支持（Apple Silicon监控）。
-- **硬件无差异**：
-  - [ ] AMD ROCm支持。
-  - [ ] Intel Arc支持。
-- ~~**多语言文档**：支持GitHub上最受欢迎的语言。~~
+  - [ ] 支持 Ubuntu/Debian 的 Linux。
+  - [ ] 支持 Apple Silicon 监控。
+- **硬件无关性**：
+  - [ ] AMD ROCm 支持。
+  - [ ] Intel Arc 支持。
+- ~~**多语言文档**：支持 GitHub 上最受欢迎的语言。~~
 
-参阅[CONTRIBUTING.md](../CONTRIBUTING.md)了解如何参与。
+请参阅 [CONTRIBUTING.md](../CONTRIBUTING.md) 了解如何参与。
 
 ---
 
 ## 要求
 
-- **操作系统**：Windows 10/11
+- **OS**：Windows 10/11
 - **Python**：3.10+
-- **硬件**：NVIDIA GPU及其安装驱动程序。
-- **CUDA**：12.x工具包（严格要求基准测试/模拟功能）。
-  - *注意：如果未检测到CUDA 12.x，GPU特定基准测试功能将禁用。*
+- **硬件**：NVIDIA GPU 和已安装的驱动程序。
+- **CUDA**：12.x（严格要求用于基准测试/模拟功能）。
+  - *注意：如果未检测到 CUDA 12.x，则 GPU 特定基准测试功能将被禁用。*
 
 ---
 
 ## 安装
 
-该工具支持模块化安装，以适应您的需求：
+工具支持模块化安装，以适应您的需求：
 
-### 1. 最小（仅命令行）
+### 1. 最小（仅命令行界面）
 
-适用于无显示器的服务器或后台监控。
+适用于无头服务器或后台监控。
 
 - 命令行界面。
-- 基本系统/GPU指标。
+- 基本系统/GPU 指标。
 
-### 2. 标准（命令行+网络UI）
+### 2. 标准（命令行界面 + 网络 UI）
 
 适用于大多数用户。
 
-- 包含网络仪表盘。
-- REST API端点。
+- 包括网络仪表板。
+- REST API 端点。
 - 实时图表。
 
-### 3. 完整（标准+可视化）
+### 3. 完整（标准 + 模拟）
 
 适用于开发和压力测试。
 
-- 包含粒子模拟。
-- PyTorch/CuPy依赖基准测试。
+- 包括模拟。
+- PyTorch/CuPy 依赖基准测试。
 
 ### 快速开始
 
-1. **下载**最新版本或克隆仓库。
-2. **设置**：
+1. **下载** 最新版本或克隆仓库。
+2. **运行设置**：
 
    ```powershell
    .\setup.ps1
@@ -158,15 +156,9 @@
 3. **启动**：
 
 ```powershell
-# 启动网络仪表盘（标准/完整）
+# 启动网络仪表板（标准/完整）
 python health_monitor.py web
 
 # 启动命令行
 python health_monitor.py cli
 ```
-
----
-
-## 许可证
-
-MIT许可证。详见[LICENSE](../LICENSE)。

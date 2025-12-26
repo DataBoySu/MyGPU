@@ -1,33 +1,33 @@
 <div align="center">
-  <a href="../README.md">🇺🇸 English</a> |
-  <a href="../README.de.md">🇩🇪 Deutsch</a> |
-  <a href="../README.fr.md">🇫🇷 Français</a> |
-  <a href="../README.es.md">🇪🇸 Español</a> |
-  <a href="../README.ja.md">🇯🇵 日本語</a> |
-  <a href="../README.zh.md">🇨🇳 中文</a> |
-  <a href="../README.pt.md">🇵🇹 Português</a> |
-  <a href="../README.ko.md">🇰🇷 한국어</a> |
-  <a href="../README.hi.md">🇮🇳 Hindi</a>
+  <a href="../README.md">🇺🇸 英語</a> |
+  <a href="../locales/README.de.md">🇩🇪 ドイツ語</a> |
+  <a href="../locales/README.fr.md">🇫🇷 フランス語</a> |
+  <a href="../locales/README.es.md">🇪🇸 スペイン語</a> |
+  <a href="../locales/README.ja.md">🇯🇵 日本語</a> |
+  <a href="../locales/README.zh.md">🇨🇳 中文</a> |
+  <a href="../locales/README.pt.md">🇵🇹 ポルトガル語</a> |
+  <a href="../locales/README.ko.md">🇰🇷 韓国語</a> |
+  <a href="../locales/README.hi.md">🇮🇳 हिंदी</a>
 </div>
 
 <div style="text-align:center; margin:18px 0;">
-  <img src="../monitor/api/static/logo.png" alt="MyGPU logo"/>
+  <img src="../monitor/api/static/logo.png" alt="MyGPU ロゴ"/>
 </div>
 
-> *マイGPU: 軽量GPU管理ユーティリティ: コンパクトな`nvidia-smi`ラッパーに洗練されたウェブダッシュボードを備えたものです。*
+> *MyGPU: GPU 管理ユーティリティの軽量版: 洗練されたウェブダッシュボードを備えた `nvidia-smi` ラッパー*
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Python](https://img.shields.io/badge/python-3.10%2B-blue)
-![Version](https://img.shields.io/badge/version-1.2.3-blue)
-![Platform](https://img.shields.io/badge/platform-Windows-lightgrey)
-![cuda 12.x](https://img.shields.io/badge/CUDA-12.x-0f9d58?logo=nvidia)
+![ライセンス](https://img.shields.io/badge/ライセンス-MIT-blue.svg)
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
+![バージョン](https://img.shields.io/badge/バージョン-1.2.3-blue)
+![プラットフォーム](https://img.shields.io/badge/プラットフォーム-Windows-lightgrey)
+![CUDA 12.x](https://img.shields.io/badge/CUDA-12.x-0f9d58?logo=nvidia)
 
-## Gallery
+## ギャラリー
 
 <details>
-  <summary>Web Dashboard</summary>
+  <summary>ウェブダッシュボード</summary>
   <div style="display:flex; overflow-x:auto; gap:10px; padding:12px 0; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;">
-    <!-- Use first image aspect ratio 1624x675 for slide frame; images fit inside using object-fit:contain -->
+    <!-- 画像は 1624x675 のアスペクト比に合わせてスライドフレームに配置 -->
     <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
       <img src="../monitor/api/static/web1.png" style="width:100%; height:100%; object-fit:contain;" />
     </div>
@@ -41,16 +41,14 @@
       <img src="../monitor/api/static/web4.png" style="width:100%; height:100%; object-fit:contain;" />
     </div>
   </div>
-
 </details>
 <details>
   <summary>CLI</summary>
   <div style="display:flex; overflow-x:auto; gap:10px; padding:12px 0; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;">
-
-  <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
+    <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
       <img src="../monitor/api/static/cli1.png" style="width:100%; height:100%; object-fit:contain;" />
-  </div>
-  <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
+    </div>
+    <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
       <img src="../monitor/api/static/cli2.png" style="width:100%; height:100%; object-fit:contain;" />
     </div>
     <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
@@ -62,41 +60,41 @@
     <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
       <img src="../monitor/api/static/cli5.png" style="width:100%; height:100%; object-fit:contain;" />
     </div>
-
+  </div>
 </details>
 
-### このツールを使う理由
+### 利用理由
 
-- **軽量**: 最小限のリソース消費。
-- **柔軟**: CLIツールとして実行するか、完全なウェブダッシュボードとして実行可能。
-- **管理者向け**: VRAM強制（制限を超えるプロセスを自動的に終了）やウォッチリストなどの機能が含まれています。
-- **開発者向け**: システムの安定性を検証するための組み込みベンチマークとストレステストツール（GEMM、粒子物理学）を備えています。
+- **軽量性**: リソース消費量が最小限に抑えられている。
+- **柔軟性**: CLIツールとして、または完全なウェブダッシュボードとして利用可能。
+- **管理者向け機能**: VRAM制限（VRAM使用量超過時の自動終了）やウォッチリストなどの機能を備えている。
+- **開発者向け機能**: ストレステストや粒子物理学シミュレーションなどのベンチマークツールが組み込まれている。
 
 ---
 
-## 特徴
+## 機能
 
 - **リアルタイム監視**:
-  - GPUメトリック（利用率、VRAM、電力、温度）。
-  - システムメトリック（CPU、RAMなど）。
+  - GPUメトリクス（利用率、VRAM、電力、温度）。
+  - システムメトリクス（CPU、メモリなど）。
 
-- **管理者および強制**:
-  - **VRAMキャップ**: 各GPUに対してVRAM使用量の上限を設定。
-  - **自動終了**: 管理者のみ、VRAMポリシーに違反するプロセスを自動的に終了（管理者のみ）。
+- **管理者向け機能**:
+  - **VRAMキャップ**: 各GPUのVRAM使用量の上限を設定。
+  - **自動終了**: VRAMポリシーに違反するプロセスを自動的に終了（管理者のみ）。
   - **ウォッチリスト**: 特定のPIDやプロセス名を監視。
 
 - **ベンチマークとシミュレーション**:
-  - **ストレステスト**: 熱的スローイングと安定性をテストするための構成可能なGEMMワークロード。
-  - **視覚シミュレーション**: インタラクティブな3D粒子物理学シミュレーションでGPU負荷を視覚化。
+  - **ストレステスト**: 構成可能なGEMMワークロードで熱的スローシングとシステム安定性をテスト。
+  - **視覚化シミュレーション**: インタラクティブな3D粒子物理学シミュレーションでGPU負荷を視覚化。
 
 ---
 
-## ロードマップと将来の作業
+## 開発ロードマップと将来の作業
 
-貢献は歓迎します！主な今後のポイントは次のとおりです。
+貢献は歓迎します！主な今後のポイントは以下の通りです。
 
-- **マルチGPUサポート**: マルチカードセットアップとNVLinkトポロジの処理を強化。
-- **コンテナ化**: Docker公式サポートで、コンテナ環境への簡単なデプロイを実現。
+- **マルチGPUサポート**: マルチカードセットアップやNVLinkトポロジーの処理を強化。
+- **コンテナ化**: 公式のDockerサポートで簡単なデプロイを実現。
 - **リモートアクセス**: SSHトンネル統合とセキュアなリモート管理。
 - **クロスプラットフォーム**:
   - [ ] Linuxサポート（Ubuntu/Debianに焦点を当てて）。
@@ -104,9 +102,9 @@
 - **ハードウェア非依存**:
   - [ ] AMD ROCmサポート。
   - [ ] Intel Arcサポート。
-- ~~**マルチ言語ドキュメント**: GitHubで最も人気のある言語でドキュメントをサポート。~~
+- ~~**マルチ言語ドキュメント**: 最も人気のあるGitHub言語でドキュメントをサポート。~~
 
-[CONTRIBUTING.md](../CONTRIBUTING.md)を参照して、どのように貢献できるかを見てください。
+[CONTRIBUTING.md](../CONTRIBUTING.md) を参照して、どのように貢献できるかを知ってください。
 
 ---
 
@@ -114,42 +112,42 @@
 
 - **OS**: Windows 10/11
 - **Python**: 3.10+
-- **ハードウェア**: NVIDIA GPUにインストールされたドライバー。
-- **CUDA**: 12.xツールキット（ベンチマーク/シミュレーション機能を有効にするには厳密に必要）。
-  - *注: CUDA 12.xが検出されない場合は、GPU固有のベンチマーク機能が無効になります。*
+- **ハードウェア**: NVIDIA GPU
+- **CUDA**: 12.x (ベンチマーク/シミュレーション機能を使用する場合は厳密に必要)。
+- *注: CUDA 12.xが検出されない場合は、GPU固有のベンチマーク機能が無効になります。*
 
 ---
 
 ## インストール
 
-このツールは、ニーズに合わせてモジュール形式でインストールできます。
+ツールには、ニーズに合わせて複数のインストールオプションがあります。
 
 ### 1. 最小（CLIのみ）
 
 ヘッドレスサーバーやバックグラウンド監視に最適です。
 
-- コマンドラインインターフェイス。
-- 基本的なシステム/GPUメトリック。
+- コマンドラインインターフェースのみ。
+- 基本的なシステム/GPUメトリクス。
 
-### 2. 標準（CLI + Web UI）
+### 2. 標準（CLI + ウェブUI）
 
 ほとんどのユーザーに最適です。
 
-- Webダッシュボードが含まれています。
+- ウェブダッシュボードが含まれています。
 - REST APIエンドポイント。
 - リアルタイムチャート。
 
 ### 3. フル（標準 + 視覚化）
 
-開発とストレステストに最適です。
+開発やストレステストに最適です。
 
-- 粒子シミュレーションが含まれています。
-- ベンチマークにはPyTorch/CuPy依存関係が必要です。
+- シミュレーション機能が含まれています。
+- PyTorch/CuPy依存関係（ベンチマーク用）。
 
 ### クイックスタート
 
-1. **ダウンロード** 最新リリースまたはリポジトリをクローンします。
-2. **セットアップ実行**:
+1. **ダウンロード** またはリポジトリをクローンします。
+2. **セットアップスクリプトを実行**:
 
   ```powershell
   .\setup.ps1
@@ -158,15 +156,9 @@
 3. **起動**:
 
 ```powershell
-# Webダッシュボード（標準/フル）を起動
+# ウェブダッシュボードを起動（標準/フル）
 python health_monitor.py web
 
 # CLIを起動
 python health_monitor.py cli
 ```
-
----
-
-## ライセンス
-
-MITライセンス。[LICENSE](../LICENSE)で詳細をご確認ください。
