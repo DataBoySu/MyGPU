@@ -1,13 +1,5 @@
 # MyGPU: Utilitário de Gerenciamento de GPU Leve: um Wrapper Compacto para `nvidia-smi` com um Dashboard Web Elegante
 
-> *MyGPU: Um utilitário de gerenciamento de GPU leve, com um wrapper compacto para `nvidia-smi` e um dashboard web elegante.*
-
-![Licença](https://img.shields.io/badge/licença-MIT-blue.svg)
-![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
-![Versão](https://img.shields.io/badge/versão-1.2.3-blue)
-![Plataforma](https://img.shields.io/badge/plataforma-Windows-lightgrey)
-![CUDA 12.x](https://img.shields.io/badge/CUDA-12.x-0f9d58?logo=nvidia)
-
 ## Galeria
 
 <details>
@@ -27,16 +19,14 @@
       <img src="../monitor/api/static/web4.png" style="width:100%; height:100%; object-fit:contain;" />
     </div>
   </div>
-
 </details>
 <details>
   <summary>CLI</summary>
   <div style="display:flex; overflow-x:auto; gap:10px; padding:12px 0; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;">
-
-  <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
+    <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
       <img src="../monitor/api/static/cli1.png" style="width:100%; height:100%; object-fit:contain;" />
-  </div>
-  <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
+    </div>
+    <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
       <img src="../monitor/api/static/cli2.png" style="width:100%; height:100%; object-fit:contain;" />
     </div>
     <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
@@ -48,14 +38,15 @@
     <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
       <img src="../monitor/api/static/cli5.png" style="width:100%; height:100%; object-fit:contain;" />
     </div>
+  </div>
 </details>
 
 ### Por que usar isso?
 
 - **Leveza**: Pés no chão em termos de uso de recursos.
-- **Flexibilidade**: Funciona como uma ferramenta CLI ou um dashboard web completo.
-- **Foco no Administrador**: Inclui recursos como **Limites de VRAM** (desligar processos que excedem limites) e **Listas de Observação**.
-- **Amigável ao Desenvolvedor**: Ferramentas de teste de desempenho integradas (GEMM, Física de Partículas) para validar a estabilidade do sistema.
+- **Flexibilidade**: Funciona como uma ferramenta CLI ou um Dashboard Web completo.
+- **Orientado a Administradores**: Inclui recursos como **Limites de VRAM** (desligar processos que excedem limites) e **Listas de Observação**.
+- **Amigável para Desenvolvedores**: Ferramentas de teste e simulação integradas (GEMM, Física de Partículas) para validar a estabilidade do sistema.
 
 ---
 
@@ -71,22 +62,25 @@
   - **Listas de Observação**: Monitore PIDs ou nomes de processos específicos.
 
 - **Testes e Simulação**:
-  - **Testes de Estresse**: Cargas de trabalho GEMM configuráveis para testar a capacidade de resfriamento e estabilidade.
+  - **Testes de Estresse**: Cargas de trabalho GEMM configuráveis para testar a capacidade de resfriamento térmico e estabilidade.
   - **Simulação Visual**: Simulação interativa de física de partículas para visualizar a carga de trabalho da GPU.
 
 ---
 
 ## Roadmap e Trabalho Futuro
 
-Contribuições são bem-vindas! Os principais pontos futuros a serem abordados seriam:
+Contribuições são bem-vindas! Os principais pontos futuros a serem abordados incluem:
 
-- **Suporte Multi-GPU**: Melhor suporte para configurações multi-cartão e topologias NVLink.
-- **Containerização**: Suporte oficial do Docker para implantação fácil em ambientes contêinerizados.
+- **Suporte Multi-GPU**: Melhor suporte para configurações multi-card e topologias NVLink.
+- **Containerização**: Suporte oficial para Docker para implantação fácil em ambientes contêinerizados.
 - **Acesso Remoto**: Integração de túnel SSH e gerenciamento remoto seguro.
-- **Plataforma Cruzada**:
+- **Plataformas Cruzadas**:
   - [ ] Suporte a Linux (foco em Ubuntu/Debian).
   - [ ] Suporte a Apple Silicon para monitoramento.
-- **Documentação Multilíngue**: Suporte para as principais linguagens do GitHub.
+- **Independência de Hardware**:
+  - [ ] Suporte a AMD ROCm.
+  - [ ] Suporte a Intel Arc.
+- **Documentação Multilíngue**: (em breve)
 
 Veja [CONTRIBUTING.md](../CONTRIBUTING.md) para saber como contribuir.
 
@@ -94,10 +88,10 @@ Veja [CONTRIBUTING.md](../CONTRIBUTING.md) para saber como contribuir.
 
 ## Requisitos
 
-- **OS**: Windows 10/11
+- **Sistema Operacional**: Windows 10/11
 - **Python**: 3.10+
 - **Hardware**: GPU NVIDIA com drivers instalados.
-- **CUDA**: Kit de Desenvolvimento 12.x (estritamente necessário para recursos de teste e simulação).
+- **CUDA**: Versão 12.x (estritamente necessária para recursos de teste e simulação).
   - *Observação: Se a CUDA 12.x não for detectada, os recursos de teste e simulação serão desabilitados.*
 
 ---
@@ -120,19 +114,19 @@ Ideal para a maioria dos usuários.
 - Inclui o Dashboard Web.
 - Endpoints de API REST.
 - Gráficos em tempo real.
-- Mas sem a Simulação ou os recursos de teste.
+- Mas sem recursos de simulação ou teste.
 
 ### 3. Instalação Completa (Padrão + Visualização)
 
 Ideal para desenvolvimento e testes de estresse.
 
-- Inclui a Simulação.
-- Dependências do PyTorch/CuPy para testes de desempenho.
+- Inclui Simulação.
+- Dependências de PyTorch/CuPy para testes de benchmark.
 
 ### Início Rápido
 
 1. **Baixe** a versão mais recente ou clone o repositório.
-2. **Execute o Setup**:
+2. **Execute o script de configuração**:
 
   ```powershell
   .\setup.ps1
@@ -141,7 +135,7 @@ Ideal para desenvolvimento e testes de estresse.
 3. **Inicie**:
 
 ```powershell
-# Inicie o dashboard web (Padrão/Completa)
+# Inicie o Dashboard Web (Padrão/Completa)
 python health_monitor.py web
 
 # Inicie o CLI
