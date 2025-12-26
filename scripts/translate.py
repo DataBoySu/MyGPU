@@ -46,8 +46,6 @@ def protect_match(match):
 
 text_to_translate = original_text
 
-# 0. Protect Explicit Blocks (<!-- b --> ... <!-- e -->)
-text_to_translate = re.sub(r'(<!--\s*b\s*-->.*?<!--\s*e\s*-->)', protect_match, text_to_translate, flags=re.DOTALL)
 # 1. Protect Navigation Bar (Robust regex for attributes and whitespace)
 text_to_translate = re.sub(r'(<div\s+[^>]*align=["\']center["\'][^>]*>.*?</div>)', protect_match, text_to_translate, flags=re.DOTALL | re.IGNORECASE)
 # 2. Protect Logo Block (Robust regex for style attribute)
@@ -70,7 +68,7 @@ CRITICAL RULES:
    - 'Headless' = Servers without a display (JA: ヘッドレス, ZH: 无头).
    - 'Agnostic' = Independence (JA: 非依存, ZH: 无关性).
 8. **System Tags**: Return any text in the format [[PB_X]] exactly as is. These are code identifiers, NOT text. Do NOT translate the word 'PB' or change the brackets.
-
+9. **Noise**: Do not discard anything from the input, everything is important. This is a markdown/HTML document, so preserve tags.
 <|START_OF_TURN_TOKEN|><|USER_TOKEN|>
 {text_to_translate}<|END_OF_TURN_TOKEN|>
 <|START_OF_TURN_TOKEN|><|CHATBOT_TOKEN|>"""
