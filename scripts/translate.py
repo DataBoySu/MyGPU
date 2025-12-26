@@ -9,8 +9,11 @@ LANG_MAP = {
     "fr": "French",
     "es": "Spanish",
     "ja": "Japanese",
-    "zh": "Chinese (Simplified)",
-    "ru": "Russian"
+    "zh": "Simplified Chinese",
+    "ru": "Russian",
+    "pt": "Portuguese",
+    "ko": "Korean",
+    "hi": "Hindi"
 }
 
 parser = argparse.ArgumentParser()
@@ -41,6 +44,7 @@ You are a professional technical translator.
 Perform a strict technical translation of the provided README into professional developer-level {target_lang_name}. 
 Maintain a formal tone and preserve technical terminology (e.g., GPU, CLI, vCPU).
 Keep all Markdown/HTML syntax exactly as is. 
+IMPORTANT: Do not strip or modify the top-level HTML tags (like <div> or <img>) at the beginning of the file.
 ONLY output the translated {target_lang_name} text. No talk, just translation.
 Do not add new information, do not summarize, and do not include any conversational filler or "thinking" process.<|END_OF_TURN_TOKEN|>
 <|START_OF_TURN_TOKEN|><|USER_TOKEN|>
@@ -57,9 +61,6 @@ response = llm(
 )
 
 translated_content = response['choices'][0]['text'].strip()
-
-# # 0. SAFETY: Remove HTML comments if the LLM wrapped the output in them
-# translated_content = re.sub(r'^<!--\s*|(?:\s*)?-->$', '', translated_content).strip()
 
 # 1. CLEANUP: Remove markdown code fences if the LLM included them
 if translated_content.startswith("```"):

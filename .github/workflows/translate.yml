@@ -1,4 +1,4 @@
-name: AI Readme Translator (Multilingual)
+name: Readme Translator (Multilingual)
 
 on:
   workflow_dispatch:
@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        lang: [de, fr, es, ja, zh] # German, French, Spanish, Japanese, Chinese
+        lang: [de, fr, es, ja, zh, pt, ko, hi] # German, French, Spanish, Japanese, Chinese, Portuguese, Korean, Hindi
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
