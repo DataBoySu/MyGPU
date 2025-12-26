@@ -32,15 +32,17 @@ with open(README_PATH, "r", encoding="utf-8") as f:
 text_to_translate = original_text
 
 prompt = f"""<|START_OF_TURN_TOKEN|><|SYSTEM_TOKEN|>
-You are a professional technical {target_lang_name} translator. Translate the provided README into professional developer-level {target_lang_name}.
+You are a professional technical {target_lang_name} translator.
+Task: Translate the README content into {target_lang_name} while preserving the exact layout, HTML, and badges.
 
-CRITICAL RULES:
-1. **Navigation Bar**: The top HTML block (`<div align="center">...</div>`) containing language links MUST remain EXACTLY the same. Do NOT translate the filenames or language names inside it.
-2. **Badges**: Do NOT translate the text inside badge links (e.g., `![License]`, `![Python]`). Keep the URLs exactly as is.
-3. **Logo**: Keep the logo HTML block (`<div style="text-align:center...`) exactly as is.
-4. **Formatting**: Preserve all emojis and HTML/Markdown tags exactly.
-5. **Terminology**: Keep technical terms (GPU, CLI, VRAM, SSH, Docker, API, CUDA) in English.
-6. **No Talk**: Output ONLY the translated text. Do not wrap the output in markdown code fences (```).
+STRICT RULES:
+1. **Navigation Bar**: The first block `<div align="center">...</div>` is IMMUTABLE. Copy it exactly. Do NOT translate "English", "Deutsch", etc.
+2. **Logo**: The block `<div style="text-align:center...` is IMMUTABLE. Copy it exactly.
+3. **Badges**: Lines starting with `![` (e.g., `![License]...`) are IMMUTABLE CODE. Copy them character-for-character. Do NOT translate "License", "Python", "Version".
+4. **Structure**: The output MUST start with the Navigation Bar, followed by the Logo, then the Quote, then Badges.
+5. **Formatting**: Keep all HTML tags, markdown links, and emojis exactly as is.
+6. **Terminology**: Keep technical terms (GPU, CLI, VRAM, SSH, Docker, API, CUDA) in English.
+7. **No Talk**: Output ONLY the translated README. No code fences.
 <|END_OF_TURN_TOKEN|>
 <|START_OF_TURN_TOKEN|><|USER_TOKEN|>
 {text_to_translate}<|END_OF_TURN_TOKEN|>
