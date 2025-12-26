@@ -1,19 +1,33 @@
-# MyGPU : Outil de gestion légère des GPU
+<div align="center">
+  <a href="../README.md">🇺🇸 Anglais</a> |
+  <a href="../README.de.md">🇩🇪 Allemand</a> |
+  <a href="../README.fr.md">🇫🇷 Français</a> |
+  <a href="../README.es.md">🇪🇸 Espagnol</a> |
+  <a href="../README.ja.md">🇯🇵 Japonais</a> |
+  <a href="../README.zh.md">🇨🇳 Chinois</a> |
+  <a href="../README.pt.md">🇵🇹 Portugais</a> |
+  <a href="../README.ko.md">🇰🇷 Coréen</a> |
+  <a href="../README.hi.md">🇮🇳 Hindi</a>
+</div>
 
-*MyGPU : Un utilitaire de gestion légère des GPU, un wrapper compact de `nvidia-smi` avec un tableau de bord web propre.*
+<div style="text-align:center; margin:18px 0;">
+  <img src="../monitor/api/static/logo.png" alt="MyGPU logo"/>
+</div>
+
+> *MyGPU : Outil de gestion de GPU léger : un wrapper compact pour `nvidia-smi` avec un tableau de bord web propre.*
 
 ![Licence](https://img.shields.io/badge/licence-MIT-blue.svg)
-![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
+![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![Version](https://img.shields.io/badge/version-1.2.3-blue)
 ![Plateforme](https://img.shields.io/badge/plateforme-Windows-lightgrey)
-![CUDA 12.x](https://img.shields.io/badge/CUDA-12.x-0f9d58?logo=nvidia)
+![cuda 12.x](https://img.shields.io/badge/CUDA-12.x-0f9d58?logo=nvidia)
 
 ## Galerie
 
 <details>
   <summary>Tableau de bord web</summary>
   <div style="display:flex; overflow-x:auto; gap:10px; padding:12px 0; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;">
-    <!-- Utilisez la première image pour le cadre de diaporama avec un rapport hauteur/largeur de 1624/675; les autres images s'ajustent à l'intérieur en utilisant object-fit:contain -->
+    <!-- Utilisez la première image pour le cadre de diapositive; ajustez les autres en conséquence -->
     <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
       <img src="../monitor/api/static/web1.png" style="width:100%; height:100%; object-fit:contain;" />
     </div>
@@ -38,12 +52,12 @@
   </div>
 </details>
 
-### Pourquoi utiliser MyGPU ?
+### Pourquoi l'utiliser ?
 
-- **Légèreté** : Empreinte ressource minimale.
-- **Flexibilité** : Fonctionne comme un outil CLI, un service en arrière-plan ou un tableau de bord web complet.
-- **Orienté administration** : Inclut des fonctionnalités telles que **l'enforcement de la VRAM** (arrêt automatique des processus dépassant les limites) et les **listes de surveillance**.
-- **Amical pour les développeurs** : Outils intégrés de test et de simulation de stress (GEMM, physique des particules) pour valider la stabilité du système.
+- **Léger** : empreinte ressource minimale.
+- **Polyvalent** : peut être exécuté en tant qu'outil CLI, service en arrière-plan ou tableau de bord web complet.
+- **Orienté administrateur** : inclut des fonctionnalités telles que **l'enforcement de la VRAM** (arrêt automatique des processus dépassant les limites) et les **listes de surveillance**.
+- **Amical pour les développeurs** : outils intégrés de test et de simulation (GEMM, physique des particules) pour valider la stabilité du système.
 
 ---
 
@@ -54,13 +68,13 @@
   - Métriques système (CPU, RAM, etc.).
 
 - **Administration et application de règles** :
-  - **Limites de VRAM** : Définir des limites dures sur l'utilisation de la VRAM par GPU.
-  - **Arrêt automatique** : Arrêter automatiquement les processus qui violent les politiques de VRAM (uniquement pour les administrateurs).
-  - **Listes de surveillance** : Surveiller des PIDs ou des noms de processus spécifiques.
+  - **Limites de VRAM** : définissez des limites dures sur l'utilisation de la VRAM par GPU.
+  - **Arrêt automatique** : arrêtez automatiquement les processus qui violent les règles de politique de VRAM (uniquement administrateur).
+  - **Listes de surveillance** : surveillez des PIDs ou des noms de processus spécifiques.
 
 - **Test et simulation** :
-  - **Test de stress** : Utiliser des charges de travail GEMM configurables pour tester la thermolage et la stabilité.
-  - **Simulation visuelle** : Simulation interactive de physique des particules pour visualiser la charge de travail du GPU.
+  - **Tests de stress** : configurez des charges de travail GEMM pour tester la thermolage et la stabilité.
+  - **Simulation visuelle** : simulation interactive de physique des particules pour visualiser la charge de travail du GPU.
 
 ---
 
@@ -68,15 +82,15 @@
 
 Les contributions sont les bienvenues ! Les points principaux à aborder seraient :
 
-- **Prise en charge multi-GPU** : Amélioration du traitement des configurations multi-cartes et des topologies NVLink.
-- **Conteneurisation** : Support officiel pour Docker pour un déploiement facile dans des environnements conteneurisés.
-- **Accès à distance** : Intégration du tunnel SSH et gestion à distance sécurisée.
+- **Prise en charge multi-GPU** : gestion améliorée des configurations multi-cartes et des topologies NVLink.
+- **Conteneurisation** : prise en charge officielle de Docker pour un déploiement facile dans des environnements conteneurisés.
+- **Accès à distance** : intégration du tunnel SSH et gestion à distance sécurisée.
 - **Prise en charge multiplateforme** :
-  - [ ] Linux (concentration sur Ubuntu/Debian).
-  - [ ] macOS (prise en charge de la surveillance Apple Silicon).
-- **Indépendant du matériel** :
-  - [ ] Prise en charge de ROCm d'AMD.
-  - [ ] Prise en charge d'Arc d'Intel.
+  - [ ] Linux (focalisation sur Ubuntu/Debian).
+  - [ ] macOS (surveillance Apple Silicon).
+- **Indépendance du matériel** :
+  - [ ] Prise en charge d'AMD ROCm.
+  - [ ] Prise en charge d'Intel Arc.
 
 Consultez [CONTRIBUTING.md](../CONTRIBUTING.md) pour savoir comment participer.
 
@@ -116,16 +130,16 @@ Idéale pour la plupart des utilisateurs.
 Idéale pour le développement et les tests de stress.
 
 - Inclut la simulation de particules.
-- Dépendances PyTorch/CuPy pour les tests de performance.
+- Dépendances PyTorch/CuPy pour les tests de benchmark.
 
 ### Démarrage rapide
 
 1. **Téléchargez** la dernière version ou clonez le dépôt.
 2. **Exécutez l'installation** :
 
-   ```powershell
-   .\setup.ps1
-   ```
+  ```powershell
+  .\setup.ps1
+  ```
 
 3. **Lancez** :
 

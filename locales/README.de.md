@@ -1,21 +1,33 @@
-# MyGPU: Ein leichtgewichtiges GPU-Verwaltungstool: Ein kompakter Wrapper für `nvidia-smi` mit einer sauberen Web-Dashboard-Schnittstelle
+<div align="center">
+  <a href="../README.md">🇺🇸 Englisch</a> |
+  <a href="../README.de.md">🇩🇪 Deutsch</a> |
+  <a href="../README.fr.md">🇫🇷 Französisch</a> |
+  <a href="../README.es.md">🇪🇸 Spanisch</a> |
+  <a href="../README.ja.md">🇯🇵 Japanisch</a> |
+  <a href="../README.zh.md">🇨🇳 Chinesisch</a> |
+  <a href="../README.pt.md">🇵🇹 Portugiesisch</a> |
+  <a href="../README.ko.md">🇰🇷 Koreanisch</a> |
+  <a href="../README.hi.md">🇮🇳 Hindi</a>
+</div>
 
-> *MyGPU: Ein leichtgewichtiges GPU-Verwaltungstool mit einer kompakten `nvidia-smi`-Verpackung und einem sauberen Web-Dashboard.*
+<div style="text-align:center; margin:18px 0;">
+  <img src="../monitor/api/static/logo.png" alt="MyGPU Logo"/>
+</div>
+
+> *MyGPU: Ein leichtgewichtiges GPU-Verwaltungstool: Ein kompakter Wrapper für `nvidia-smi` mit einer sauberen Web-Dashboard-Schnittstelle.*
 
 ![Lizenz](https://img.shields.io/badge/Lizenz-MIT-blue.svg)
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
 ![Version](https://img.shields.io/badge/Version-1.2.3-blue)
 ![Plattform](https://img.shields.io/badge/Plattform-Windows-lightgrey)
-![CUDA 12.x](https://img.shields.io/badge/CUDA-12.x-0f9d58?logo=nvidia)
+![cuda 12.x](https://img.shields.io/badge/CUDA-12.x-0f9d58?logo=nvidia)
 
 ## Galerie
-
-### Web-Dashboard
 
 <details>
   <summary>Web-Dashboard</summary>
   <div style="display:flex; overflow-x:auto; gap:10px; padding:12px 0; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;">
-    <!-- Verwenden Sie das erste Bild mit einem Seitenverhältnis von 1624x675 für den Folienrahmen; die Bilder passen sich mit `object-fit: contain` innerhalb ein -->
+    <!-- Verwenden Sie das erste Bild mit einem Seitenverhältnis von 1624x675 für den Folienrahmen; Bilder passen sich mit `object-fit: contain` innerhalb an -->
     <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
       <img src="../monitor/api/static/web1.png" style="width:100%; height:100%; object-fit:contain;" />
     </div>
@@ -30,9 +42,6 @@
     </div>
   </div>
 </details>
-
-### CLI
-
 <details>
   <summary>CLI</summary>
   <div style="display:flex; overflow-x:auto; gap:10px; padding:12px 0; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;">
@@ -54,33 +63,33 @@
   </div>
 </details>
 
-### Warum dies verwenden?
+### Warum diese Nutzung?
 
-- **Leichtgewichtig**: Minimale Ressourcenbelastung.
+- **Leichtgewichtig**: Minimaler Ressourcenverbrauch.
 - **Flexibel**: Als CLI-Tool, Hintergrunddienst oder voll ausgestattetes Web-Dashboard ausführbar.
-- **admin-zentriert**: Enthält Funktionen wie **VRAM-Enforcement** (Automatische Beendigung von Prozessen, die VRAM-Richtlinien verletzen) und **Watchlists**.
-- **entwicklerfreundlich**: Integrierte Benchmarking- und Stresstestwerkzeuge (GEMM, Teilchenphysik) zur Validierung der Systemstabilität.
+- **admin-zentriert**: Enthält Funktionen wie **VRAM-Enforcement** (Automatische Beendigung von Prozessen, die VRAM-Grenzen überschreiten) und **Watchlists**.
+- **entwicklerfreundlich**: Integrierte Benchmarking- und Simulationswerkzeuge (GEMM, Teilchenphysik) zur Validierung der Systemstabilität.
 
 ---
 
 ## Funktionen
 
-- **Echtzeitüberwachung**:
+- **Echtzeit-Überwachung**:
   - Detaillierte GPU-Metriken (Nutzung, VRAM, Leistung, Temperatur).
   - Systemmetriken (CPU, RAM usw.).
 
 - **Admin- und Durchsetzungsfunktionen**:
-  - **VRAM-Grenzen**: Legen Sie harte VRAM-Nutzungsgrenzen für jede GPU fest.
-  - **Automatische Beendigung**: Automatisch beenden Sie Prozesse, die VRAM-Richtlinien verletzen (nur für Administratoren).
-  - **Watchlists**: Überwachen Sie bestimmte PIDs oder Prozessnamen.
+  - **VRAM-Grenzen**: Legen Sie harte Grenzen für die VRAM-Nutzung pro GPU fest.
+  - **Automatische Beendigung**: Automatisch Prozesse beenden, die VRAM-Richtlinien verletzen (nur für Administratoren).
+  - **Watchlists**: Überwachen Sie spezifische PIDs oder Prozessnamen.
 
-- **Benchmarking und Simulation**:
-  - **Stresstest**: Konfigurierbare GEMM-Lasten zum Testen der thermischen Throtting und Stabilität.
-  - **Visuelle Simulation**: Interaktive 3D-Teilchenphysiksimulation zur Visualisierung der GPU-Last.
+- **Benchmarking & Simulation**:
+  - **Stresstest**: Konfigurierbare GEMM-Lasten zur Tests der thermischen Throtting und Stabilität.
+  - **Visuelle Simulation**: Interaktive 3D-Teilchenphysik-Simulation zur Visualisierung der GPU-Last.
 
 ---
 
-## Roadmap und zukünftige Arbeiten
+## Roadmap & zukünftige Arbeiten
 
 Beiträge sind willkommen! Die Hauptpunkte, die in der Zukunft abgedeckt werden sollen, sind:
 
@@ -112,36 +121,36 @@ Siehe [CONTRIBUTING.md](../CONTRIBUTING.md), um herauszufinden, wie du dich einb
 
 Das Tool unterstützt eine modulare Installation, um Ihren Bedürfnissen gerecht zu werden:
 
-### 1. Minimale Installation (nur CLI)
+### 1. Minimal (CLI nur)
 
 Am besten für Headless-Server oder Hintergrundüberwachung geeignet.
 
 - Befehlszeileninterface.
 - Grundlegende System-/GPU-Metriken.
 
-### 2. Standardinstallation (CLI + Web-UI)
+### 2. Standard (CLI + Web-UI)
 
 Am besten für die meisten Benutzer geeignet.
 
 - Enthält Web-Dashboard.
 - REST-API-Endpunkte.
-- Echtzeitdiagramme.
+- Echtzeit-Diagramme.
 
-### 3. Vollständige Installation (Standard + Visualisierung)
+### 3. Vollständig (Standard + Visualisierung)
 
 Am besten für Entwicklung und Stresstest geeignet.
 
 - Enthält Teilchenphysik-Simulation.
 - Abhängigkeiten für PyTorch/CuPy-Benchmarking.
 
-### Schnelle Einrichtung
+### Schnelle Startanleitung
 
 1. **Laden** Sie die neueste Version herunter oder klonen Sie das Repository.
-2. **Einrichten**:
+2. **Ausführen der Setup-Skript**:
 
-   ```powershell
-   .\setup.ps1
-   ```
+  ```powershell
+  .\setup.ps1
+  ```
 
 3. **Starten**:
 
