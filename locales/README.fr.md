@@ -1,77 +1,51 @@
-<div align="center">
-  <a href="../README.md">🇺🇸 English</a> |
-  <a href="../locales/README.de.md">🇩🇪 Deutsch</a> |
-  <a href="../locales/README.fr.md">🇫🇷 Français</a> |
-  <a href="../locales/README.es.md">🇪🇸 Español</a> |
-  <a href="../locales/README.ja.md">🇯🇵 日本語</a> |
-  <a href="../locales/README.zh.md">🇨🇳 中文</a> |
-  <a href="../locales/README.pt.md">🇵🇹 Português</a> |
-  <a href="../locales/README.ko.md">🇰🇷 한국어</a> |
-  <a href="../locales/README.hi.md">🇮🇳 हिंदी</a>
-</div>
-</details>
-<div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
-<img src="../monitor/api/static/cli5.png" style="width:100%; height:100%; object-fit:contain;" />
-</div>
-<div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
-<img src="../monitor/api/static/cli4.png" style="width:100%; height:100%; object-fit:contain;" />
-</div>
-<div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
-<img src="../monitor/api/static/cli3.png" style="width:100%; height:100%; object-fit:contain;" />
-</div>
-<div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
-<img src="../monitor/api/static/cli2.png" style="width:100%; height:100%; object-fit:contain;" />
-</div>
-</details>
-<details>
-<summary>
-</summary>
-<div style="display:flex; overflow-x:auto; gap:10px; padding:12px 0; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;">
-<div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
-<img src="../monitor/api/static/cli1.png" style="width:100%; height:100%; object-fit:contain;" />
-</div>
-</div>
-<div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
-<img src="../monitor/api/static/web4.png" style="width:100%; height:100%; object-fit:contain;" />
-</div>
-<div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
-<img src="../monitor/api/static/web3.png" style="width:100%; height:100%; object-fit:contain;" />
-</div>
-<div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
-<img src="../monitor/api/static/web2.png" style="width:100%; height:100%; object-fit:contain;" />
-</div>
-<div style="text-align:center; margin:18px 0;">
-  <img src="../monitor/api/static/logo.png" alt="MyGPU logo"/>
-</div>
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
+# MyGPU : Outil de gestion de GPU léger
+
+*MyGPU est un utilitaire de gestion de GPU léger, un wrapper compact pour `nvidia-smi` avec un tableau de bord web élégant.*
+
+![Licence](https://img.shields.io/badge/licence-MIT-blue.svg)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![Version](https://img.shields.io/badge/version-1.2.3-blue)
-![Platform](https://img.shields.io/badge/platform-Windows-lightgrey)
-![cuda 12.x](https://img.shields.io/badge/CUDA-12.x-0f9d58?logo=nvidia)
-<details>
-<summary>
-</summary>
-<div style="display:flex; overflow-x:auto; gap:10px; padding:12px 0; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;">
-<!-- Use first image aspect ratio 1624x675 for slide frame; images fit inside using object-fit:contain -->
-<div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
-<img src="../monitor/api/static/web1.png" style="width:100%; height:100%; object-fit:contain;" />
-</div>
-
-## Mon utilitaire GPU : MyGPU - Un outil de gestion léger des GPU avec un tableau de bord web élégant
-
-**MyGPU** est un outil léger de gestion des GPU, un wrapper compact de `nvidia-smi` avec un tableau de bord web intégré.
+![Plateforme](https://img.shields.io/badge/plateforme-Windows-lightgrey)
+![CUDA 12.x](https://img.shields.io/badge/CUDA-12.x-0f9d58?logo=nvidia)
 
 ## Galerie
 
-- **Tableau de bord web** : une interface utilisateur intuitive pour surveiller et gérer vos GPU.
-- **CLI** : une interface en ligne de commande pour une utilisation rapide et discrète.
+<details>
+  <summary>Tableau de bord web</summary>
+  <div style="display:flex; overflow-x:auto; gap:10px; padding:12px 0; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;">
+    <!-- Utilisez la première image pour le cadre de diapositive avec un rapport d'aspect 1624/675; les autres s'ajustent automatiquement -->
+    <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
+      <img src="../monitor/api/static/web1.png" style="width:100%; height:100%; object-fit:contain;" />
+    </div>
+    <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
+      <img src="../monitor/api/static/web2.png" style="width:100%; height:100%; object-fit:contain;" />
+    </div>
+    <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
+      <img src="../monitor/api/static/web3.png" style="width:100%; height:100%; object-fit:contain;" />
+    </div>
+    <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
+      <img src="../monitor/api/static/web4.png" style="width:100%; height:100%; object-fit:contain;" />
+    </div>
+  </div>
+</details>
+<details>
+  <summary>Interface en ligne de commande (CLI)</summary>
+  <div style="display:flex; overflow-x:auto; gap:10px; padding:12px 0; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;">
+    <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
+      <img src="../monitor/api/static/cli1.png" style="width:100%; height:100%; object-fit:contain;" />
+    </div>
+    <!-- Ajoutez d'autres images CLI ici -->
+  </div>
+</details>
 
-## Pourquoi l'utiliser ?
+### Pourquoi utiliser MyGPU ?
 
-- **Léger** : empreinte minimale en termes de ressources.
-- **Polyvalent** : fonctionne en tant qu'outil CLI ou avec un tableau de bord web complet.
-- **Orienté administration** : inclut des fonctionnalités telles que la **limitation de la VRAM** et les **listes de surveillance**.
-- **Amical pour les développeurs** : outils intégrés de test et de simulation pour valider la stabilité du système.
+- **Léger** : empreinte ressource minimale.
+- **Polyvalent** : fonctionne comme un outil CLI ou un tableau de bord web complet.
+- **Orienté administration** : inclut des fonctionnalités telles que l'**enforcement de la mémoire VRAM** (arrêt automatique des processus dépassant les limites) et les **listes de surveillance**.
+- **Amical pour les développeurs** : outils intégrés de test et de simulation de stress (GEMM, physique des particules) pour valider la stabilité du système.
+
+---
 
 ## Fonctionnalités
 
@@ -80,68 +54,69 @@
   - Métriques système (CPU, RAM, etc.).
 
 - **Administration et application de règles** :
-  - **Limites de VRAM** : définissez des limites strictes sur l'utilisation de la VRAM par GPU.
-  - **Arrêt automatique** : arrêtez automatiquement les processus qui violent les règles de la VRAM (réservé aux administrateurs).
+  - **Limites de VRAM** : définissez des limites dures sur l'utilisation de la VRAM par GPU.
+  - **Arrêt automatique** : arrêtez automatiquement les processus qui violent les règles de politique VRAM (uniquement pour les administrateurs).
   - **Listes de surveillance** : surveillez des PIDs ou des noms de processus spécifiques.
 
 - **Test et simulation** :
-  - **Tests de stress** : charges de travail GEMM configurables pour tester la throttling thermique et la stabilité.
-  - **Simulation visuelle** : simulation interactive de physique des particules pour visualiser la charge du GPU.
+  - **Test de stress** : charges de travail GEMM configurables pour tester la thermolage et la stabilité.
+  - **Simulation visuelle** : simulation interactive de physique des particules pour visualiser la charge de travail du GPU.
+
+---
 
 ## Roadmap et travaux futurs
 
-Les contributions sont les bienvenues ! Les points principaux à aborder dans un futur proche sont :
+Les contributions sont les bienvenues ! Les points principaux à aborder seraient :
 
-- **Prise en charge multi-GPU** : amélioration de la gestion des configurations multi-cartes et des topologies NVLink.
-- **Conteneurisation** : prise en charge officielle de Docker pour un déploiement facile dans des environnements conteneurisés.
-- **Accès à distance** : intégration du tunnel SSH et de la gestion sécurisée à distance.
-- **Prise en charge multi-plateforme** :
-
+- **Prise en charge multi-GPU** : gestion améliorée des configurations multi-cartes et des topologies NVLink.
+- **Conteneurisation** : support officiel pour Docker pour un déploiement facile dans des environnements conteneurisés.
+- **Accès à distance** : intégration du tunnel SSH et gestion à distance sécurisée.
+- **Prise en charge multiplateforme** :
   - [ ] Linux (focalisation sur Ubuntu/Debian).
-  - [ ] macOS (prise en charge Apple Silicon pour la surveillance).
-
-- **Indépendant de l'hardware** :
-
+  - [ ] macOS (surveillance Apple Silicon).
+- **Indépendance du matériel** :
   - [ ] Prise en charge de ROCm d'AMD.
   - [ ] Prise en charge d'Intel Arc.
-
-- **Documentation multi-langues** : prise en charge des principales langues de GitHub.
+- ~~**Documentation multilingue** : prise en charge des principales langues GitHub.~~
 
 Consultez [CONTRIBUTING.md](../CONTRIBUTING.md) pour savoir comment participer.
+
+---
 
 ## Exigences
 
 - **Système d'exploitation** : Windows 10/11
 - **Python** : 3.10+
-- **Hardware** : GPU NVIDIA avec pilotes installés.
-- **CUDA** : Toolkit 12.x (strictement requis pour les fonctionnalités de test et de simulation).
+- **Matériel** : GPU NVIDIA avec pilotes installés.
+- **CUDA** : 12.x (strictement requis pour les fonctionnalités de test et de simulation).
+  - *Remarque : Si CUDA 12.x n'est pas détecté, les fonctionnalités de test et de simulation seront désactivées.*
 
-  *Note : Si CUDA 12.x n'est pas détecté, les fonctionnalités de test et de simulation seront désactivées.*
+---
 
 ## Installation
 
-L'outil offre plusieurs options d'installation pour répondre à vos besoins :
+L'outil prend en charge une installation modulaire pour répondre à vos besoins :
 
-### 1. Minimal (CLI uniquement)
+### 1. Installation minimale (CLI uniquement)
 
-Idéal pour les serveurs sans tête ou la surveillance en arrière-plan.
+Idéale pour les serveurs sans tête ou la surveillance en arrière-plan.
 
 - Interface en ligne de commande.
 - Métriques système et GPU de base.
 
-### 2. Standard (CLI + Tableau de bord web)
+### 2. Installation standard (CLI + Tableau de bord web)
 
-Idéal pour la plupart des utilisateurs.
+Idéale pour la plupart des utilisateurs.
 
 - Inclut le tableau de bord web.
-- Points de terminaison d'API REST.
+- Points de terminaison API REST.
 - Graphiques en temps réel.
 
-### 3. Complet (Standard + Simulation)
+### 3. Installation complète (Standard + Simulation)
 
-Idéal pour le développement et les tests de stress.
+Idéale pour le développement et les tests de stress.
 
-- Inclut la simulation de particules.
+- Inclut la simulation.
 - Dépendances PyTorch/CuPy pour les tests de performance.
 
 ### Démarrage rapide
@@ -153,16 +128,12 @@ Idéal pour le développement et les tests de stress.
   .\setup.ps1
   ```
 
-3. **Démarrez** :
+3. **Lancez** :
 
 ```powershell
-# Démarrez le tableau de bord web (Standard/Complet)
+# Démarrez le tableau de bord web (Standard/Complete)
 python health_monitor.py web
 
-# Démarrez l'interface CLI
+# Démarrez l'interface en ligne de commande
 python health_monitor.py cli
 ```
-
-## Licence
-
-Licence MIT. Veuillez consulter le fichier [LICENSE](../LICENSE) pour plus de détails.
