@@ -1,21 +1,33 @@
-[PROTECTADO_BLOQUE_0]
+<div align="center">
+  <a href="../README.md">🇺🇸 English</a> |
+  <a href="../README.de.md">🇩🇪 Deutsch</a> |
+  <a href="../README.fr.md">🇫🇷 Français</a> |
+  <a href="../README.es.md">🇪🇸 Español</a> |
+  <a href="../README.ja.md">🇯🇵 日本語</a> |
+  <a href="../README.zh.md">🇨🇳 中文</a> |
+  <a href="../README.pt.md">🇵🇹 Português</a> |
+  <a href="../README.ko.md">🇰🇷 한국어</a> | 
+  <a href="../README.hi.md">🇮🇳 Hindi</a>
+</div>
 
-[PROTECTADO_BLOQUE_1]
+<div style="text-align:center; margin:18px 0;">
+  <img src="../monitor/api/static/logo.png" alt="MyGPU logo"/>
+</div>
 
-> *MyGPU: Utilidad de gestión de GPU ligera: un envoltorio compacto de `nvidia-smi` con un elegante panel web.*
+> *MyGPU: Una utilidad de gestión de GPU ligera: un envoltorio compacto de `nvidia-smi` con un elegante tablero web.*
 
-[PROTECTADO_BLOQUE_2]
-[PROTECTADO_BLOQUE_3]
-[PROTECTADO_BLOQUE_4]
-[PROTECTADO_BLOQUE_5]
-[PROTECTADO_BLOQUE_6]
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Python](https://img.shields.io/badge/python-3.10%2B-blue)
+![Version](https://img.shields.io/badge/version-1.2.3-blue)
+![Platform](https://img.shields.io/badge/platform-Windows-lightgrey)
+![cuda 12.x](https://img.shields.io/badge/CUDA-12.x-0f9d58?logo=nvidia)
 
 ## Galería
 
 <details>
-  <summary>Panel Web</summary>
+  <summary>Tablero Web</summary>
   <div style="display:flex; overflow-x:auto; gap:10px; padding:12px 0; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;">
-    <!-- Utilice la primera imagen con relación de aspecto 1624x675 para el marco de diapositiva; las imágenes se ajustan automáticamente usando object-fit:contain -->
+    <!-- Utilice la primera imagen con relación de aspecto 1624x675 para el marco de diapositiva; las imágenes se ajustan automáticamente con object-fit:contain -->
     <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
       <img src="../monitor/api/static/web1.png" style="width:100%; height:100%; object-fit:contain;" />
     </div>
@@ -29,7 +41,6 @@
       <img src="../monitor/api/static/web4.png" style="width:100%; height:100%; object-fit:contain;" />
     </div>
   </div>
-
 </details>
 <details>
   <summary>CLI</summary>
@@ -49,16 +60,14 @@
     <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
       <img src="../monitor/api/static/cli5.png" style="width:100%; height:100%; object-fit:contain;" />
     </div>
-  </div>
-
-</details>
+  </details>
 
 ### ¿Por qué usar esto?
 
-- **Ligero**: Pie de contacto mínimo con los recursos.
-- **Versátil**: Funciona como herramienta de línea de comandos o como un panel web completo.
-- **Orientado a la administración**: Incluye características como **restricción de VRAM** (terminación automática de procesos que superen los límites) y **listas de vigilancia**.
-- **Amigable con el desarrollador**: Herramientas integradas de prueba de estrés y simulación (GEMM, Física de Partículas) para validar la estabilidad del sistema.
+- **Ligero**: Pieza de recurso mínima.
+- **Flexible**: Se ejecuta como una herramienta CLI o un tablero web completo.
+- **Orientado a la administración**: Incluye características como **restricciones de VRAM** (auto-terminación de procesos que superen los límites) y **listas de vigilancia**.
+- **Amigable con el desarrollador**: Herramientas integradas de prueba y simulación (GEMM, Física de Partículas) para validar la estabilidad del sistema.
 
 ---
 
@@ -71,28 +80,27 @@
 - **Administración y aplicación de políticas**:
   - **Límites de VRAM**: Establezca límites duros en el uso de VRAM por GPU.
   - **Terminación automática**: Termine automáticamente los procesos que violen las políticas de VRAM (solo para administradores).
-  - **Listas de vigilancia**: Monitoree procesos específicos o nombres de procesos.
+  - **Listas de vigilancia**: Monitoree PIDs o nombres de procesos específicos.
 
 - **Pruebas y simulación**:
-  - **Pruebas de estrés**: Configure cargas de trabajo GEMM configurables para probar el throtting térmico y la estabilidad.
+  - **Pruebas de estrés**: Cargas de trabajo GEMM configurables para probar el throtting térmico y la estabilidad.
   - **Simulación visual**: Simulación interactiva de física de partículas para visualizar la carga de GPU.
 
 ---
 
-## Roadmap y trabajo futuro
+## Plan de desarrollo
 
-Las contribuciones son bienvenidas. Los puntos principales a cubrir serían:
+Las contribuciones son bienvenidas. Los futuros puntos principales a cubrir serían:
 
 - **Soporte multi-GPU**: Manejo mejorado para configuraciones multi-tarjeta y topologías NVLink.
-- **Contenedorización**: Soporte oficial para Docker para un despliegue fácil en entornos contenedorizados.
+- **Contenedorización**: Soporte oficial de Docker para un despliegue fácil en entornos contenedorizados.
 - **Acceso remoto**: Integración de túneles SSH y gestión remota segura.
 - **Plataforma cruzada**:
-  - [ ] Soporte para Linux (foco en Ubuntu/Debian).
-  - [ ] Soporte para Apple Silicon para monitoreo.
-- **Independiente de hardware**:
+  - [ ] Soporte para macOS (monitoreo de Apple Silicon).
+- **Independencia de hardware**:
   - [ ] Soporte para AMD ROCm.
   - [ ] Soporte para Intel Arc.
-- **Documentación en múltiples idiomas**: Apoyo a los lenguajes más populares de GitHub.
+- ~~**Documentación multilingüe**: Apoyo a los lenguajes más populares de GitHub.~~
 
 Consulte [CONTRIBUTING.md](../CONTRIBUTING.md) para saber cómo involucrarse.
 
@@ -119,11 +127,11 @@ Ideal para servidores sin cabeza o monitoreo en segundo plano.
 - Interfaz de línea de comandos.
 - Métricas básicas del sistema y la GPU.
 
-### 2. Estándar (CLI + Panel web)
+### 2. Estándar (CLI + Tablero web)
 
 Ideal para la mayoría de los usuarios.
 
-- Incluye el panel web.
+- Incluye el tablero web.
 - Puntos finales de API REST.
 - Gráficos en tiempo real.
 
@@ -146,15 +154,9 @@ Ideal para desarrollo y pruebas de estrés.
 3. **Inicie**:
 
 ```powershell
-# Inicie el panel web (Estándar/Completo)
+# Inicie el tablero web (Estándar/Completo)
 python health_monitor.py web
 
 # Inicie la CLI
 python health_monitor.py cli
 ```
-
----
-
-## Licencia
-
-Licencia MIT. Consulte [LICENSE](../LICENSE) para más detalles.

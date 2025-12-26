@@ -1,68 +1,56 @@
-[PROTECTADO_BLOCO_0]
-
-[PROTECTADO_BLOCO_1]
-
-> *MyGPU: Uma utilidade de gerenciamento de GPU leve: um wrapper compacto para `nvidia-smi` com um dashboard web elegante.*
-
-[PROTECTADO_BLOCO_2]
-[PROTECTADO_BLOCO_3]
-[PROTECTADO_BLOCO_4]
-[PROTECTADO_BLOCO_5]
-[PROTECTADO_BLOCO_6]
+# MyGPU: Utilitário de Gerenciamento de GPU Leve: um Wrapper Compacto para nvidia-smi com um Dashboard Web Elegante
 
 ## Galeria
 
 <details>
   <summary>Dashboard Web</summary>
-  <div style="display:flex; overflow-x:auto; gap:10px; padding:12px 0; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;">
-    <!-- Use first image aspect ratio 1624x675 for slide frame; images fit inside using object-fit:contain -->
-    <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
-      <img src="../monitor/api/static/web1.png" style="width:100%; height:100%; object-fit:contain;" />
+  <div style="display: flex; overflow-x: auto; gap: 10px; padding: 12px 0; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;">
+    <!-- Use a primeira imagem com proporção 1624x675 para o frame da galeria; as imagens se ajustam usando object-fit: contain -->
+    <div style="flex: 0 0 100%; scroll-snap-align: center; aspect-ratio: 1624/675; display: flex; align-items: center; justify-content: center;">
+      <img src="../monitor/api/static/web1.png" style="width: 100%; height: 100%; object-fit: contain;" />
     </div>
-    <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
-      <img src="../monitor/api/static/web2.png" style="width:100%; height:100%; object-fit:contain;" />
+    <div style="flex: 0 0 100%; scroll-snap-align: center; aspect-ratio: 1624/675; display: flex; align-items: center; justify-content: center;">
+      <img src="../monitor/api/static/web2.png" style="width: 100%; height: 100%; object-fit: contain;" />
     </div>
-    <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
-      <img src="../monitor/api/static/web3.png" style="width:100%; height:100%; object-fit:contain;" />
+    <div style="flex: 0 0 100%; scroll-snap-align: center; aspect-ratio: 1624/675; display: flex; align-items: center; justify-content: center;">
+      <img src="../monitor/api/static/web3.png" style="width: 100%; height: 100%; object-fit: contain;" />
     </div>
-    <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
-      <img src="../monitor/api/static/web4.png" style="width:100%; height:100%; object-fit:contain;" />
+    <div style="flex: 0 0 100%; scroll-snap-align: center; aspect-ratio: 1624/675; display: flex; align-items: center; justify-content: center;">
+      <img src="../monitor/api/static/web4.png" style="width: 100%; height: 100%; object-fit: contain;" />
     </div>
   </div>
-
 </details>
 <details>
   <summary>CLI</summary>
-  <div style="display:flex; overflow-x:auto; gap:10px; padding:12px 0; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;">
-
-  <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
-      <img src="../monitor/api/static/cli1.png" style="width:100%; height:100%; object-fit:contain;" />
+  <div style="display: flex; overflow-x: auto; gap: 10px; padding: 12px 0; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;">
+    <div style="flex: 0 0 100%; scroll-snap-align: center; aspect-ratio: 1624/675; display: flex; align-items: center; justify-content: center;">
+      <img src="../monitor/api/static/cli1.png" style="width: 100%; height: 100%; object-fit: contain;" />
+    </div>
+    <div style="flex: 0 0 100%; scroll-snap-align: center; aspect-ratio: 1624/675; display: flex; align-items: center; justify-content: center;">
+      <img src="../monitor/api/static/cli2.png" style="width: 100%; height: 100%; object-fit: contain;" />
+    </div>
+    <div style="flex: 0 0 100%; scroll-snap-align: center; aspect-ratio: 1624/675; display: flex; align-items: center; justify-content: center;">
+      <img src="../monitor/api/static/cli3.png" style="width: 100%; height: 100%; object-fit: contain;" />
+    </div>
+    <div style="flex: 0 0 100%; scroll-snap-align: center; aspect-ratio: 1624/675; display: flex; align-items: center; justify-content: center;">
+      <img src="../monitor/api/static/cli4.png" style="width: 100%; height: 100%; object-fit: contain;" />
+    </div>
+    <div style="flex: 0 0 100%; scroll-snap-align: center; aspect-ratio: 1624/675; display: flex; align-items: center; justify-content: center;">
+      <img src="../monitor/api/static/cli5.png" style="width: 100%; height: 100%; object-fit: contain;" />
+    </div>
   </div>
-  <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
-      <img src="../monitor/api/static/cli2.png" style="width:100%; height:100%; object-fit:contain;" />
-    </div>
-    <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
-      <img src="../monitor/api/static/cli3.png" style="width:100%; height:100%; object-fit:contain;" />
-    </div>
-    <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
-      <img src="../monitor/api/static/cli4.png" style="width:100%; height:100%; object-fit:contain;" />
-    </div>
-    <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
-      <img src="../monitor/api/static/cli5.png" style="width:100%; height:100%; object-fit:contain;" />
-    </div>
-
 </details>
 
-### Por que usá-lo?
+## Por que usar?
 
 - **Leveza**: Pés no chão em termos de uso de recursos.
-- **Flexibilidade**: Funciona como uma ferramenta CLI ou um dashboard web completo.
-- **Orientado a Administradores**: Inclui recursos como **Enforcamento de VRAM** (desligar processos que excedem limites) e **Listas de Observação**.
+- **Flexibilidade**: Funciona como uma ferramenta CLI ou um Dashboard Web completo.
+- **Foco no Administrador**: Inclui recursos como **Enforcamento de VRAM** (desligar processos que excedem limites) e **Listas de Observação**.
 - **Amigável para Desenvolvedores**: Ferramentas de teste e simulação integradas (GEMM, Física de Partículas) para validar a estabilidade do sistema.
 
 ---
 
-### Recursos
+## Recursos
 
 - **Monitoramento em Tempo Real**:
   - Métricas detalhadas da GPU (Utilização, VRAM, Potência, Temperatura).
@@ -74,14 +62,14 @@
   - **Listas de Observação**: Monitore PIDs ou nomes de processos específicos.
 
 - **Testes e Simulação**:
-  - **Testes de Estresse**: Configure cargas de trabalho GEMM configuráveis para testar a sobreaquecimento e estabilidade.
-  - **Simulação Visual**: Simulação interativa de física de partículas para visualizar a carga da GPU.
+  - **Testes de Estresse**: Cargas de trabalho GEMM configuráveis para testar a capacidade de resfriamento térmico e estabilidade.
+  - **Simulação Visual**: Simulação interativa de física de partículas para visualizar a carga de trabalho da GPU.
 
 ---
 
-### Roadmap e Trabalho Futuro
+## Roadmap e Trabalho Futuro
 
-Contribuições são bem-vindas! Os principais pontos futuros a serem abordados seriam:
+Contribuições são bem-vindas! Os principais pontos a serem abordados incluem:
 
 - **Suporte Multi-GPU**: Melhoria no manuseio de configurações multi-cartão e topologias NVLink.
 - **Containerização**: Suporte oficial para Docker para implantação fácil em ambientes de contêiner.
@@ -89,7 +77,7 @@ Contribuições são bem-vindas! Os principais pontos futuros a serem abordados 
 - **Plataformas Cruzadas**:
   - [ ] Suporte a Linux (foco em Ubuntu/Debian).
   - [ ] Suporte a Apple Silicon para monitoramento.
-- **Hardware Agnóstico**:
+- **Hardware Agnostico**:
   - [ ] Suporte a AMD ROCm.
   - [ ] Suporte a Intel Arc.
 - ~~**Documentação Multilíngue**: Suporte aos principais idiomas do GitHub.~~
@@ -98,38 +86,38 @@ Consulte [CONTRIBUTING.md](../CONTRIBUTING.md) para saber como contribuir.
 
 ---
 
-### Requisitos
+## Requisitos
 
 - **OS**: Windows 10/11
 - **Python**: 3.10+
 - **Hardware**: GPU NVIDIA com drivers instalados.
-- **CUDA**: Toolkit 12.x (Requerido estritamente para recursos de teste e simulação).
-  - *Observação: Se o CUDA 12.x não for detectado, os recursos de teste e simulação serão desabilitados.*
+- **CUDA**: Versão 12.x (estritamente necessária para recursos de teste e simulação).
+  - *Observação: Se a CUDA 12.x não for detectada, os recursos de teste e simulação serão desabilitados.*
 
 ---
 
-### Instalação
+## Instalação
 
-A ferramenta suporta instalação modular para atender às suas necessidades:
+A ferramenta oferece opções de instalação modular para atender às suas necessidades:
 
-### 1. Mínimo (CLI Apenas)
+### 1. Instalação Mínima (CLI apenas)
 
 Ideal para servidores sem cabeça ou monitoramento em segundo plano.
 
 - Interface de linha de comando.
-- Métricas básicas do sistema e da GPU.
+- Monitoramento básico do sistema e da GPU.
 
-### 2. Padrão (CLI + Dashboard Web)
+### 2. Instalação Padrão (CLI + Dashboard Web)
 
 Ideal para a maioria dos usuários.
 
-- Inclui Dashboard Web.
-- Pontos finais de API REST.
+- Inclui o Dashboard Web.
+- Endpoints de API REST.
 - Gráficos em tempo real.
 
-### 3. Completo (Padrão + Visualização)
+### 3. Instalação Completa (Padrão + Simulação)
 
-Ideal para desenvolvimento e testes de estresse.
+Ideal para desenvolvimento e testes de carga.
 
 - Inclui Simulação de Partículas.
 - Dependências de PyTorch/CuPy para testes de benchmark.
@@ -137,7 +125,7 @@ Ideal para desenvolvimento e testes de estresse.
 ### Início Rápido
 
 1. **Baixe** a versão mais recente ou clone o repositório.
-2. **Execute Configuração**:
+2. **Execute o Setup**:
 
   ```powershell
   .\setup.ps1
@@ -146,15 +134,9 @@ Ideal para desenvolvimento e testes de estresse.
 3. **Inicie**:
 
 ```powershell
-# Inicie o dashboard web (Padrão/Completo)
+# Inicie o Dashboard Web (Padrão/Completa)
 python health_monitor.py web
 
 # Inicie o CLI
 python health_monitor.py cli
 ```
-
----
-
-### Licença
-
-MIT. Consulte [LICENSE](../LICENSE) para detalhes.
