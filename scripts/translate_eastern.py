@@ -25,7 +25,7 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 llm = Llama(model_path=MODEL_PATH, n_ctx=6144, n_threads=2, verbose=False)
 
 with open(README_PATH, "r", encoding="utf-8") as f:
-    lines = f.readlines()
+    original_text = f.read()
 
 # --- PRE-PROCESSING ---
 protected_blocks = []
@@ -35,17 +35,16 @@ def protect_match(match):
     protected_blocks.append(match.group(0))
     return placeholder
 
-# Manual Line Protection (User Request)
-# Block 0: Lines 1-15 (Nav + Logo) -> lines[0:15]
-protected_blocks.append("".join(lines[0:15]))
-# Block 1: Lines 19-66 (Badges + Gallery) -> lines[18:66]
-protected_blocks.append("".join(lines[18:66]))
+text_to_translate = original_text
 
-# Construct text: PB0 + Lines 16-18 (Quote) + PB1 + Lines 67+ (Body)
-text_to_translate = f"__PB_0__{''.join(lines[15:18])}__PB_1__{''.join(lines[66:])}"
-
-# Protect any remaining images in the rest of the text
+# 1. Protect Navigation Bar (Whole Block)
+text_to_translate = re.sub(r'(<div\s+align=["\']center["\']\s*>.*?</div>)', protect_match, text_to_translate, flags=re.DOTALL | re.IGNORECASE)
+# 2. Protect Logo (Whole Block)
+text_to_translate = re.sub(r'(<div\s+style=["\'][^"]*text-align:center[^"]*["\']\s*>.*?</div>)', protect_match, text_to_translate, flags=re.DOTALL | re.IGNORECASE)
+# 3. Protect Markdown Images (Badges, Screenshots)
 text_to_translate = re.sub(r'(!\[[^\]\r\n]*\]\([^)\r\n]+\))', protect_match, text_to_translate)
+# 4. Protect HTML Tags (Preserves Gallery structure <details>, <summary>, <img> but exposes text)
+text_to_translate = re.sub(r'(<[^>]+>)', protect_match, text_to_translate)
 
 # Specialized Prompt for CJK/Eastern Languages
 prompt = f"""<|START_OF_TURN_TOKEN|><|SYSTEM_TOKEN|>
@@ -99,10 +98,6 @@ for i, block in enumerate(protected_blocks):
             translated_content = block + "\n\n" + translated_content
 
 # 4. Path Correction
-# Remove 'locales/' hallucination
-translated_content = re.sub(r'(\[.*?\]\()locales/', r'\1', translated_content)
-translated_content = re.sub(r'((?:src|href)=["\'])locales/', r'\1', translated_content)
-
 # Prepend ../ to relative paths
 translated_content = re.sub(r'(\[.*?\]\()(?!(?:http|/|#|\.\./))', r'\1../', translated_content)
 translated_content = re.sub(r'((?:src|href)=["\'])(?!(?:http|/|#|\.\./))', r'\1../', translated_content)

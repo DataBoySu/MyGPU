@@ -7,7 +7,7 @@
   <a href="locales/README.zh.md">🇨🇳 中文</a> |
   <a href="locales/README.pt.md">🇵🇹 Português</a> |
   <a href="locales/README.ko.md">🇰🇷 한국어</a> |
-  <a href="README.hi.md">🇮🇳 Hindi</a>
+  <a href="locales/README.hi.md">🇮🇳 हिंदी</a>
 </div>
 
 <div style="text-align:center; margin:18px 0;">
