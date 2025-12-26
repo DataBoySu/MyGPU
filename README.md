@@ -62,10 +62,9 @@
     <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
       <img src="monitor/api/static/cli5.png" style="width:100%; height:100%; object-fit:contain;" />
     </div>
-
 </details>
 
-### Why use this?!
+### Why use this?
 
 - **Lightweight**: Minimal resource footprint.
 - **Flexible**: Runs as a CLI tool, or a full-featured Web Dashboard.
