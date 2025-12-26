@@ -18,7 +18,7 @@ All contributions are welcome, bug fixes, new features, documentation improvemen
 
 Choose one of the options below — both end with running the included `setup.ps1` to prepare the environment.
 
-Option A — Install from Releases (ZIP)
+Option A: Install from Releases (ZIP)
 -------------------------------------
 
 1. Download the latest release ZIP from the Releases page: https://github.com/yourusername/mygpu/releases
@@ -30,7 +30,7 @@ Option A — Install from Releases (ZIP)
 .\setup.ps1
 ```
 
-Option B — Clone the repository (for development)
+Option B: Clone the repository (for development)
 -----------------------------------------------
 
 1. Clone the repository and `cd` into it:
