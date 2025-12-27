@@ -7,13 +7,13 @@ from openai import OpenAI
 # 1. Config
 LANG_MAP = {
     "de": "German", "fr": "French", "es": "Spanish", "ja": "Japanese",
-    "zh": "Chinese(Simplified)", "zh-tw": "Chinese(Traditional)",
+    "zh": "Chinese(Simplified)", 
     "ru": "Russian", "pt": "Portuguese", "ko": "Korean", "hi": "Hindi",
     # Not fully checked
     "ar": "Arabic", "cs": "Czech", "nl": "Dutch", "en": "English",
     "el": "Greek", "he": "Hebrew", "id": "Indonesian", "it": "Italian",
     "fa": "Persian", "pl": "Polish", "ro": "Romanian", "tr": "Turkish",
-    "uk": "Ukrainian", "vi": "Vietnamese"
+    "uk": "Ukrainian", "vi": "Vietnamese", "zh-tw": "Chinese(Traditional)",
 }
 
 parser = argparse.ArgumentParser()
@@ -192,7 +192,6 @@ SYSTEM_PROSE = (
     "- NEVER modify HTML tags, attributes (href, src), or CSS styles.\n"
     "- Keep technical terms (GPU, VRAM, CLI, Docker, GEMM, PIDs, NVLink) in English.\n"
     "- Preserve all Markdown symbols (#, **, `, -, [link](url)) exactly."
-    "If the section is a License notice (e.g., MIT License), DO NOT explain it. Simply translate the phrase 'MIT License. See LICENSE for details' as a single, short sentence."
 )
 
 # 4. Main
@@ -203,15 +202,19 @@ def main():
 
     chunks = merge_small_chunks(get_smart_chunks(content))
 
-    print("\n--- Chunk Preview ---")
-    for i, (ctype, ctext) in enumerate(chunks):
-        preview = ctext.replace("\n", " ")[:120]
-        print(f"[{i+1:02d}] {ctype.upper():6} | {len(ctext):4} chars | {preview}...")
-    print("--- End Preview ---\n")
-
-    input("Press Enter to start translation...")
-
     final_output = []
+
+    # Precompute multiplier map once
+    high_multiplier_map = {
+        "ja": 5.5,  # Japanese can expand a lot
+        "hi": 5.5,  # Hindi often requires more tokens
+        "ar": 4.0,  # Arabic often expands moderately
+        "he": 4.0,  # Hebrew
+        "fa": 4.0,  # Persian (Farsi)
+        "ru": 3.5,  # Russian
+        "uk": 3.5,  # Ukrainian
+        "pl": 3.5,  # Polish
+    }
 
     for i, (ctype, ctext) in enumerate(chunks):
         if ctype == "struct":
@@ -223,61 +226,29 @@ def main():
 
         # Select the prompt based on context
         current_system_prompt = SYSTEM_HEADER if is_lone_header else SYSTEM_PROSE
-        
         if lang_guidance and not is_lone_header:
             current_system_prompt = f"{SYSTEM_PROSE}\n\nADDITIONAL GUIDANCE:\n{lang_guidance}"
 
-        # Logging the logic
-        print(f"[{i+1}/{len(chunks)}] Mode: {'HEADER-ONLY' if is_lone_header else 'PROSE'} -> ", end="")
-
+        # Non-streaming call: request the full completion for this chunk
         response = client.chat.completions.create(
             model="aya-expanse-8b",
             messages=[
-                {"role": "system", "content": current_system_prompt}, 
+                {"role": "system", "content": current_system_prompt},
                 {"role": "user", "content": ctext}
             ],
             temperature=0,
-            stream=True
         )
 
-        translated = ""
-        aborted = False
+        # Extract text from the response object (LM Studio / OpenAI style)
+        try:
+            translated = response.choices[0].message.content.strip()
+        except Exception:
+            # Fallback for alternate response shapes
+            translated = getattr(response.choices[0], 'text', '') or ''
 
-        for part in response:
-            delta = part.choices[0].delta.content
-            if not delta:
-                continue
-
-            translated += delta
-
-            # Dynamic length check
-            high_multiplier_map = {
-                "ja": 5.5,  # Japanese can expand a lot
-                "hi": 5.5,  # Hindi often requires more tokens
-                "ar": 4.0,  # Arabic often expands moderately
-                "he": 4.0,  # Hebrew
-                "fa": 4.0,  # Persian (Farsi)
-                "ru": 3.5,  # Russian
-                "uk": 3.5,  # Ukrainian
-                "pl": 3.5,  # Polish
-            }
-
-            multiplier = high_multiplier_map.get(args.lang, 2.5)
-
-            if len(translated) > multiplier * len(ctext):
-                print(f"\n[WARN] Output too long ({len(translated)} chars) — aborting.")
-                aborted = True
-                break
-
-            if any(f in translated for f in FORBIDDEN):
-                print("\n[WARN] Forbidden phrase — aborting.")
-                aborted = True
-                break
-
-            sys.stdout.write(delta)
-            sys.stdout.flush()
-
-        if aborted:
+        # Validate length and forbidden phrases, abort (use original) if issues
+        multiplier = high_multiplier_map.get(args.lang, 2.5)
+        if len(translated) > multiplier * len(ctext) or any(f in translated for f in FORBIDDEN):
             translated = ctext
 
         final_output.append(translated.rstrip() + "\n\n")
