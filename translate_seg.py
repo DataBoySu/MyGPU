@@ -51,22 +51,48 @@ def get_smart_chunks(text):
 
 
 def merge_small_chunks(chunks, min_chars=400):
+    """
+    Prevents 'naked headers' by ensuring short prose blocks are 
+    bundled with the following structural or prose content.
+    """
     merged = []
-    buffer = ""
-
-    for ctype, ctext in chunks:
-        if ctype == "prose":
-            buffer += "\n\n" + ctext.strip()
+    i = 0
+    while i < len(chunks):
+        ctype, ctext = chunks[i]
+        
+        # Lookahead Logic: If current is a header or very short prose
+        # and there is a subsequent block available
+        if ctype == "prose" and (ctext.startswith('#') or len(ctext) < 50) and i + 1 < len(chunks):
+            next_ctype, next_ctext = chunks[i+1]
+            
+            # Bundle them together to provide context to the LLM
+            # We treat the merged block as 'prose' so the LLM processes the internal tags
+            combined_text = ctext + "\n\n" + next_ctext
+            merged.append(("prose", combined_text))
+            i += 2 # Skip the next block since it's now bundled
         else:
-            if buffer:
-                merged.append(("prose", buffer.strip()))
-                buffer = ""
             merged.append((ctype, ctext))
-
-    if buffer:
-        merged.append(("prose", buffer.strip()))
-
+            i += 1
+            
     return merged
+
+
+def fix_relative_paths(text):
+    # Matches Markdown links [text](path)
+    # Ignores http, /, #, and already existing ../
+    text = re.sub(r'(\[.*?\]\()(?!(?:http|/|#|\.\./))', r'\1../', text) 
+    
+    # Matches HTML attributes src="path" or href="path"
+    text = re.sub(r'((?:src|href)=["\'])(?!(?:http|/|#|\.\./))', r'\1../', text)
+    
+    return text
+
+# The regex used to capture complex "tree" structures (div/details) as single chunks
+pattern = r'(' \
+          r'```[\s\S]*?```|' \
+          r'<(div|details|section|table)\b[^>]*>[\s\S]*?<\/\2>|' \
+          r'^#{1,6} .*' \
+          r')'
 
 
 FORBIDDEN = ["This section", "In this", "means", "explains", "以下", "说明"]
@@ -74,12 +100,13 @@ FORBIDDEN = ["This section", "In this", "means", "explains", "以下", "说明"]
 # 3. Prompt
 
 SYSTEM_PROSE = (
-    f"You are a literal translation engine. Translate into {target_lang_name}.\n"
-    "Rules:\n"
-    "- Output ONLY the translation.\n"
-    "- Do NOT explain or add content.\n"
-    "- Preserve formatting and symbols.\n"
-    "- If input is not meaningful language, return it unchanged.\n"
+    f"You are a robotic technical translation engine for {target_lang_name}.\n"
+    "STRICT RULES:\n"
+    "- Translate human text inside tags (e.g., <summary>Text</summary> -> <summary>翻译</summary>).\n"
+    "- NEVER translate HTML tag names or attributes (keep <div>, <summary>, <strong> as is).\n"
+    "- Preserve Markdown syntax (#, **, `) exactly.\n"
+    "- Keep technical terms (GPU, VRAM, CLI, Docker, GEMM) in English.\n"
+    "- Output ONLY the translated result. No explanations or intro."
 )
 
 # 4. Main
@@ -147,8 +174,10 @@ def main():
 
     full_text = "".join(final_output)
 
-    # Fix only markdown relative links, not HTML
+    # Fix markdown links: [text](path)
     full_text = re.sub(r'(\[.*?\]\()(?!(?:http|/|#|\.\./))', r'\1../', full_text) 
+
+    # Fix HTML attributes: src="path" or href="path"
     full_text = re.sub(r'((?:src|href)=["\'])(?!(?:http|/|#|\.\./))', r'\1../', full_text)
 
     os.makedirs("locales", exist_ok=True)
