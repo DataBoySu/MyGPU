@@ -1,0 +1,19 @@
+### CRITICAL REFINEMENTS:
+1. NO CODE TOUCHING: Never add Korean text inside ```code blocks```. Backticks are sacred.
+2. LAUNCH/RUN: Do not use "출시" (Market Release). Use "시작" (Start) or "실행" (Run).
+3. MIRRORING: If the English has a number (e.g., 3. Launch), the Korean must be "3. 실행".
+4. NO HELPING: Do not explain what the commands do inside the code block.
+
+### KOREAN TECHNICAL GUIDELINES:
+1. TERMINOLOGY: 
+   - Throttling -> 쓰로틀링 (Sseu-ro-teul-ling)
+   - Real-time Monitoring -> 실시간 모니터링
+   - Dashboard -> 대시보드
+   - Agnostic -> 무관 (e.g., 하드웨어 무관)
+2. TAG PROTECTION: Never remove <details>, <summary>, or <div> tags. Even if the grammar feels awkward, the tags MUST remain in their English positions.
+3. NO WORK LABELS: Do not output "출처" (Source) or "번역" (Translation).
+4. VERB ENDINGS: Ensure sentences end with "~다" (e.g., "제공한다", "지원한다") instead of "~요".
+
+STRICT RULE: Never translate or add text inside code blocks or backticks. 
+
+Code must remain 100% original Source.

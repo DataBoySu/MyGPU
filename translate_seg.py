@@ -16,6 +16,22 @@ parser.add_argument("--lang", type=str, required=True)
 args = parser.parse_args()
 target_lang_name = LANG_MAP.get(args.lang, "English")
 
+# 1. Config and Argument Parsing
+
+# NEW: Language-Specific Prompt Injection
+lang_guidance = ""
+scripts_dir = "scripts"
+guidance_file = os.path.join(scripts_dir, f"{args.lang}.txt")
+
+if os.path.exists(guidance_file):
+    with open(guidance_file, "r", encoding="utf-8") as f:
+        lang_guidance = f.read().strip()
+    print(f"[INFO] Injected language-specific guidance from {guidance_file}")
+else:
+    print(f"[INFO] No specific guidance found for '{args.lang}', using global defaults.")
+
+
+
 client = OpenAI(base_url="http://localhost:5432/v1", api_key="lm-studio")
 
 # 2. Chunking
@@ -51,29 +67,22 @@ def get_smart_chunks(text):
 
 
 def merge_small_chunks(chunks, min_chars=400):
-    """
-    Prevents 'naked headers' by ensuring short prose blocks are 
-    bundled with the following structural or prose content.
-    """
     merged = []
     i = 0
     while i < len(chunks):
         ctype, ctext = chunks[i]
         
-        # Lookahead Logic: If current is a header or very short prose
-        # and there is a subsequent block available
         if ctype == "prose" and (ctext.startswith('#') or len(ctext) < 50) and i + 1 < len(chunks):
             next_ctype, next_ctext = chunks[i+1]
-            
-            # Bundle them together to provide context to the LLM
-            # We treat the merged block as 'prose' so the LLM processes the internal tags
             combined_text = ctext + "\n\n" + next_ctext
-            merged.append(("prose", combined_text))
-            i += 2 # Skip the next block since it's now bundled
+            
+            # If we swallowed a struct, call it a hybrid
+            new_type = "hybrid" if next_ctype == "struct" else "prose"
+            merged.append((new_type, combined_text))
+            i += 2 
         else:
             merged.append((ctype, ctext))
             i += 1
-            
     return merged
 
 
@@ -95,18 +104,57 @@ pattern = r'(' \
           r')'
 
 
-FORBIDDEN = ["This section", "In this", "means", "explains", "以下", "说明"]
+FORBIDDEN = [
+    # English
+    "This section", "In this", "In this section", "means", "explains",
+
+    # Chinese (Simplified)
+    "以下", "说明", "本节", "在这里", "意味着", "解释",
+
+    # German
+    "Dieser Abschnitt", "In diesem", "In diesem Abschnitt", "bedeutet", "erklärt",
+
+    # French
+    "Cette section", "Dans cette", "Dans cette section", "signifie", "explique",
+
+    # Spanish
+    "Esta sección", "En esta", "En esta sección", "significa", "explica",
+
+    # Japanese
+    "このセクション", "この中で", "このセクションでは", "意味する", "説明する",
+
+    # Russian
+    "Этот раздел", "В этом", "В этом разделе", "означает", "объясняет",
+
+    # Portuguese
+    "Esta seção", "Nesta seção", "significa", "explica",
+
+    # Korean
+    "이 섹션", "이 안에서", "이 섹션에서는", "의미한다", "설명한다",
+
+    # Hindi
+    "यह अनुभाग", "इसमें", "इस अनुभाग में", "का अर्थ है", "समझाता है",
+]
 
 # 3. Prompt
+SYSTEM_HEADER = (
+    f"You are a technical translation filter for {target_lang_name}.\n"
+    "STRICT RULES:\n"
+    "- The input is a single section header. Translate it 1:1.\n"
+    "- DO NOT generate any content, lists, or descriptions under the header.\n"
+    "- Preserve the '#' symbols exactly.\n"
+    "- Output ONLY the translated header."
+)
 
 SYSTEM_PROSE = (
-    f"You are a robotic technical translation engine for {target_lang_name}.\n"
+    f"You are a professional technical translation engine. "
+    f"Your task: Translate the input into {target_lang_name}.\n"
     "STRICT RULES:\n"
-    "- Translate human text inside tags (e.g., <summary>Text</summary> -> <summary>翻译</summary>).\n"
-    "- NEVER translate HTML tag names or attributes (keep <div>, <summary>, <strong> as is).\n"
-    "- Preserve Markdown syntax (#, **, `) exactly.\n"
-    "- Keep technical terms (GPU, VRAM, CLI, Docker, GEMM) in English.\n"
-    "- Output ONLY the translated result. No explanations or intro."
+    "- Output ONLY the final translated text. No intros, no 'Here is the translation'.\n"
+    "- Translate human text inside HTML tags (e.g., <summary>Source</summary> -> <summary>Translation</summary>).\n"
+    "- NEVER modify HTML tags, attributes (href, src), or CSS styles.\n"
+    "- Keep technical terms (GPU, VRAM, CLI, Docker, GEMM, PIDs, NVLink) in English.\n"
+    "- Preserve all Markdown symbols (#, **, `, -, [link](url)) exactly."
 )
 
 # 4. Main
@@ -128,19 +176,29 @@ def main():
     final_output = []
 
     for i, (ctype, ctext) in enumerate(chunks):
-        print(f"\n[{i+1}/{len(chunks)}] {ctype.upper()} ({len(ctext)} chars)")
-        print("-" * 60)
-        print(ctext[:300])
-        print("-" * 60)
-
         if ctype == "struct":
             final_output.append(ctext + "\n\n")
             continue
 
+        # Check if the chunk is just a header (Starts with # and has no newlines)
+        is_lone_header = ctext.strip().startswith('#') and "\n" not in ctext.strip()
+
+        # Select the prompt based on context
+        current_system_prompt = SYSTEM_HEADER if is_lone_header else SYSTEM_PROSE
+        
+        if lang_guidance and not is_lone_header:
+            current_system_prompt = f"{SYSTEM_PROSE}\n\nADDITIONAL GUIDANCE:\n{lang_guidance}"
+
+        # Logging the logic
+        print(f"[{i+1}/{len(chunks)}] Mode: {'HEADER-ONLY' if is_lone_header else 'PROSE'} -> ", end="")
+
         response = client.chat.completions.create(
             model="aya-expanse-8b",
-            messages=[{"role": "system", "content": SYSTEM_PROSE}, {"role": "user", "content": ctext}],
-            temperature=0,
+            messages=[
+                {"role": "system", "content": current_system_prompt}, 
+                {"role": "user", "content": ctext}
+            ],
+            temperature=0, # Keeps the model from getting 'creative'
             stream=True
         )
 
@@ -154,8 +212,12 @@ def main():
 
             translated += delta
 
-            if len(translated) > 2.5 * len(ctext):
-                print("\n[WARN] Output too long — aborting.")
+            # Dynamic length check
+            # Adjust multiplier for Japanese "Nyan" expansion
+            multiplier = 5.5 if args.lang in ["ja", "hi"] else 2.5
+
+            if len(translated) > multiplier * len(ctext):
+                print(f"\n[WARN] Output too long ({len(translated)} chars) — aborting.")
                 aborted = True
                 break
 
