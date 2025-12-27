@@ -1,14 +1,14 @@
 <!-- HTML_BLOCK:1... -->
 <div align="center">
-  <a href="../README.md">🇺🇸 English</a> |
-  <a href="../locales/README.de.md">🇩🇪 Deutsch</a> |
-  <a href="../locales/README.fr.md">🇫🇷 Français</a> |
-  <a href="../locales/README.es.md">🇪🇸 Español</a> |
-  <a href="../locales/README.ja.md">🇯🇵 日本語</a> |
-  <a href="../locales/README.zh.md">🇨🇳 中文</a> |
-  <a href="../locales/README.pt.md">🇵🇹 Português</a> |
-  <a href="../locales/README.ko.md">🇰🇷 한국어</a> |
-  <a href="../locales/README.hi.md">🇮🇳 हिंदी</a>
+  <a href="../en/README.md">🇺🇸 English</a> |
+  <a href="../de/README.de.md">🇩🇪 Deutsch</a> |
+  <a href="../fr/README.fr.md">🇫🇷 Français</a> |
+  <a href="../es/README.es.md">🇪🇸 Español</a> |
+  <a href="../ja/README.ja.md">🇯🇵 日本語</a> |
+  <a href="../zh/README.zh.md">🇨🇳 中文</a> |
+  <a href="../pt/README.pt.md">🇵🇹 Português</a> |
+  <a href="../ko/README.ko.md">🇰🇷 한국어</a> |
+  <a href="../hi/README.hi.md">🇮🇳 हिंदी</a>
 </div>
 <!-- HTML_BLOCK:2... -->
 <div style="text-align:center; margin:18px 0;">
@@ -16,14 +16,14 @@
 </div>
 <!-- HTML_BLOCK:... -->
 
-> *MyGPU: Ein leichtgewichtiges GPU-Verwaltungstool: ein kompakter `nvidia-smi`-Wrapper mit einer eleganten Web-Dashboard.*
+> *MyGPU: Ein leichtgewichtiges GPU-Verwaltungstool: Ein kompakter Wrapper für `nvidia-smi` mit einer eleganten Web-Dashboard-Schnittstelle.*
 
 ## Galerie
 
 <details>
   <summary>Web-Dashboard</summary>
   <div style="display:flex; overflow-x:auto; gap:10px; padding:12px 0; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;">
-    <!-- Verwenden Sie das erste Bild mit einem Seitenverhältnis von 1624x675 für den Slide-Rahmen; Bilder passen sich mithilfe von `object-fit:contain` innerhalb an. -->
+    <!-- Verwenden Sie das erste Bild mit einem Seitenverhältnis von 1624/675 für den Slide-Rahmen; Bilder passen sich mit object-fit:contain innerhalb an -->
     <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
       <img src="../monitor/api/static/web1.png" style="width:100%; height:100%; object-fit:contain;" />
     </div>
@@ -56,41 +56,42 @@
     <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
       <img src="../monitor/api/static/cli5.png" style="width:100%; height:100%; object-fit:contain;" />
     </div>
-  </details>
+  </div>
+</details>
 
-## Warum diese Nutzung?
+### Warum diese Nutzung?
 
 - **Leichtgewichtig**: Minimale Ressourcenbelastung.
-- **Flexibel**: Als CLI-Tool oder als vollständiges Web-Dashboard einsetzbar.
+- **Flexibel**: Als CLI-Tool oder als Web-Dashboard verfügbar.
 - **Admin-zentriert**: Enthält Funktionen wie **VRAM-Enforcement** (Automatische Beendigung von Prozessen, die VRAM-Richtlinien verletzen) und **Watchlists**.
-- **Entwicklerfreundlich**: Integrierte Benchmarking- und Stresstestwerkzeuge (GEMM, Teilchenphysik) zur Validierung der Systemstabilität.
+- **Entwicklerfreundlich**: Integrierte Benchmarking- und Stresstest-Tools (GEMM, Teilchenphysik) zur Validierung der Systemstabilität.
 
 ---
 
-## Funktionen
+## Warum verwenden?
 
-- **Echtzeitüberwachung**:
-  - Detaillierte GPU-Metriken (Auslastung, VRAM, Leistung, Temperatur).
+- **Echtzeit-Überwachung**:
+  - Detaillierte GPU-Metriken (Nutzung, VRAM, Temperatur, Stromverbrauch).
   - Systemmetriken (CPU, RAM usw.).
 
 - **Admin- und Durchsetzungsfunktionen**:
-  - **VRAM-Grenzen**: Legen Sie harte Grenzen für die VRAM-Nutzung pro GPU fest.
-  - **Automatische Beendigung**: Automatisch beenden Sie Prozesse, die VRAM-Richtlinien verletzen (nur für Administratoren).
-  - **Watchlists**: Überwachen Sie bestimmte PIDs oder Prozessnamen.
+  - **VRAM-Grenzen**: Legen Sie harte Grenzen für VRAM-Nutzung pro GPU fest.
+  - **Automatische Beendigung**: Automatisch Prozesse beenden, die VRAM-Richtlinien verletzen (nur für Administratoren).
+  - **Watchlists**: Überwachen Sie spezifische PIDs oder Prozessnamen.
 
 - **Benchmarking und Simulation**:
-  - **Stresstest**: Konfigurierbare GEMM-Lastarbeiten zur Tests der thermischen Throttling und Stabilität.
-  - **Visuelle Simulation**: Interaktive 3D-Teilchenphysiksimulation zur Visualisierung der GPU-Belastung.
+  - **Stresstest**: Konfigurierbare GEMM-Lasten zur Tests der thermischen Throttling und Stabilität.
+  - **Visuelle Simulation**: Interaktive 3D-Teilchenphysik-Simulation zur Visualisierung der GPU-Last.
 
 ---
 
-## Roadmap & zukünftige Arbeiten
+## Roadmap und zukünftige Arbeiten
 
-Beiträge sind willkommen! Die Hauptpunkte, die in Zukunft abgedeckt werden sollen, wären:
+Beiträge sind willkommen! Die Hauptpunkte, die in der Zukunft abgedeckt werden sollen, sind:
 
-- **Multi-GPU-Unterstützung**: Verbesserte Handhabung für Multi-Karten-Einrichtungen und NVLink-Topologien.
+- **Multi-GPU-Unterstützung**: Verbesserte Handhabung für Multi-Karten-Setups und NVLink-Topologien.
 - **Containerisierung**: Offizielle Docker-Unterstützung für eine einfache Bereitstellung in Containerumgebungen.
-- **Remotezugriff**: SSH-Tunneling-Integration und sichere Remoteverwaltung.
+- **Remote-Zugriff**: SSH-Tunnel-Integration und sicherer Remote-Management.
 - **Plattformübergreifend**:
   - [ ] Linux-Unterstützung (Ubuntu/Debian-Fokus).
   - [ ] macOS-Unterstützung (Apple Silicon-Überwachung).
@@ -108,14 +109,14 @@ Siehe [CONTRIBUTING.md](../CONTRIBUTING.md), um herauszufinden, wie du dich einb
 - **OS**: Windows 10/11
 - **Python**: 3.10+
 - **Hardware**: NVIDIA-GPU mit installierten Treibern.
-- **CUDA**: Toolkit 12.x (Streng erforderlich für Benchmarking-/Simulationsfunktionen).
-  - *Hinweis: Wenn CUDA 12.x nicht erkannt wird, werden GPU-spezifische Benchmarkingfunktionen deaktiviert.*
+- **CUDA**: Toolkit 12.x (Streng erforderlich für Benchmarking/Simulation-Funktionen).
+  - *Hinweis: Wenn CUDA 12.x nicht erkannt wird, werden GPU-spezifische Benchmarking-Funktionen deaktiviert.*
 
 ---
 
 ## Installation
 
-Das Tool unterstützt modulare Installationen, um Ihren Bedürfnissen gerecht zu werden:
+Das Tool unterstützt eine modulare Installation, um Ihren Bedürfnissen gerecht zu werden:
 
 ### 1. Minimal (CLI nur)
 
@@ -130,7 +131,7 @@ Am besten für die meisten Benutzer geeignet.
 
 - Enthält Web-Dashboard.
 - REST-API-Endpunkte.
-- Echtzeitdiagramme.
+- Echtzeit-Diagramme.
 - Aber keine Simulation oder Benchmarking.
 
 ### 3. Vollständig (Standard + Visualisierung)
@@ -143,13 +144,13 @@ Am besten für Entwicklung und Stresstest geeignet.
 ### Schnelle Startanleitung
 
 1. **Laden** Sie die neueste Version herunter oder klonen Sie das Repository.
-2. **Einrichten**:
+2. **Führen Sie die Setup-Skript aus**:
 
   ```powershell
   .\setup.ps1
   ```
 
-3. **Starten**:
+3. **Starten** Sie:
 
 ```powershell
 # Starten Sie das Web-Dashboard (Standard/Vollständig)

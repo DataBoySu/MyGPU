@@ -16,13 +16,7 @@
 </div>
 <!-- HTML_BLOCK:... -->
 
-> *MyGPU: Uma Utilidade de Gerenciamento de GPU Leve: um Wrapper Compacto para `nvidia-smi` com um Dashboard Web Elegante.*
-
-![Licença](https://img.shields.io/badge/licen%C3%A7a-MIT-blue.svg)
-![Python](https://img.shields.io/badge/python-3.10%252B-blue)
-![Versão](https://img.shields.io/badge/vers%C3%A3o-1.2.3-blue)
-![Plataforma](https://img.shields.io/badge/plataforma-Windows-lightgrey)
-![cuda 12.x](https://img.shields.io/badge/CUDA-12.x-0f9d58?logo=nvidia)
+> *MyGPU: Uma Utilidade de Gerenciamento de GPU Leve: um wrapper compacto para `nvidia-smi` com um dashboard web elegante.*
 
 ## Galeria
 
@@ -68,10 +62,10 @@
 
 ### Por que usar isso?
 
-- **Leve**: Pés no chão em termos de uso de recursos.
-- **Flexível**: Funciona como uma ferramenta CLI, ou um Dashboard Web completo.
-- **Administrador-Centrico**: Inclui recursos como **Limites de VRAM** (desligar processos que excedem limites) e **Listas de Observação**.
-- **Amigável ao Desenvolvedor**: Ferramentas de teste de estresse e simulação integradas (GEMM, Física de Partículas) para validar a estabilidade do sistema.
+- **Leveza**: Pés no chão em termos de uso de recursos.
+- **Flexibilidade**: Funciona como uma ferramenta CLI, ou um dashboard web completo.
+- **Foco no Administrador**: Inclui recursos como **Limites de VRAM** (desligar processos que excedem limites) e **Listas de Observação**.
+- **Amigável ao Desenvolvedor**: Inclui ferramentas de teste de desempenho (GEMM, Física de Partículas) integradas para validar a estabilidade do sistema.
 
 ---
 
@@ -83,12 +77,12 @@
 
 - **Admin e Aplicação de Políticas**:
   - **Limites de VRAM**: Defina limites rígidos de uso de VRAM por GPU.
-  - **Desligamento Automático**: Desligue automaticamente processos que violam as políticas de VRAM (apenas para administradores).
+  - **Desligamento Automático**: Desligue automaticamente processos que violem as políticas de VRAM (apenas para administradores).
   - **Listas de Observação**: Monitore PIDs ou nomes de processos específicos.
 
 - **Testes e Simulação**:
-  - **Testes de Estresse**: Configure cargas de trabalho GEMM configuráveis para testar a estabilização térmica e o desempenho.
-  - **Simulação Visual**: Simulação interativa de física de partículas para visualizar a carga da GPU.
+  - **Testes de Estresse**: Configure cargas de trabalho GEMM configuráveis para testar a capacidade de resfriamento térmico e estabilidade.
+  - **Simulação Interativa**: Visualize cargas de trabalho de física de partículas para visualizar a carga da GPU.
 
 ---
 
@@ -96,8 +90,8 @@
 
 Contribuições são bem-vindas! Os principais pontos futuros a serem abordados seriam:
 
-- **Suporte Multi-GPU**: Melhor suporte para configurações multi-cartão e topologias NVLink.
-- **Containerização**: Suporte oficial do Docker para implantação fácil em ambientes de contêineres.
+- **Suporte Multi-GPU**: Melhor suporte para configurações multi-card e topologias NVLink.
+- **Containerização**: Suporte oficial do Docker para implantação fácil em ambientes de contêiner.
 - **Acesso Remoto**: Integração de túnel SSH e gerenciamento remoto seguro.
 - **Plataforma Cruzada**:
   - [ ] Suporte a Linux (foco em Ubuntu/Debian).
@@ -107,7 +101,7 @@ Contribuições são bem-vindas! Os principais pontos futuros a serem abordados 
   - [ ] Suporte Intel Arc.
 - ~~**Documentação Multilíngue**: Suporte aos idiomas mais populares do GitHub.~~
 
-Consulte o [CONTRIBUTING.md](../CONTRIBUTING.md) para saber como contribuir.
+Veja [CONTRIBUTING.md](../CONTRIBUTING.md) para saber como contribuir.
 
 ---
 
@@ -116,8 +110,8 @@ Consulte o [CONTRIBUTING.md](../CONTRIBUTING.md) para saber como contribuir.
 - **OS**: Windows 10/11
 - **Python**: 3.10+
 - **Hardware**: GPU NVIDIA com drivers instalados.
-- **CUDA**: Versão 12.x (estritamente necessária para recursos de teste e simulação).
-  - *Observação: Se a CUDA 12.x não for detectada, os recursos de teste e simulação serão desabilitados.*
+- **CUDA**: Versão 12.x (estritamente necessária para recursos de teste de desempenho/simulação).
+  - *Observação: Se a CUDA 12.x não for detectada, os recursos de teste de desempenho serão desabilitados.*
 
 ---
 
@@ -125,33 +119,33 @@ Consulte o [CONTRIBUTING.md](../CONTRIBUTING.md) para saber como contribuir.
 
 A ferramenta suporta instalação modular para atender às suas necessidades:
 
-### 1. Mínimo (CLI apenas)
+### 1. Instalação Mínima (apenas CLI)
 
 Ideal para servidores sem cabeça ou monitoramento em segundo plano.
 
 - Interface de linha de comando.
 - Monitoramento básico do sistema e da GPU.
 
-### 2. Padrão (CLI + Dashboard Web)
+### 2. Instalação Padrão (CLI + Dashboard Web)
 
 Ideal para a maioria dos usuários.
 
 - Inclui o Dashboard Web.
 - Endpoints de API REST.
 - Gráficos em tempo real.
-- Mas sem recursos de simulação ou teste.
+- Mas sem recursos de simulação ou teste de desempenho.
 
-### 3. Completo (Padrão + Visualização)
+### 3. Instalação Completa (Padrão + Simulação)
 
-Ideal para desenvolvimento e testes de estresse.
+Ideal para desenvolvimento e testes de desempenho.
 
 - Inclui Simulação.
 - Dependências do PyTorch/CuPy para testes de desempenho.
 
-### Instalação Rápida
+### Início Rápido
 
 1. **Baixe** a versão mais recente ou clone o repositório.
-2. **Execute Configuração**:
+2. **Execute o Setup**:
 
   ```powershell
   .\setup.ps1
@@ -160,15 +154,9 @@ Ideal para desenvolvimento e testes de estresse.
 3. **Inicie**:
 
 ```powershell
-# Inicie o Dashboard Web (Padrão/Completo)
+# Inicie o Dashboard Web (Padrão/Completa)
 python health_monitor.py web
 
 # Inicie o CLI
 python health_monitor.py cli
 ```
-
----
-
-## Licença
-
-MIT License. Consulte o arquivo [LICENSE](../LICENSE) para detalhes.

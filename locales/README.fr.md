@@ -1,14 +1,14 @@
 <!-- HTML_BLOCK:1... -->
 <div align="center">
-  <a href="../README.md">🇺🇸 Anglais</a> |
-  <a href="../locales/README.de.md">🇩🇪 Allemand</a> |
-  <a href="../locales/README.fr.md">🇫🇷 Français</a> |
-  <a href="../locales/README.es.md">🇪🇸 Espagnol</a> |
-  <a href="../locales/README.ja.md">🇯🇵 Japonais</a> |
-  <a href="../locales/README.zh.md">🇨🇳 Chinois</a> |
-  <a href="../locales/README.pt.md">🇵🇹 Portugais</a> |
-  <a href="../locales/README.ko.md">🇰🇷 Coréen</a> |
-  <a href="../locales/README.hi.md">🇮🇳 Hindi</a>
+  <a href="../en/README.md">🇺🇸 Anglais</a> |
+  <a href="../de/README.de.md">🇩🇪 Allemand</a> |
+  <a href="../fr/README.fr.md">🇫🇷 Français</a> |
+  <a href="../es/README.es.md">🇪🇸 Espagnol</a> |
+  <a href="../ja/README.ja.md">🇯🇵 Japonais</a> |
+  <a href="../zh/README.zh.md">🇨🇳 Chinois</a> |
+  <a href="../pt/README.pt.md">🇵🇹 Portugais</a> |
+  <a href="../ko/README.ko.md">🇰🇷 Coréen</a> |
+  <a href="../hi/README.hi.md">🇮🇳 Hindi</a>
 </div>
 <!-- HTML_BLOCK:2... -->
 <div style="text-align:center; margin:18px 0;">
@@ -16,7 +16,7 @@
 </div>
 <!-- HTML_BLOCK:... -->
 
-> *MyGPU : Un utilitaire de gestion GPU léger : un enveloppe compacte pour `nvidia-smi` avec un tableau de bord web élégant.*
+> *MyGPU : Outil de gestion GPU léger : un wrapper compact pour `nvidia-smi` avec un tableau de bord web élégant.*
 
 <!-- HTML_BLOCK: no change to url; output entire as it is... -->
 ![Licence](https://img.shields.io/badge/licence-MIT-blue.svg)
@@ -30,7 +30,7 @@
 <details>
   <summary>Tableau de bord web</summary>
   <div style="display:flex; overflow-x:auto; gap:10px; padding:12px 0; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;">
-    <!-- Utilisez le rapport d'aspect 1624/675 pour la diapositive du cadre; les images s'adaptent à l'aide de object-fit:contain -->
+    <!-- Utilisez le rapport d'aspect 1624x675 pour le cadre de diapositive; les images s'ajustent automatiquement avec object-fit:contain -->
     <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
       <img src="../monitor/api/static/web1.png" style="width:100%; height:100%; object-fit:contain;" />
     </div>
@@ -48,12 +48,10 @@
 <details>
   <summary>CLI</summary>
   <div style="display:flex; overflow-x:auto; gap:10px; padding:12px 0; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;">
-    <!-- Mettez en place la même logique que pour le tableau de bord web -->
-
-  <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
+    <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
       <img src="../monitor/api/static/cli1.png" style="width:100%; height:100%; object-fit:contain;" />
-  </div>
-  <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
+    </div>
+    <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
       <img src="../monitor/api/static/cli2.png" style="width:100%; height:100%; object-fit:contain;" />
     </div>
     <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
@@ -70,103 +68,101 @@
 
 ### Pourquoi l'utiliser ?
 
-- **Léger** : Empreinte ressource minimale.
-- **Polyvalent** : Fonctionne en tant qu'outil CLI, ou avec un tableau de bord web complet.
-- **Administratif** : Inclut des fonctionnalités telles que **limites VRAM** (auto-arrêt des processus dépassant les limites) et **listes de surveillance**.
-- **Amical pour les développeurs** : Intégré avec des outils de test et de simulation (GEMM, physique des particules) pour valider la stabilité du système.
+- **Léger** : empreinte ressource minimale.
+- **Polyvalent** : disponible en version CLI, ou avec un tableau de bord web complet.
+- **Administratif** : inclut des fonctionnalités comme **la limitation de la VRAM** (arrêt automatique des processus dépassant les limites) et les **listes de surveillance**.
+- **Amical au développeur** : inclut des outils de test de stabilité et de stress (GEMM, physique des particules).
 
 ---
 
 ## Fonctionnalités
 
 - **Surveillance en temps réel** :
-  - Métriques détaillées GPU (Utilisation, VRAM, Température).
+  - Métriques détaillées sur les GPU (Utilisation, VRAM, Puissance, Température).
   - Métriques système (CPU, RAM, etc.).
 
 - **Administration et application de règles** :
-  - **Limites VRAM** : Définir des limites dures sur l'utilisation de la VRAM par GPU.
-  - **Arrêt automatique** : Arrêter automatiquement les processus qui violent les politiques VRAM (accès administrateur uniquement).
-  - **Listes de surveillance** : Surveiller des PIDs ou des noms de processus spécifiques.
+  - **Limites de VRAM** : définissez des limites de VRAM par GPU.
+  - **Arrêt automatique** : arrêtez automatiquement les processus qui violent les règles de VRAM (administrateur uniquement).
+  - **Listes de surveillance** : surveillez des PIDs ou des noms de processus spécifiques.
 
 - **Benchmarking et simulation** :
-  - **Tests de stress** : Utiliser des charges de travail GEMM configurables pour tester la thermo-throttling et la stabilité.
-  - **Simulation physique** : Visualiser la charge GPU avec une simulation interactive de physique des particules 3D.
+  - **Tests de stress** : configurez des charges de travail GEMM pour tester la throttling thermique et la stabilité.
+  - **Simulation visuelle** : simulation interactive de physique des particules pour visualiser la charge GPU.
 
 ---
 
 ## Roadmap et travaux futurs
 
-Les contributions sont les bienvenues ! Les principaux points à couvrir seraient :
+Les contributions sont les bienvenues ! Les points principaux à couvrir seraient :
 
-- **Support multi-GPU** : Gestion améliorée des configurations multi-cartes et topologies NVLink.
-- **Conteneurisation** : Support officiel Docker pour un déploiement facile dans des environnements conteneurisés.
-- **Accès distant** : Intégration du tunnel SSH et gestion sécurisée de l'accès à distance.
-- **Support multiplateforme** :
-  - [ ] Linux (focussé sur Ubuntu/Debian).
-  - [ ] macOS (support Apple Silicon pour la surveillance).
-- **Support matériel non NVIDIA** :
+- **Support multi-GPU** : gestion améliorée des configurations multi-cartes et des topologies NVLink.
+- **Conteneurisation** : support officiel pour Docker pour un déploiement facile dans des environnements conteneurisés.
+- **Accès à distance** : intégration du tunnel SSH et de la gestion à distance sécurisée.
+- **Cross-Platform** :
+  - [ ] Support Linux (Ubuntu/Debian à la priorité).
+  - [ ] Support macOS (Apple Silicon pour la surveillance).
+- **Hardware Agnostic** :
   - [ ] Support AMD ROCm.
   - [ ] Support Intel Arc.
-- ~~**Documentation multilingue** : Prendre en charge les langues les plus populaires sur GitHub.~~
+- ~~**Documentation multi-langues** : prise en charge des langues les plus populaires sur GitHub.~~
 
-Consultez [CONTRIBUTING.md](../CONTRIBUTING.md) pour savoir comment contribuer.
+Consultez [CONTRIBUTING.md](../CONTRIBUTING.md) pour savoir comment participer.
 
 ---
 
 ## Exigences
 
-- **Système d'exploitation** : Windows 10/11
+- **OS** : Windows 10/11
 - **Python** : 3.10+
 - **Matériel** : GPU NVIDIA avec pilotes installés.
-- **CUDA** : Version 12.x (strictement requise pour les fonctionnalités de simulation et de test).
-  - *Note : Si CUDA 12.x n'est pas détecté, les fonctionnalités de test et de simulation seront désactivées.*
+- **CUDA** : Version 12.x (strictement requise pour les fonctionnalités de benchmarking/simulation).
+  - *Note : Si CUDA 12.x n'est pas détecté, les fonctionnalités de benchmarking seront désactivées.*
 
 ---
 
 ## Installation
 
-L'outil prend en charge une installation modulaire pour répondre à vos besoins :
+L'outil offre plusieurs options d'installation :
 
 ### 1. Installation minimale (CLI uniquement)
 
-Idéal pour les serveurs sans tête ou la surveillance en arrière-plan.
+Idéale pour les serveurs sans tête ou la surveillance en arrière-plan.
 
 - Interface en ligne de commande.
-- Métriques système et GPU de base.
+- Surveillance de base du système et des GPU.
 
 ### 2. Installation standard (CLI + Tableau de bord web)
 
-Idéal pour la plupart des utilisateurs.
+Idéale pour la plupart des utilisateurs.
 
 - Inclut le tableau de bord web.
-- API REST pour les interactions.
+- Endpoints API REST.
 - Graphiques en temps réel.
-- Mais sans simulation ou fonctionnalités de test.
+- Mais sans simulation ni benchmarking.
 
 ### 3. Installation complète (Standard + Visualisation)
 
-Idéal pour le développement et les tests :
+Idéale pour le développement et les tests de stress.
 
 - Inclut la simulation.
-- Dépendances PyTorch/CuPy pour les tests de performance.
+- Dépendances pour le benchmarking PyTorch/CuPy.
 
----
+### Démarrage rapide
 
-## Instructions d'installation
+1. **Téléchargez** la dernière version ou clonez le dépôt.
+2. **Exécutez l'installation** :
 
-> 1. **Télécharger** la dernière version ou cloner le dépôt.
-> 2. **Lancer l'installation** :
+  ```powershell
+  .\setup.ps1
+  ```
 
-```powershell
-.\setup.ps1
-```
-
-> 3. **Lancer** :
+3. **Lancez** :
 
 ```powershell
-# Lancer le tableau de bord web (Standard/Complete)
+# Démarrez le tableau de bord web (Standard/Complete)
 python health_monitor.py web
 
-# Lancer l'interface CLI
+# Lancez le CLI
 python health_monitor.py cli
 ```
