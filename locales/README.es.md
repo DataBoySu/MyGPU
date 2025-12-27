@@ -68,10 +68,10 @@
 
 ### ¿Por qué usar esto?
 
-- **Ligero**: Pie de contacto mínimo con los recursos.
-- **Versátil**: Funciona como herramienta de línea de comandos, o como un tablero web completo.
-- **Orientado a la administración**: Incluye características como **límites de VRAM** (desactivación automática de procesos que superen las políticas) y **listas de vigilancia**.
-- **Amigable con el desarrollador**: Herramientas integradas para pruebas de estrés y simulación (GEMM, física de partículas).
+- **Ligero**: Pie de poca importancia.
+- **Versátil**: Funciona como herramienta de línea de comandos, o como un completo tablero web.
+- **Orientado a la administración**: Incluye características como **límites de VRAM** (terminación automática de procesos que superen los límites) y **listas de vigilancia**.
+- **Amigable con el desarrollador**: Incorporado pruebas de estrés y simulación de física de partículas para validar la estabilidad del sistema.
 
 ---
 
@@ -82,13 +82,13 @@
   - Métricas del sistema (CPU, RAM, etc.).
 
 - **Administración y aplicación de políticas**:
-  - **Límites de VRAM**: Establecer límites duros en el uso de VRAM por GPU.
-  - **Desactivación automática**: Automatizar la terminación de procesos que violen las políticas de VRAM (solo para administradores).
-  - **Listas de vigilancia**: Monitorear procesos específicos o nombres.
+  - **Límites de VRAM**: Establezca límites duros en el uso de VRAM por GPU.
+  - **Terminación automática**: Automatice la terminación de procesos que violen las políticas de VRAM (solo para administradores).
+  - **Listas de vigilancia**: Monitoree procesos específicos o nombres de procesos.
 
 - **Pruebas de estrés y simulación**:
-  - **Pruebas de estrés**: Configurar cargas de trabajo GEMM para probar la estabilidad y el rendimiento térmico.
-  - **Simulación visual**: Simulación interactiva de física de partículas para visualizar la carga de trabajo de la GPU.
+  - **Pruebas de estrés**: Configure cargas de trabajo GEMM configurables para probar el estrés térmico y la estabilidad.
+  - **Simulación de física de partículas**: Simulación interactiva de física de partículas para visualizar la carga de trabajo de la GPU.
 
 ---
 
@@ -96,16 +96,16 @@
 
 Las contribuciones son bienvenidas. Los puntos principales a cubrir serían:
 
-- **Soporte multi-GPU**: Mejorar el manejo de configuraciones multi-tarjeta y topologías NVLink.
+- **Soporte multi-GPU**: Manejo mejorado para configuraciones multi-tarjeta y topologías NVLink.
 - **Contenedorización**: Soporte oficial para Docker para una fácil implementación en entornos contenedorizados.
 - **Acceso remoto**: Integración de túneles SSH y gestión remota segura.
 - **Plataforma cruzada**:
-  - [ ] Soporte para Ubuntu/Debian (foco en Linux).
+  - [ ] Soporte para Ubuntu/Debian (enfocado en Linux).
   - [ ] Soporte para Apple Silicon (monitoreo).
-- **Independencia de hardware**:
+- **Hardware agnóstico**:
   - [ ] Soporte para AMD ROCm.
   - [ ] Soporte para Intel Arc.
-- ~~**Documentación multilingüe**: Apoyar los lenguajes de documentación más populares de GitHub.~~
+- ~~**Documentación multilingüe**: Apoyo a los lenguajes de documentación más populares de GitHub.~~
 
 Consulte [CONTRIBUTING.md](../CONTRIBUTING.md) para saber cómo involucrarse.
 

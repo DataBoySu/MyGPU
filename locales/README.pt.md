@@ -16,7 +16,7 @@
 </div>
 <!-- HTML_BLOCK:... -->
 
-> *MyGPU: Uma Utilidade de Gerenciamento de GPU Leve: um wrapper compacto para `nvidia-smi` com um dashboard web elegante.*
+> *MyGPU: Uma Utilidade de Gerenciamento de GPU Leve: um Wrapper Compacto para `nvidia-smi` com um Dashboard Web Elegante.*
 
 ## Galeria
 
@@ -63,9 +63,9 @@
 ### Por que usar isso?
 
 - **Leveza**: Pés no chão em termos de uso de recursos.
-- **Flexibilidade**: Funciona como uma ferramenta CLI, ou um dashboard web completo.
+- **Flexibilidade**: Funciona como uma ferramenta CLI, ou um Dashboard Web completo.
 - **Foco no Administrador**: Inclui recursos como **Limites de VRAM** (desligar processos que excedem limites) e **Listas de Observação**.
-- **Amigável ao Desenvolvedor**: Inclui ferramentas de teste de desempenho (GEMM, Física de Partículas) integradas para validar a estabilidade do sistema.
+- **Amigável ao Desenvolvedor**: Ferramentas de teste de estresse e simulação integradas (GEMM, Física de Partículas) para validar a estabilidade do sistema.
 
 ---
 
@@ -81,7 +81,7 @@
   - **Listas de Observação**: Monitore PIDs ou nomes de processos específicos.
 
 - **Testes e Simulação**:
-  - **Testes de Estresse**: Configure cargas de trabalho GEMM configuráveis para testar a capacidade de resfriamento térmico e estabilidade.
+  - **Testes de Estresse**: Configure cargas de trabalho GEMM configuráveis para testar a estabilidade térmica e o desempenho.
   - **Simulação Interativa**: Visualize cargas de trabalho de física de partículas para visualizar a carga da GPU.
 
 ---
@@ -99,7 +99,7 @@ Contribuições são bem-vindas! Os principais pontos futuros a serem abordados 
 - **Hardware Agnóstico**:
   - [ ] Suporte AMD ROCm.
   - [ ] Suporte Intel Arc.
-- ~~**Documentação Multilíngue**: Suporte aos idiomas mais populares do GitHub.~~
+- **Documentação Multilíngue**: Suporte para as principais linguagens do GitHub.
 
 Veja [CONTRIBUTING.md](../CONTRIBUTING.md) para saber como contribuir.
 
@@ -110,8 +110,8 @@ Veja [CONTRIBUTING.md](../CONTRIBUTING.md) para saber como contribuir.
 - **OS**: Windows 10/11
 - **Python**: 3.10+
 - **Hardware**: GPU NVIDIA com drivers instalados.
-- **CUDA**: Versão 12.x (estritamente necessária para recursos de teste de desempenho/simulação).
-  - *Observação: Se a CUDA 12.x não for detectada, os recursos de teste de desempenho serão desabilitados.*
+- **CUDA**: Versão 12.x (estritamente necessária para recursos de teste de estresse/simulação).
+  - *Observação: Se a CUDA 12.x não for detectada, os recursos de teste de estresse/simulação serão desabilitados.*
 
 ---
 
@@ -119,7 +119,7 @@ Veja [CONTRIBUTING.md](../CONTRIBUTING.md) para saber como contribuir.
 
 A ferramenta suporta instalação modular para atender às suas necessidades:
 
-### 1. Instalação Mínima (apenas CLI)
+### 1. Instalação Mínima (CLI apenas)
 
 Ideal para servidores sem cabeça ou monitoramento em segundo plano.
 
@@ -133,19 +133,19 @@ Ideal para a maioria dos usuários.
 - Inclui o Dashboard Web.
 - Endpoints de API REST.
 - Gráficos em tempo real.
-- Mas sem recursos de simulação ou teste de desempenho.
+- Mas sem recursos de simulação ou teste de estresse.
 
-### 3. Instalação Completa (Padrão + Simulação)
+### 3. Instalação Completa (Padrão + Visualização)
 
-Ideal para desenvolvimento e testes de desempenho.
+Ideal para desenvolvimento e testes de estresse.
 
-- Inclui Simulação.
-- Dependências do PyTorch/CuPy para testes de desempenho.
+- Inclui a simulação.
+- Dependências do PyTorch/CuPy para testes de estresse.
 
 ### Início Rápido
 
 1. **Baixe** a versão mais recente ou clone o repositório.
-2. **Execute o Setup**:
+2. **Execute o script de configuração**:
 
   ```powershell
   .\setup.ps1

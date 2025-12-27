@@ -1,14 +1,14 @@
 <!-- HTML_BLOCK:1... -->
 <div align="center">
-  <a href="../en/README.md">🇺🇸 Anglais</a> |
-  <a href="../de/README.de.md">🇩🇪 Allemand</a> |
-  <a href="../fr/README.fr.md">🇫🇷 Français</a> |
-  <a href="../es/README.es.md">🇪🇸 Espagnol</a> |
-  <a href="../ja/README.ja.md">🇯🇵 Japonais</a> |
-  <a href="../zh/README.zh.md">🇨🇳 Chinois</a> |
-  <a href="../pt/README.pt.md">🇵🇹 Portugais</a> |
-  <a href="../ko/README.ko.md">🇰🇷 Coréen</a> |
-  <a href="../hi/README.hi.md">🇮🇳 Hindi</a>
+  <a href="../README.md">🇺🇸 Anglais</a> |
+  <a href="../locales/README.de.md">🇩🇪 Allemand</a> |
+  <a href="../locales/README.fr.md">🇫🇷 Français</a> |
+  <a href="../locales/README.es.md">🇪🇸 Espagnol</a> |
+  <a href="../locales/README.ja.md">🇯🇵 Japonais</a> |
+  <a href="../locales/README.zh.md">🇨🇳 Chinois</a> |
+  <a href="../locales/README.pt.md">🇵🇹 Portugais</a> |
+  <a href="../locales/README.ko.md">🇰🇷 Coréen</a> |
+  <a href="../locales/README.hi.md">🇮🇳 Hindi</a>
 </div>
 <!-- HTML_BLOCK:2... -->
 <div style="text-align:center; margin:18px 0;">
@@ -16,7 +16,7 @@
 </div>
 <!-- HTML_BLOCK:... -->
 
-> *MyGPU : Outil de gestion GPU léger : un wrapper compact pour `nvidia-smi` avec un tableau de bord web élégant.*
+> *MyGPU : Outil de gestion de GPU léger : un wrapper compact pour `nvidia-smi` avec un tableau de bord web élégant.*
 
 <!-- HTML_BLOCK: no change to url; output entire as it is... -->
 ![Licence](https://img.shields.io/badge/licence-MIT-blue.svg)
@@ -30,7 +30,7 @@
 <details>
   <summary>Tableau de bord web</summary>
   <div style="display:flex; overflow-x:auto; gap:10px; padding:12px 0; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;">
-    <!-- Utilisez le rapport d'aspect 1624x675 pour le cadre de diapositive; les images s'ajustent automatiquement avec object-fit:contain -->
+    <!-- Utilisez le rapport d'aspect 1624/675 pour la frame de diapositive; les images s'ajustent automatiquement avec object-fit:contain -->
     <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
       <img src="../monitor/api/static/web1.png" style="width:100%; height:100%; object-fit:contain;" />
     </div>
@@ -69,9 +69,9 @@
 ### Pourquoi l'utiliser ?
 
 - **Léger** : empreinte ressource minimale.
-- **Polyvalent** : disponible en version CLI, ou avec un tableau de bord web complet.
-- **Administratif** : inclut des fonctionnalités comme **la limitation de la VRAM** (arrêt automatique des processus dépassant les limites) et les **listes de surveillance**.
-- **Amical au développeur** : inclut des outils de test de stabilité et de stress (GEMM, physique des particules).
+- **Polyvalent** : fonctionne en tant qu'outil CLI, ou avec un tableau de bord web complet.
+- **Orienté administration** : inclut des fonctionnalités comme **la limitation de la VRAM** (arrêt automatique des processus dépassant les limites) et les **listes de surveillance**.
+- **Amical pour les développeurs** : inclut des outils de test de stabilité et de stress (GEMM, physique des particules) intégrés.
 
 ---
 
@@ -82,8 +82,8 @@
   - Métriques système (CPU, RAM, etc.).
 
 - **Administration et application de règles** :
-  - **Limites de VRAM** : définissez des limites de VRAM par GPU.
-  - **Arrêt automatique** : arrêtez automatiquement les processus qui violent les règles de VRAM (administrateur uniquement).
+  - **Limites de VRAM** : définissez des limites dures sur l'utilisation de la VRAM par GPU.
+  - **Arrêt automatique** : arrêtez automatiquement les processus qui violent les politiques de VRAM (seul l'administrateur a accès).
   - **Listes de surveillance** : surveillez des PIDs ou des noms de processus spécifiques.
 
 - **Benchmarking et simulation** :
@@ -98,10 +98,10 @@ Les contributions sont les bienvenues ! Les points principaux à couvrir seraien
 
 - **Support multi-GPU** : gestion améliorée des configurations multi-cartes et des topologies NVLink.
 - **Conteneurisation** : support officiel pour Docker pour un déploiement facile dans des environnements conteneurisés.
-- **Accès à distance** : intégration du tunnel SSH et de la gestion à distance sécurisée.
+- **Accès à distance** : intégration du tunnel SSH et de la gestion sécurisée à distance.
 - **Cross-Platform** :
-  - [ ] Support Linux (Ubuntu/Debian à la priorité).
-  - [ ] Support macOS (Apple Silicon pour la surveillance).
+  - [ ] Support Ubuntu/Debian pour Linux.
+  - [ ] Support Apple Silicon pour la surveillance.
 - **Hardware Agnostic** :
   - [ ] Support AMD ROCm.
   - [ ] Support Intel Arc.
@@ -123,7 +123,7 @@ Consultez [CONTRIBUTING.md](../CONTRIBUTING.md) pour savoir comment participer.
 
 ## Installation
 
-L'outil offre plusieurs options d'installation :
+L'outil offre plusieurs options d'installation pour répondre à vos besoins :
 
 ### 1. Installation minimale (CLI uniquement)
 
@@ -146,7 +146,7 @@ Idéale pour la plupart des utilisateurs.
 Idéale pour le développement et les tests de stress.
 
 - Inclut la simulation.
-- Dépendances pour le benchmarking PyTorch/CuPy.
+- Dépendances PyTorch/CuPy pour le benchmarking.
 
 ### Démarrage rapide
 

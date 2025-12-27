@@ -1,14 +1,14 @@
 <!-- HTML_BLOCK:1... -->
 <div align="center">
-  <a href="../en/README.md">🇺🇸 English</a> |
-  <a href="../de/README.de.md">🇩🇪 Deutsch</a> |
-  <a href="../fr/README.fr.md">🇫🇷 Français</a> |
-  <a href="../es/README.es.md">🇪🇸 Español</a> |
-  <a href="../ja/README.ja.md">🇯🇵 日本語</a> |
-  <a href="../zh/README.zh.md">🇨🇳 中文</a> |
-  <a href="../pt/README.pt.md">🇵🇹 Português</a> |
-  <a href="../ko/README.ko.md">🇰🇷 한국어</a> |
-  <a href="../hi/README.hi.md">🇮🇳 हिंदी</a>
+  <a href="../README.md">🇺🇸 English</a> |
+  <a href="../locales/README.de.md">🇩🇪 Deutsch</a> |
+  <a href="../locales/README.fr.md">🇫🇷 Français</a> |
+  <a href="../locales/README.es.md">🇪🇸 Español</a> |
+  <a href="../locales/README.ja.md">🇯🇵 日本語</a> |
+  <a href="../locales/README.zh.md">🇨🇳 中文</a> |
+  <a href="../locales/README.pt.md">🇵🇹 Português</a> |
+  <a href="../locales/README.ko.md">🇰🇷 한국어</a> |
+  <a href="../locales/README.hi.md">🇮🇳 हिंदी</a>
 </div>
 <!-- HTML_BLOCK:2... -->
 <div style="text-align:center; margin:18px 0;">
@@ -23,7 +23,7 @@
 <details>
   <summary>Web-Dashboard</summary>
   <div style="display:flex; overflow-x:auto; gap:10px; padding:12px 0; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;">
-    <!-- Verwenden Sie das erste Bild mit einem Seitenverhältnis von 1624/675 für den Slide-Rahmen; Bilder passen sich mit object-fit:contain innerhalb an -->
+    <!-- Verwenden Sie das erste Bild mit einem Seitenverhältnis von 1624x675 für den Slide-Rahmen; Bilder passen sich mit object-fit:contain innerhalb an -->
     <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
       <img src="../monitor/api/static/web1.png" style="width:100%; height:100%; object-fit:contain;" />
     </div>
@@ -62,22 +62,22 @@
 ### Warum diese Nutzung?
 
 - **Leichtgewichtig**: Minimale Ressourcenbelastung.
-- **Flexibel**: Als CLI-Tool oder als Web-Dashboard verfügbar.
+- **Flexibel**: Als CLI-Tool oder als vollständige Web-Dashboard-Lösung verfügbar.
 - **Admin-zentriert**: Enthält Funktionen wie **VRAM-Enforcement** (Automatische Beendigung von Prozessen, die VRAM-Richtlinien verletzen) und **Watchlists**.
 - **Entwicklerfreundlich**: Integrierte Benchmarking- und Stresstest-Tools (GEMM, Teilchenphysik) zur Validierung der Systemstabilität.
 
 ---
 
-## Warum verwenden?
+### Funktionen
 
 - **Echtzeit-Überwachung**:
-  - Detaillierte GPU-Metriken (Nutzung, VRAM, Temperatur, Stromverbrauch).
+  - Detaillierte GPU-Metriken (Nutzung, VRAM, Temperatur).
   - Systemmetriken (CPU, RAM usw.).
 
 - **Admin- und Durchsetzungsfunktionen**:
-  - **VRAM-Grenzen**: Legen Sie harte Grenzen für VRAM-Nutzung pro GPU fest.
-  - **Automatische Beendigung**: Automatisch Prozesse beenden, die VRAM-Richtlinien verletzen (nur für Administratoren).
-  - **Watchlists**: Überwachen Sie spezifische PIDs oder Prozessnamen.
+  - **VRAM-Limits**: Legen Sie harte Grenzen für die VRAM-Nutzung pro GPU fest.
+  - **Automatische Beendigung**: Automatisch beenden Sie Prozesse, die VRAM-Richtlinien verletzen (nur für Administratoren).
+  - **Watchlists**: Überwachen Sie bestimmte PIDs oder Prozessnamen.
 
 - **Benchmarking und Simulation**:
   - **Stresstest**: Konfigurierbare GEMM-Lasten zur Tests der thermischen Throttling und Stabilität.
@@ -85,17 +85,17 @@
 
 ---
 
-## Roadmap und zukünftige Arbeiten
+### Roadmap und zukünftige Arbeiten
 
 Beiträge sind willkommen! Die Hauptpunkte, die in der Zukunft abgedeckt werden sollen, sind:
 
 - **Multi-GPU-Unterstützung**: Verbesserte Handhabung für Multi-Karten-Setups und NVLink-Topologien.
-- **Containerisierung**: Offizielle Docker-Unterstützung für eine einfache Bereitstellung in Containerumgebungen.
+- **Containerisierung**: Offizielle Docker-Unterstützung für eine einfache Bereitstellung in Container-Umgebungen.
 - **Remote-Zugriff**: SSH-Tunnel-Integration und sicherer Remote-Management.
 - **Plattformübergreifend**:
   - [ ] Linux-Unterstützung (Ubuntu/Debian-Fokus).
   - [ ] macOS-Unterstützung (Apple Silicon-Überwachung).
-- **Hardwareagnostisch**:
+- **Hardware-agnostisch**:
   - [ ] AMD ROCm-Unterstützung.
   - [ ] Intel Arc-Unterstützung.
 - ~~**Mehrsprachige Dokumentation**: Unterstützung der beliebtesten GitHub-Sprachen.~~
@@ -104,7 +104,7 @@ Siehe [CONTRIBUTING.md](../CONTRIBUTING.md), um herauszufinden, wie du dich einb
 
 ---
 
-## Anforderungen
+### Anforderungen
 
 - **OS**: Windows 10/11
 - **Python**: 3.10+
@@ -114,15 +114,15 @@ Siehe [CONTRIBUTING.md](../CONTRIBUTING.md), um herauszufinden, wie du dich einb
 
 ---
 
-## Installation
+### Installation
 
 Das Tool unterstützt eine modulare Installation, um Ihren Bedürfnissen gerecht zu werden:
 
-### 1. Minimal (CLI nur)
+### 1. Minimale (CLI nur)
 
 Am besten für Headless-Server oder Hintergrundüberwachung geeignet.
 
-- Befehlszeileninterface.
+- Befehlszeilen-Schnittstelle.
 - Grundlegende System-/GPU-Metriken.
 
 ### 2. Standard (CLI + Web-UI)
@@ -139,7 +139,7 @@ Am besten für die meisten Benutzer geeignet.
 Am besten für Entwicklung und Stresstest geeignet.
 
 - Enthält Simulation.
-- Abhängigkeiten für PyTorch/CuPy für das Benchmarking.
+- Abhängigkeiten für PyTorch/CuPy für Benchmarking.
 
 ### Schnelle Startanleitung
 
