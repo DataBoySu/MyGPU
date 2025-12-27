@@ -9,7 +9,7 @@ LANG_MAP = {
     "de": "German", "fr": "French", "es": "Spanish", "ja": "Japanese",
     "zh": "Chinese(Simplified)", "zh-tw": "Chinese(Traditional)",
     "ru": "Russian", "pt": "Portuguese", "ko": "Korean", "hi": "Hindi",
-    # Added languages
+    # Not fully checked
     "ar": "Arabic", "cs": "Czech", "nl": "Dutch", "en": "English",
     "el": "Greek", "he": "Hebrew", "id": "Indonesian", "it": "Italian",
     "fa": "Persian", "pl": "Polish", "ro": "Romanian", "tr": "Turkish",
@@ -23,7 +23,6 @@ target_lang_name = LANG_MAP.get(args.lang, "English")
 
 # 1. Config and Argument Parsing
 
-# NEW: Language-Specific Prompt Injection
 lang_guidance = ""
 scripts_dir = "scripts"
 guidance_file = os.path.join(scripts_dir, f"{args.lang}.txt")
@@ -124,6 +123,48 @@ FORBIDDEN = [
     "このセクション", "この中で", "このセクションでは", "意味する", "説明する",
     # Russian
     "Этот раздел", "В этом", "В этом разделе", "означает", "объясняет", "ниже",
+
+    # Arabic
+    "هذا القسم", "في هذا", "في هذا القسم", "يعني", "يشرح",
+
+    # Czech
+    "Tato sekce", "V tomto", "V této sekci", "znamená", "vysvětluje",
+
+    # Dutch
+    "Deze sectie", "In dit", "In deze sectie", "betekent", "verklaart",
+
+    # Greek
+    "Αυτό το τμήμα", "Σε αυτό", "Σε αυτό το τμήμα", "σημαίνει", "εξηγεί",
+
+    # Hebrew
+    "סעיף זה", "בזה", "בסעיף זה", "משמעותו", "מסביר",
+
+    # Indonesian
+    "Bagian ini", "Dalam ini", "Di bagian ini", "berarti", "menjelaskan",
+
+    # Italian
+    "Questa sezione", "In questo", "In questa sezione", "significa", "spiega",
+
+    # Persian (Farsi)
+    "این بخش", "در این", "در این بخش", "معنی می‌دهد", "توضیح می‌دهد",
+
+    # Polish
+    "Ta sekcja", "W tym", "W tej sekcji", "oznacza", "wyjaśnia",
+
+    # Romanian
+    "Această secțiune", "În acest", "În această secțiune", "înseamnă", "explică",
+
+    # Turkish
+    "Bu bölüm", "Bunda", "Bu bölümde", "anlamına gelir", "açıklar",
+
+    # Ukrainian
+    "Цей розділ", "У цьому", "У цьому розділі", "означає", "пояснює",
+
+    # Vietnamese
+    "Phần này", "Trong này", "Trong phần này", "có nghĩa là", "giải thích",
+
+    # Traditional Chinese
+    "以下", "說明", "本節", "在這裡", "意味著", "解釋",
     # Portuguese
     "Esta seção", "Nesta seção", "significa", "explica",
     # Korean
@@ -195,7 +236,7 @@ def main():
                 {"role": "system", "content": current_system_prompt}, 
                 {"role": "user", "content": ctext}
             ],
-            temperature=0, # Keeps the model from getting 'creative'
+            temperature=0,
             stream=True
         )
 
@@ -210,8 +251,18 @@ def main():
             translated += delta
 
             # Dynamic length check
-            # Adjust multiplier for Japanese "Nyan" expansion
-            multiplier = 5.5 if args.lang in ["ja", "hi", "ru"] else 2.5
+            high_multiplier_map = {
+                "ja": 5.5,  # Japanese can expand a lot
+                "hi": 5.5,  # Hindi often requires more tokens
+                "ar": 4.0,  # Arabic often expands moderately
+                "he": 4.0,  # Hebrew
+                "fa": 4.0,  # Persian (Farsi)
+                "ru": 3.5,  # Russian
+                "uk": 3.5,  # Ukrainian
+                "pl": 3.5,  # Polish
+            }
+
+            multiplier = high_multiplier_map.get(args.lang, 2.5)
 
             if len(translated) > multiplier * len(ctext):
                 print(f"\n[WARN] Output too long ({len(translated)} chars) — aborting.")
