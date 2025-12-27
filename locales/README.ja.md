@@ -1,43 +1,21 @@
-<!-- HTML_BLOCK:1... -->
+# MyGPU: 軽量GPU管理ユーティリティ
 
-<div align="center">
-  <a href="../README.md">🇺🇸 English</a> |
-  <a href="../locales/README.de.md">🇩🇪 Deutsch</a> |
-  <a href="../locales/README.fr.md">🇫🇷 Français</a> |
-  <a href="../locales/README.es.md">🇪🇸 Español</a> |
-  <a href="../locales/README.ja.md">🇯🇵 日本語</a> |
-  <a href="../locales/README.zh.md">🇨🇳 中文</a> |
-  <a href="../locales/README.pt.md">🇵🇹 Português</a> |
-  <a href="../locales/README.ko.md">🇰🇷 한국어</a> |
-  <a href="../locales/README.hi.md">🇮🇳 हिंदी</a>
-</div>
+**MyGPU** は、コンパクトな `nvidia-smi` ラッパーで、エレガントなウェブダッシュボードを備えたGPU管理ツールです。
 
-<!-- HTML_BLOCK:2... -->
+## 特徴
 
-<div style="text-align:center; margin:18px 0;">
-  <img src="../monitor/api/static/logo.png" alt="MyGPU logo"/>
-</div>
-
-<!-- HTML_BLOCK:... -->
-
-> *MyGPU: Lightweight GPU Management Utility: a compact `nvidia-smi` wrapper with an elegant web dashboard.*
-<!-- HTML_BLOCK: no change to url; output entire as it is... -->
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Python](https://img.shields.io/badge/python-3.10%2B-blue)
-![Version](https://img.shields.io/badge/version-1.2.3-blue)
-![Platform](https://img.shields.io/badge/platform-Windows-lightgrey)
-![cuda 12.x](https://img.shields.io/badge/CUDA-12.x-0f9d58?logo=nvidia)
+- **軽量性**: 最小限のリソース消費。
+- **柔軟性**: CLIツールとして実行するか、完全機能のウェブダッシュボードとして実行可能。
+- **管理者向け**: VRAM制限（超過時の自動終了）やウォッチリストなどの機能を備えています。
+- **開発者向け**:  GEMMや粒子物理学シミュレーションなどの組み込みベンチマークとストレステストでシステムの安定性を検証できます。
 
 ## ギャラリー
 
+### ウェブダッシュボード
+
 <details>
-
-  <summary>
-    ダッシュボード
-  </summary>
-
-  <div class="scroll-container" style="display: flex; overflow-x: auto; gap: 10px; padding: 12px 0; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;">
-    <!-- 最初の画像は1624x675の側面比でスライドフレームとして使用し、画像は`object-fit: contain`で内側にフィット -->
+  <summary>ウェブダッシュボード</summary>
+  <div style="display: flex; overflow-x: auto; gap: 10px; padding: 12px 0; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;">
     <div style="flex: 0 0 100%; scroll-snap-align: center; aspect-ratio: 1624/675; display: flex; align-items: center; justify-content: center;">
       <img src="../monitor/api/static/web1.png" style="width: 100%; height: 100%; object-fit: contain;" />
     </div>
@@ -51,131 +29,116 @@
       <img src="../monitor/api/static/web4.png" style="width: 100%; height: 100%; object-fit: contain;" />
     </div>
   </div>
-
-</details>~nyan!
+</details>
 
 <details>
   <summary>CLI</summary>
-  <div style="display:flex; overflow-x:auto; gap:10px; padding:12px 0; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;">
-
-  <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
-      <img src="../monitor/api/static/cli1.png" style="width:100%; height:100%; object-fit:contain;" />
+  <div style="display: flex; overflow-x: auto; gap: 10px; padding: 12px 0; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;">
+    <div style="flex: 0 0 100%; scroll-snap-align: center; aspect-ratio: 1624/675; display: flex; align-items: center; justify-content: center;">
+      <img src="../monitor/api/static/cli1.png" style="width: 100%; height: 100%; object-fit: contain;" />
+    </div>
+    <div style="flex: 0 0 100%; scroll-snap-align: center; aspect-ratio: 1624/675; display: flex; align-items: center; justify-content: center;">
+      <img src="../monitor/api/static/cli2.png" style="width: 100%; height: 100%; object-fit: contain;" />
+    </div>
+    <div style="flex: 0 0 100%; scroll-snap-align: center; aspect-ratio: 1624/675; display: flex; align-items: center; justify-content: center;">
+      <img src="../monitor/api/static/cli3.png" style="width: 100%; height: 100%; object-fit: contain;" />
+    </div>
+    <div style="flex: 0 0 100%; scroll-snap-align: center; aspect-ratio: 1624/675; display: flex; align-items: center; justify-content: center;">
+      <img src="../monitor/api/static/cli4.png" style="width: 100%; height: 100%; object-fit: contain;" />
+    </div>
+    <div style="flex: 0 0 100%; scroll-snap-align: center; aspect-ratio: 1624/675; display: flex; align-items: center; justify-content: center;">
+      <img src="../monitor/api/static/cli5.png" style="width: 100%; height: 100%; object-fit: contain;" />
+    </div>
   </div>
-  <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
-      <img src="../monitor/api/static/cli2.png" style="width:100%; height:100%; object-fit:contain;" />
-    </div>
-    <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
-      <img src="../monitor/api/static/cli3.png" style="width:100%; height:100%; object-fit:contain;" />
-    </div>
-    <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
-      <img src="../monitor/api/static/cli4.png" style="width:100%; height:100%; object-fit:contain;" />
-    </div>
-    <div style="flex:0 0 100%; scroll-snap-align:center; aspect-ratio:1624/675; display:flex; align-items:center; justify-content:center;">
-      <img src="../monitor/api/static/cli5.png" style="width:100%; height:100%; object-fit:contain;" />
-    </div>
 </details>
 
-### なぜこれを使うの？
+## 使用理由
 
-- **軽量**: 最小限のリソースで動作。
-- **柔軟**: CLIツールとして、またはフル機能のWebダッシュボードとして実行可能。
-- **管理者向け**: VRAM強制（制限を超えたプロセスを自動的に終了）やウォッチリストなどの機能を含む。
-- **開発者フレンドリー**: GEMM、粒子物理学などの組み込みベンチマークとストレステストツール（システムの安定性を検証するために）を備えています。
-
-~nyan!
+- **軽量性**: リソース消費量が最小限。
+- **柔軟性**: CLIツールとして、または完全機能のウェブダッシュボードとして実行可能。
+- **管理者向け機能**: VRAM制限（超過時の自動終了）やウォッチリストなどの機能を備えています。
+- **開発者向け機能**: 組み込みのベンチマークとストレステストでシステムの安定性を検証できます。
 
 ## 機能
 
-- **リアルタイム監視**
-  - GPUの詳細なメトリクス（利用率、VRAM、電力、温度）
-  - システムメトリクス（CPU、RAMなど）
+- **リアルタイム監視**:
+  - GPUメトリクス（利用率、VRAM、電力、温度）。
+  - システムメトリクス（CPU、RAMなど）。
+- **管理者向け機能**:
+  - **VRAM制限**: 各GPUのVRAM使用量に上限を設定。
+  - **自動終了**: VRAMポリシーに違反するプロセスを自動的に終了（管理者のみ）。
+  - **ウォッチリスト**: 特定のPIDやプロセス名を監視。
+- **ベンチマークとシミュレーション**:
+  - **ストレステスト**: 構成可能なGEMMワークロードで、熱的スローシングと安定性をテスト。
+  - **粒子物理学シミュレーション**: GPU負荷を視覚化するインタラクティブな3Dシミュレーション。
 
-- **管理および執行**
-  - **VRAMキャップ**: 各GPUに対してVRAM使用量の上限を設定
-  - **自動終了**: VRAMポリシーに違反するプロセスを自動的に終了（管理者のみ）
-  - **ウォッチリスト**: 特定のPIDまたはプロセス名を監視
+## 今後の開発
 
-- **ベンチマークおよびシミュレーション**
-  - **ストレステスト**: 熱的スローイングと安定性をテストするための構成可能なGEMMワークロード
-  - **視覚化シミュレーション**: インタラクティブな3D粒子物理シミュレーションでGPUの負荷を可視化~nyan!
+貢献は歓迎します！主な今後の開発ポイントは以下の通りです。
 
-## ロードマップ & 今後の作業
-
-貢献大歓迎です！今後取り組む主なポイントは次の通りです：
-
-- **マルチGPUサポート**: マルチカード設定とNVLinkトポロジの強化処理。
-- **コンテナ化**: 公式Dockerサポートでコンテナ環境への簡単なデプロイを実現。
+- **マルチGPUサポート**: マルチカードセットアップやNVLinkトポロジーの処理を強化。
+- **コンテナ化**: 公式のDockerサポートで、コンテナ環境での簡単なデプロイを実現。
 - **リモートアクセス**: SSHトンネル統合とセキュアなリモート管理。
 - **クロスプラットフォーム**:
-  - [ ] Linuxサポート（Ubuntu/Debian中心）。
-  - [ ] macOSサポート（Apple Siliconの監視）。
-- **ハードウェアに依存しない**:
+  - [ ] Linuxサポート（Ubuntu/Debianに焦点）。
+  - [ ] macOSサポート（Apple Siliconのモニタリング）。
+- **ハードウェア非依存**:
   - [ ] AMD ROCmサポート。
   - [ ] Intel Arcサポート。
-- **~~多言語ドキュメント**: GitHubで最も人気のある言語のサポート。~~
+- [ ] マルチ言語ドキュメント（GitHubで人気のある言語をサポート）。
 
-[CONTRIBUTING.md](../CONTRIBUTING.md) を参照して、どのように参加するか確認してください。
-
-~nyan!
+[CONTRIBUTING.md](../CONTRIBUTING.md) を参照して、どのように貢献できるか確認してください。
 
 ## 要件
 
 - **OS**: Windows 10/11
-- **Python**: 3.10以上
-- **ハードウェア**: NVIDIA製GPUおよび対応ドライバー
-- **CUDA**: Toolkit 12.x (ベンチマーク/シミュレーション機能を使用する場合は必須)。
-
-*注意: CUDA 12.xが検出されない場合、GPU固有のベンチマーク機能が無効になります。*~nyan!
+- **Python**: 3.10+
+- **ハードウェア**: NVIDIA GPUとインストールされたドライバー。
+- **CUDA**: 12.xツールキット（ベンチマークやシミュレーション機能を使用する場合は必須）。
+  - *注: CUDA 12.xが検出されない場合は、GPU固有のベンチマーク機能が無効になります。*
 
 ## インストール
 
-このツールには、ニーズに合わせてモジュール形式でインストールできる機能が備わっています：~nyan！
+ツールには、ニーズに合わせて複数のインストール方法があります。
 
-### 1. ミニマル（CLIのみ）
+### 1. 最小限（CLIのみ）
 
-ヘッドレスサーバーやバックグラウンドモニタリングに最適です。
+ヘッドレスサーバーやバックグラウンド監視に最適です。
 
-- コマンドラインインターフェース
-- 基本的なシステム/GPUメトリクス~nyan!
+- コマンドラインインターフェースのみ。
+- 基本的なシステム/GPUメトリクスの監視。
 
-### 2. 標準（CLI + Web UI）
+### 2. 標準（CLI + ウェブUI）
 
 ほとんどのユーザーに最適です。
 
-- Webダッシュボードが含まれています。
+- ウェブダッシュボードが含まれています。
 - REST APIエンドポイント。
 - リアルタイムチャート。
-- シミュレーションやベンチマークはありません。~nyan!
+- シミュレーションやベンチマークは含まれません。
 
-### 3. フル（標準 + ビジュアライゼーション）
+### 3. フル（標準 + シミュレーション）
 
-開発とストレステストに最適です。
+開発やストレステストに最適です。
 
-- シミュレーションを含みます。
-- PyTorch/CuPy の依存関係でベンチマークを行います。~nyan!
+- シミュレーションが含まれています。
+- PyTorch/CuPy依存関係でベンチマークが可能。
 
 ### クイックスタート
 
-1. **ダウンロード**最新のリリースまたはリポジトリをクローンしてください。
-2. **セットアップ実行**:~nyan!
+1. **ダウンロード**: 最新リリースをダウンロードするか、リポジトリをクローンします。
+2. **セットアップ**:
 
-```powershell
+  ```powershell
   .\setup.ps1
   ```
 
-<summary>起動</summary>
+3. **起動**:
 
 ```powershell
-# ウェブダッシュボード（標準/フル）の開始
+# ウェブダッシュボードを起動（標準/フル）
 python health_monitor.py web
 
-# CLIの開始
+# CLIを起動
 python health_monitor.py cli
-```~nyan!
-
----
-
-## License
-
-MITライセンス。詳細については[LICENSE](../LICENSE)をご覧ください。~nyan!
-
+```
