@@ -33,11 +33,20 @@ def create_app(config: Dict[str, Any]) -> FastAPI:
     # Determine if the process is running with admin/elevated rights or was started with --admin
     try:
         import sys
-        try:
-            import ctypes
-            is_elev = bool(ctypes.windll.shell32.IsUserAnAdmin())
-        except Exception:
-            is_elev = False
+        import platform
+        import os
+        is_elev = False
+        if platform.system() == 'Windows':
+            try:
+                import ctypes
+                is_elev = bool(ctypes.windll.shell32.IsUserAnAdmin())
+            except Exception:
+                is_elev = False
+        else:
+            try:
+                is_elev = os.getuid() == 0
+            except Exception:
+                is_elev = False
 
         started_with_flag = '--admin' in (sys.argv[1:] if len(sys.argv) > 1 else [])
         app.state.is_admin = bool(is_elev or started_with_flag)
