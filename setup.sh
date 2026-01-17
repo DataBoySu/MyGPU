@@ -23,7 +23,8 @@ cd "$PROJECT_DIR"
 get_project_version() {
     local ver_file="monitor/__version__.py"
     if [[ -f "$ver_file" ]]; then
-        local version=$(grep "__version__" "$ver_file" | cut -d'"' -f2)
+        # Matches both single and double quotes
+        local version=$(grep "__version__" "$ver_file" | sed -E "s/__version__[[:space:]]*=[[:space:]]*['\"]([^'\"]+)['\"].*/\1/")
         echo "$version"
     else
         echo "(unknown)"
@@ -187,7 +188,7 @@ else
             uv pip install --python "$VENV_PYTHON" $torch_pkgs
         else
             # Linux: use CUDA index
-            uv pip install --python "$VENV_PYTHON" --extra-index-url https://download.pytorch.org/whl/cu121 $torch_pkgs
+            uv pip install --python "$VENV_PYTHON" --extra-index-url https://download.pytorch.org/whl/cu128 $torch_pkgs
         fi
     fi
 fi
