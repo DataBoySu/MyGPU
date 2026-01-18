@@ -106,6 +106,7 @@ def create_app(config: Dict[str, Any]) -> FastAPI:
 
     app.state.vram_caps = _load_vram_caps()
     app.state.vram_watchlist = _load_vram_watchlist()
+    app.state.port_watchlist = [] # Initialize port watchlist
     try:
         from monitor.enforcer import get_enforcer
         app.state.vram_enforcer = get_enforcer()
@@ -621,6 +622,29 @@ def create_app(config: Dict[str, Any]) -> FastAPI:
     async def get_ports():
         sc = SystemCollector()
         return {'ports': sc.collect_ports()}
+
+    @app.get("/api/ports/watchlist")
+    async def get_ports_watchlist():
+        return {'watchlist': list(getattr(app.state, 'port_watchlist', []))}
+
+    @app.post("/api/ports/watchlist")
+    async def update_ports_watchlist(payload: Dict[str, Any]):
+        """Add or remove a port-pid key from the watchlist.
+        JSON: { "key": "8089-1234", "action": "add"|"remove" }
+        """
+        key = payload.get('key')
+        action = payload.get('action', 'add')
+        if not key:
+            return {'status': 'error', 'error': 'missing_key'}
+        
+        wl = set(getattr(app.state, 'port_watchlist', []) or [])
+        if action == 'add':
+            wl.add(key)
+        elif action == 'remove':
+            wl.discard(key)
+        
+        app.state.port_watchlist = list(wl)
+        return {'status': 'success', 'watchlist': list(wl)}
 
     @app.post("/api/processes/terminate")
     async def terminate_process(payload: Dict[str, Any]):
@@ -1148,8 +1172,16 @@ def create_app(config: Dict[str, Any]) -> FastAPI:
         return {'alerts': alert_engine.get_active_alerts()}
     
     @app.get("/api/history")
-    async def get_history(hours: int = 1, metric: str = "gpu_0_utilization"):
-        metrics = await storage.query(metric_name=metric, hours=hours)
+    async def get_history(hours: str = "1", metric: str = "gpu_0_utilization"):
+        try:
+            if hours == "lifetime":
+                h_val = 100000 # ~11 years
+            else:
+                h_val = int(hours)
+        except Exception:
+            h_val = 1
+            
+        metrics = await storage.query(metric_name=metric, hours=h_val)
         return {
             'metric': metric,
             'hours': hours,

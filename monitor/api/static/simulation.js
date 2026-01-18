@@ -26,19 +26,19 @@ async function startSimulation() {
     console.log('Start Simulation clicked');
     console.log('Current benchmark type:', selectedBenchType);
     console.log('Current mode:', selectedMode);
-    
+
     const btn = document.getElementById('start-sim-btn');
-    
+
     // Prevent multiple clicks while simulation is starting
     if (btn.disabled) {
         console.log('Simulation already starting, ignoring click');
         return;
     }
-    
+
     // Check current benchmark type
     const currentType = selectedBenchType;
     let modeToUse;
-    
+
     // If not on particle type, switch to it and use 'quick' mode
     if (currentType !== 'particle') {
         selectBenchType('particle');
@@ -48,25 +48,25 @@ async function startSimulation() {
         // Use the currently selected mode
         modeToUse = selectedMode;
     }
-    
+
     const stopBtn = document.getElementById('stop-bench-btn');
     btn.disabled = true;
     btn.textContent = 'Opening Simulation...';
     stopBtn.style.display = 'inline-block';
-    
+
     document.getElementById('benchmark-progress').style.display = 'block';
     document.getElementById('benchmark-live-charts').style.display = 'block';
     document.getElementById('benchmark-results').innerHTML = '';
     document.getElementById('bench-stop-reason').textContent = '';
     document.getElementById('iteration-counter').style.display = 'inline';
     document.getElementById('iteration-counter').textContent = 'Iteration #0';
-    
+
     // Get duration and particles based on selected mode
     let duration = 60;
     let particles = 100000;
     let backendMultiplier = 1;  // Default to 1x (no backend stress)
     let autoScale = false;  // Only auto-scale in stress-test mode
-    
+
     if (modeToUse === 'quick') {
         duration = 15;
         particles = 50000;
@@ -93,30 +93,30 @@ async function startSimulation() {
         backendMultiplier = 1;
         autoScale = false;
     }
-    
+
     // Build URL with params - use actual mode and only enable auto-scaling for stress-test
     // Update preview from user selection immediately
-    try { if (typeof updateWorkloadPreview === 'function') updateWorkloadPreview(); } catch(e){ console.debug('updateWorkloadPreview failed', e); }
+    try { if (typeof updateWorkloadPreview === 'function') updateWorkloadPreview(); } catch (e) { console.debug('updateWorkloadPreview failed', e); }
 
     let url = `/api/benchmark/start?benchmark_type=particle&visualize=true&mode=${modeToUse}&auto_scale=${autoScale}&duration=${duration}&num_particles=${particles}&backend_multiplier=${backendMultiplier}`;
     // Append preferred backend (safe read) if user selected one
-    function getSelectedBackendSafe(){
-        try{
+    function getSelectedBackendSafe() {
+        try {
             const el = document.getElementById('benchmark-backend-select');
             if (el && el.value && el.value !== 'auto') return el.value;
             if (typeof selectedBackend !== 'undefined' && selectedBackend && selectedBackend !== 'auto') return selectedBackend;
-        } catch(e){}
+        } catch (e) { }
         return 'auto';
     }
     const sb = getSelectedBackendSafe();
     if (sb && sb !== 'auto') url += '&preferred_backend=' + encodeURIComponent(sb);
-    
+
     // Initialize live charts
     initLiveCharts();
     // Reset progress UI immediately when starting simulation
-    try { document.getElementById('bench-progress-bar').style.width = '0%'; } catch(e) {}
-    try { document.getElementById('bench-percent').textContent = '0%'; } catch(e) {}
-    
+    try { document.getElementById('bench-progress-bar').style.width = '0%'; } catch (e) { }
+    try { document.getElementById('bench-percent').textContent = '0%'; } catch (e) { }
+
     try {
         const resp = await fetch(url, { method: 'POST' });
         try {
@@ -137,9 +137,12 @@ async function startSimulation() {
                 const workloadElement = document.getElementById('workload-info');
                 if (workloadElement) workloadElement.textContent = `Workload: Bounce Simulation (${cfg.num_particles.toLocaleString()} particles, ${backend})`;
             }
-        } catch(e){ console.debug('start simulation response parse failed', e); }
+        } catch (e) { console.debug('start simulation response parse failed', e); }
 
         btn.textContent = 'Simulation Running';
+        if (typeof benchmarkPollInterval !== 'undefined' && benchmarkPollInterval) {
+            clearInterval(benchmarkPollInterval);
+        }
         benchmarkPollInterval = setInterval(pollBenchmarkStatus, 500);
     } catch (error) {
         console.error('Error starting simulation:', error);

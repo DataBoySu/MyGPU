@@ -347,6 +347,24 @@ button[disabled][data-hover] {
     border-radius: 8px;
     padding: 15px;
     margin-bottom: 10px;
+    position: relative;
+}
+
+.benchmark-card {
+    height: 380px;
+    min-height: 380px;
+}
+
+.benchmark-charts-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+}
+
+@media (max-width: 1000px) {
+    .benchmark-charts-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 .gpu-header {
@@ -507,6 +525,15 @@ button[disabled][data-hover] {
     border-radius: 12px;
     padding: 20px;
     margin-bottom: 20px;
+    min-height: 500px;
+    height: 50vh;
+    max-height: 800px;
+    position: relative;
+    overflow: hidden;
+}
+
+canvas {
+    max-width: 100% !important;
 }
 
 .chart-controls {

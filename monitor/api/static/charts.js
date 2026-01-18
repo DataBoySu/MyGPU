@@ -1,60 +1,82 @@
-// charts.js - Chart initialization and update functions
-// Maintenance: small clarity comment added for future editors.
-// Purpose: keep chart init/update logic compact and safe.
+// charts.js - Live benchmark charts using Apache ECharts
+function initLiveCharts() {
+    const datasets = [
+        { id: 'chartUtilization', color: '#76b900', name: 'Utilization', unit: '%' },
+        { id: 'chartTemperature', color: '#ffb300', name: 'Temperature', unit: '°C' },
+        { id: 'chartMemory', color: '#00a0ff', name: 'Memory', unit: 'MB' },
+        { id: 'chartPower', color: '#ff4d4d', name: 'Power', unit: 'W' }
+    ];
 
-function createSmallChart(canvasId, color, maxY = null) {
-    const ctx = document.getElementById(canvasId).getContext('2d');
-    return new Chart(ctx, {
-        type: 'line',
-        data: { labels: [], datasets: [{ data: [], borderColor: color, backgroundColor: color + '20', fill: true, tension: 0.3, pointRadius: 0 }] },
-        options: {
-            responsive: true,
-            plugins: { legend: { display: false } },
-            scales: {
-                x: { display: false },
-                y: { min: 0, max: maxY, ticks: { color: '#a0a0a0' }, grid: { color: '#4a4a4a' } }
-            }
+    datasets.forEach(d => {
+        const chartDom = document.getElementById(d.id);
+        if (benchCharts[d.id]) {
+            benchCharts[d.id].dispose();
         }
+        const chart = echarts.init(chartDom, 'dark');
+
+        const option = {
+            backgroundColor: 'transparent',
+            grid: { top: 10, bottom: 25, left: 45, right: 10 },
+            xAxis: {
+                type: 'category',
+                boundaryGap: false,
+                data: Array(60).fill(''),
+                axisLine: { show: false },
+                axisTick: { show: false },
+                axisLabel: { show: false }
+            },
+            yAxis: {
+                type: 'value',
+                min: 0,
+                splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } },
+                axisLabel: { color: 'rgba(255,255,255,0.5)', fontSize: 10 }
+            },
+            series: [{
+                name: d.name,
+                type: 'line',
+                data: Array(60).fill(0),
+                showSymbol: false,
+                lineStyle: { color: d.color, width: 2 },
+                areaStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                        { offset: 0, color: d.color + '44' },
+                        { offset: 1, color: d.color + '00' }
+                    ])
+                },
+                animation: false
+            }]
+        };
+
+        chart.setOption(option);
+        benchCharts[d.id] = chart;
+    });
+
+    window.addEventListener('resize', () => {
+        Object.values(benchCharts).forEach(c => c && c.resize());
     });
 }
 
-function initLiveCharts() {
-    Object.values(benchCharts).forEach(c => c.destroy());
-    benchCharts = {
-        utilization: createSmallChart('chartUtilization', '#76b900', 100),
-        temperature: createSmallChart('chartTemperature', '#ffc107', 100),
-        memory: createSmallChart('chartMemory', '#00a0ff'),
-        power: createSmallChart('chartPower', '#dc3545')
+function updateLiveCharts(sample) {
+    if (!sample) return;
+    const mappings = {
+        chartUtilization: sample.utilization,
+        chartTemperature: sample.temperature_c,
+        chartMemory: sample.memory_used_mb,
+        chartPower: sample.power_w
     };
-}
 
-function updateLiveCharts(metrics) {
-    if (!benchCharts.utilization) return;
-    
-    const currentTime = new Date().toLocaleTimeString();
-    
-    // Update each chart with new data point
-    // Backend sends: utilization, temperature_c, memory_used_mb, power_w
-    const charts = {
-        utilization: metrics.utilization || 0,
-        temperature: metrics.temperature_c || 0,
-        memory: metrics.memory_used_mb || 0,
-        power: metrics.power_w || 0
-    };
-    
-    Object.entries(charts).forEach(([key, value]) => {
-        const chart = benchCharts[key];
+    Object.keys(mappings).forEach(id => {
+        const chart = benchCharts[id];
         if (chart) {
-            chart.data.labels.push(currentTime);
-            chart.data.datasets[0].data.push(value);
-            
-            // Keep only last 50 data points
-            if (chart.data.labels.length > 50) {
-                chart.data.labels.shift();
-                chart.data.datasets[0].data.shift();
+            const option = chart.getOption();
+            const data = option.series[0].data;
+            data.push(mappings[id]);
+            if (data.length > 60) {
+                data.shift();
             }
-            
-            chart.update('none');
+            chart.setOption({
+                series: [{ data: data }]
+            });
         }
     });
 }

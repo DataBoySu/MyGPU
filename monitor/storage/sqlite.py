@@ -109,7 +109,10 @@ class MetricsStorage:
             query += ' AND metric_name = ?'
             params.append(metric_name)
         
-        query += ' ORDER BY timestamp DESC LIMIT 1000'
+        if hours > 1000:
+             query += ' ORDER BY timestamp DESC LIMIT 5000'
+        else:
+             query += ' ORDER BY timestamp DESC LIMIT 1000'
         
         cursor = self.conn.execute(query, params)
         return [dict(row) for row in cursor.fetchall()]

@@ -1,84 +1,48 @@
-// benchmark.js - (disabled) Benchmark control functions
-// The original benchmark UI/logic is intentionally disabled. Functions remain defined as no-ops
-// so the rest of the application doesn't throw errors when referencing them.
+// benchmark.js - Benchmark UI helper functions
+// Primarily handles preview updates and mode descriptions.
 
-let benchUserChangeTs = 0;
-const BENCH_PREVIEW_GUARD_MS = 4000;
+function updateWorkloadPreview() {
+    const type = selectedBenchType;
+    const mode = selectedMode;
+    const desc = document.getElementById('mode-description');
+    const typeDesc = document.getElementById('type-description');
+    const info = document.getElementById('workload-info');
 
-function selectBenchType(type) {
-    // disabled: original implementation commented out
-    console.debug('selectBenchType called but benchmark UI is disabled');
-    selectedBenchType = type;
-}
-
-function selectMode(mode) {
-    console.debug('selectMode called but benchmark UI is disabled');
-    selectedMode = mode;
-}
-
-function updateWorkloadPreview(){
-    // no-op while benchmark UI is disabled
-    try {
-        const el = document.getElementById('workload-info');
-        if (el) el.textContent = 'Benchmark UI disabled';
-    } catch(e){}
-}
-
-function initBackendDropdown(){
-    try { window.selectedBackend = window.selectedBackend || 'auto'; } catch(e){}
-}
-
-function updateSliderValue(type) { /* placeholder kept for compatibility */ }
-
-function exportData(format) {
-    if (format === 'json') {
-        fetch('/api/metrics/export/json')
-            .then(r => r.blob())
-            .then(blob => {
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'metrics.json';
-                a.click();
-            });
-    } else if (format === 'csv') {
-        fetch('/api/metrics/export/csv')
-            .then(r => r.blob())
-            .then(blob => {
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'metrics.csv';
-                a.click();
-            });
-    }
-}
-
-async function loadBaseline() {
-    try {
-        const response = await fetch('/api/benchmark/baseline?benchmark_type=' + selectedBenchType);
-        const baseline = await response.json();
-        if (baseline && baseline.status !== 'no_baseline') {
-            document.getElementById('baseline-info').style.display = 'block';
-            const benchTypeLabel = baseline.benchmark_type === 'gemm' ? 'GEMM' : 'Particle';
-            const runModeLabel = baseline.run_mode === 'simulation' ? ' (Simulation)' : ' (Benchmark)';
-            document.getElementById('baseline-details').innerHTML = `
-                <div class="metric-row"><span class="metric-label">GPU</span><span class="metric-value">${baseline.gpu_name}</span></div>
-                <div class="metric-row"><span class="metric-label">Type</span><span class="metric-value">${benchTypeLabel}${runModeLabel}</span></div>
-                <div class="metric-row"><span class="metric-label">Iterations</span><span class="metric-value">${baseline.iterations_completed}</span></div>
-                <div class="metric-row"><span class="metric-label">Avg Iteration</span><span class="metric-value">${baseline.avg_iteration_time_ms.toFixed(2)} ms</span></div>
-                <div class="metric-row"><span class="metric-label">Avg Temp</span><span class="metric-value">${baseline.avg_temperature.toFixed(1)} C</span></div>
-                <p style="font-size: 0.85em; color: var(--text-secondary); margin-top: 10px;">Saved: ${new Date(baseline.timestamp).toLocaleString()}</p>
-            `;
+    if (type === 'gemm') {
+        typeDesc.textContent = 'Dense matrix multiplication for maximum GPU compute stress. Measures TFLOPS.';
+        if (mode === 'quick') {
+            desc.textContent = 'Quick baseline test - 15 seconds with fixed workload size (4096).';
+            info.textContent = 'Workload: Matrix Multi (4096 x 4096, FP32)';
+        } else if (mode === 'standard') {
+            desc.textContent = 'Standard validation - 60 seconds. Recommended for stability checks.';
+            info.textContent = 'Workload: Matrix Multi (4096 x 4096, FP32)';
+        } else if (mode === 'extended') {
+            desc.textContent = 'Extended stress - 3 minutes. Validates thermal throttling behavior.';
+            info.textContent = 'Workload: Matrix Multi (4096 x 4096, FP32)';
+        } else if (mode === 'stress-test') {
+            desc.textContent = 'Maximum stress - 60 seconds. Power limit testing with async bursts.';
+            info.textContent = 'Workload: Multi-burst GEMM (256 - 8192 mix)';
         } else {
-            document.getElementById('baseline-info').style.display = 'none';
+            desc.textContent = 'Custom parameters manually configured below.';
+            info.textContent = 'Workload: Custom Matrix Multiply';
         }
-    } catch (error) {
-        const msg = error && error.message ? error.message : String(error);
-        if (typeof window !== 'undefined' && window.showError) {
-            window.showError('Error loading baseline: ' + msg);
+    } else if (type === 'particle') {
+        typeDesc.textContent = 'N-Body particle attractor simulation. Stresses both compute and memory latency.';
+        if (mode === 'quick') {
+            desc.textContent = 'Quick simulation - 15 seconds, 50k particles.';
+            info.textContent = 'Workload: Particle Simulation (50,000 particles)';
+        } else if (mode === 'standard') {
+            desc.textContent = 'Standard simulation - 60 seconds, 100k particles.';
+            info.textContent = 'Workload: Particle Simulation (100,000 particles)';
+        } else if (mode === 'extended') {
+            desc.textContent = 'Long simulation - 3 minutes. High particle count (100k).';
+            info.textContent = 'Workload: Particle Simulation (100,000 particles)';
+        } else if (mode === 'stress-test') {
+            desc.textContent = 'System stress - Heavy memory pressure with 200k particles + high backend load.';
+            info.textContent = 'Workload: Stress Simulation (200,000 particles)';
         } else {
-            console.error('Error loading baseline:', error);
+            desc.textContent = 'Custom parameters manually configured below.';
+            info.textContent = 'Workload: Custom Particle Simulation';
         }
     }
 }

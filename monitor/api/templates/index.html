@@ -13,6 +13,7 @@
     <script
         src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
     <link rel="stylesheet" href="/static/style.css">
     <style>
         /* Toasts are provided by /static/toast.js (right-side popouts).
@@ -68,7 +69,8 @@
         <div id="history" class="tab-content">
             <div class="chart-container">
                 <div class="chart-controls">
-                    <select id="metric-select">
+                    <select id="metric-select" class="chart-btn"
+                        style="padding: 10px 15px; background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 8px;">
                         <option value="gpu_0_utilization">GPU Utilization (%)</option>
                         <option value="gpu_0_memory_used">GPU Memory (MB)</option>
                         <option value="gpu_0_temperature">GPU Temperature (°C)</option>
@@ -76,7 +78,8 @@
                         <option value="cpu_percent">CPU Usage (%)</option>
                         <option value="memory_percent">RAM Usage (%)</option>
                     </select>
-                    <select id="hours-select">
+                    <select id="hours-select" class="chart-btn"
+                        style="padding: 10px 15px; background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 8px;">
                         <option value="1">Last 1 hour</option>
                         <option value="6">Last 6 hours</option>
                         <option value="24">Last 24 hours</option>
@@ -84,10 +87,11 @@
                         <option value="720">Last 30 days</option>
                         <option value="lifetime">Lifetime</option>
                     </select>
-                    <button onclick="loadHistory()">Refresh</button>
+                    <button class="update-btn" style="padding: 10px 20px; font-weight: 600;"
+                        onclick="loadHistory()">Refresh</button>
                     <div style="display:inline-flex; gap:8px; align-items:center; margin-left:8px;"></div>
                 </div>
-                <canvas id="historyChart" height="100"></canvas>
+                <div id="historyChart" style="width:100%; height:100%;"></div>
             </div>
         </div>
 
@@ -138,6 +142,7 @@
                 <table class="process-table">
                     <thead>
                         <tr>
+                            <th style="width:44px;">&nbsp;</th>
                             <th>Port</th>
                             <th>Protocol</th>
                             <th>Process</th>
@@ -323,82 +328,86 @@
                     </div>
                 </div>
 
-                <div id="benchmark-live-charts" style="display: none; margin: 20px 0;">
+                <div id="benchmark-live-charts" style="display: none; margin-top: 20px;">
                     <h3 style="color: var(--accent-green); margin-bottom: 15px;">Real-time Metrics</h3>
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
-                        <div class="gpu-card">
+                    <div class="benchmark-charts-grid">
+                        <div class="gpu-card benchmark-card">
                             <h4 style="color: var(--accent-green); margin-bottom: 10px; font-size: 0.9em;">GPU
                                 Utilization (%)</h4>
-                            <canvas id="chartUtilization" height="60"></canvas>
+                            <div id="chartUtilization" style="width:100%; height:320px;"></div>
                         </div>
-                        <div class="gpu-card">
-                            <h4 style="color: var(--accent-yellow); margin-bottom: 10px; font-size: 0.9em;">Temperature
+                        <div class="gpu-card benchmark-card">
+                            <h4 style="color: var(--accent-yellow); margin-bottom: 10px; font-size: 0.9em;">
+                                Temperature
                                 (C)</h4>
-                            <canvas id="chartTemperature" height="60"></canvas>
+                            <div id="chartTemperature" style="width:100%; height:320px;"></div>
                         </div>
-                        <div class="gpu-card">
-                            <h4 style="color: var(--accent-blue); margin-bottom: 10px; font-size: 0.9em;">Memory Used
+                        <div class="gpu-card benchmark-card">
+                            <h4 style="color: var(--accent-blue); margin-bottom: 10px; font-size: 0.9em;">Memory
+                                Used
                                 (MB)</h4>
-                            <canvas id="chartMemory" height="60"></canvas>
+                            <div id="chartMemory" style="width:100%; height:320px;"></div>
                         </div>
-                        <div class="gpu-card">
-                            <h4 style="color: var(--accent-red); margin-bottom: 10px; font-size: 0.9em;">Power Draw (W)
+                        <div class="gpu-card benchmark-card">
+                            <h4 style="color: var(--accent-red); margin-bottom: 10px; font-size: 0.9em;">Power Draw
+                                (W)
                             </h4>
-                            <canvas id="chartPower" height="60"></canvas>
+                            <div id="chartPower" style="width:100%; height:320px;"></div>
                         </div>
                     </div>
-                </div>
 
-                <div id="benchmark-results" style="margin-top: 20px;"></div>
+                    <div id="benchmark-results" style="margin-top: 20px;"></div>
+                </div>
             </div>
+
+            <footer>
+                <p>MyGPU {{VERSION}} | <span id="last-update">-</span></p>
+            </footer>
         </div>
 
-        <footer>
-            <p>MyGPU {{VERSION}} | <span id="last-update">-</span></p>
-        </footer>
-    </div>
+        <!-- Load modules in correct order -->
+        <script>
+            // Ensure global selectedBackend exists before other static scripts run
+            window.selectedBackend = window.selectedBackend || 'auto';
+            // Called by inline select onchange to immediately update global and preview
+            window.onBackendChange = function (val) {
+                try { window.selectedBackend = val || 'auto'; } catch (e) { }
+                try { if (typeof updateWorkloadPreview === 'function') updateWorkloadPreview(); } catch (e) { }
+            };
+        </script>
+        <script src="/static/utils.js"></script>
+        <script src="/static/charts.js"></script>
+        <script src="/static/benchmark.js"></script>
+        <script src="/static/simulation.js"></script>
+        <script src="/static/toast.js"></script>
+        <script src="/static/shutdown.js"></script>
+        <script src="/static/main.js"></script>
+        <script>
+            (function () {
+                function pad(n) { return String(n).padStart(2, '0'); }
+                function formatTime(d) {
+                    var h = d.getHours();
+                    var ampm = h >= 12 ? 'PM' : 'AM';
+                    h = h % 12; if (h === 0) h = 12;
+                    return pad(h) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds()) + ' ' + ampm;
+                }
 
-    <!-- Load modules in correct order -->
-    <script>
-        // Ensure global selectedBackend exists before other static scripts run
-        window.selectedBackend = window.selectedBackend || 'auto';
-        // Called by inline select onchange to immediately update global and preview
-        window.onBackendChange = function (val) {
-            try { window.selectedBackend = val || 'auto'; } catch (e) { }
-            try { if (typeof updateWorkloadPreview === 'function') updateWorkloadPreview(); } catch (e) { }
-        };
-    </script>
-    <script src="/static/utils.js"></script>
-    <script src="/static/charts.js"></script>
-    <script src="/static/benchmark.js"></script>
-    <script src="/static/simulation.js"></script>
-    <script src="/static/toast.js"></script>
-    <script src="/static/main.js"></script>
-    <script>
-        (function () {
-            function pad(n) { return String(n).padStart(2, '0'); }
-            function formatTime(d) {
-                var h = d.getHours();
-                var ampm = h >= 12 ? 'PM' : 'AM';
-                h = h % 12; if (h === 0) h = 12;
-                return pad(h) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds()) + ' ' + ampm;
-            }
+                function setLastUpdate(timestamp) {
+                    var el = document.getElementById('last-update');
+                    if (!el) return;
+                    var d = timestamp ? new Date(timestamp) : new Date();
+                    el.textContent = formatTime(d);
+                }
 
-            function setLastUpdate(timestamp) {
-                var el = document.getElementById('last-update');
-                if (!el) return;
-                var d = timestamp ? new Date(timestamp) : new Date();
-                el.textContent = formatTime(d);
-            }
+                // Expose for other scripts to set server-provided timestamp.
+                // The UI will update the "Last update" only when the client
+                // receives fresh metrics from the server and calls this.
+                window.setLastUpdate = setLastUpdate;
 
-            // Expose for other scripts to set server-provided timestamp.
-            // The UI will update the "Last update" only when the client
-            // receives fresh metrics from the server and calls this.
-            window.setLastUpdate = setLastUpdate;
+                // Notifications handled by /static/toast.js (window.showToast/showError/showSuccess/showWarn)
+            })();
+        </script>
 
-            // Notifications handled by /static/toast.js (window.showToast/showError/showSuccess/showWarn)
-        })();
-    </script>
 </body>
 
 </html>

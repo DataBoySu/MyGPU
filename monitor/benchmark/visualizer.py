@@ -2,8 +2,13 @@ import time
 import random
 from typing import Optional, Tuple, List
 import numpy as np
+import os
 from . import ui_components  # Import UI rendering functions
 from . import event_handler  # Import event handling
+
+# Set SDL video driver for Windows to allow background thread display globally
+if os.name == 'nt':
+    os.environ['SDL_VIDEODRIVER'] = 'windows'
 
 
 class ParticleVisualizer:
@@ -73,11 +78,12 @@ class ParticleVisualizer:
             warnings.filterwarnings("ignore", category=UserWarning, message="pkg_resources is deprecated.*")
             import pygame
             import os
-            # Set SDL video driver for Windows to allow background thread display
-            os.environ['SDL_VIDEODRIVER'] = 'windows'
-            
             self.pygame = pygame
-            pygame.init()
+            if not pygame.get_init():
+                pygame.init()
+            if not pygame.display.get_init():
+                pygame.display.init()
+                
             self.screen = pygame.display.set_mode(self.window_size)
             pygame.display.set_caption("GPU Particle Simulation - Benchmark Visualization")
             self.clock = pygame.time.Clock()
@@ -340,7 +346,14 @@ class ParticleVisualizer:
     def close(self):
         """Close visualizer and cleanup."""
         if self.pygame and self.running:
-            self.pygame.quit()
+            try:
+                self.pygame.display.quit()
+                import time
+                time.sleep(0.1) # Give OS time to close window
+                if self.pygame.get_init():
+                    self.pygame.quit()
+            except Exception:
+                pass
         self.running = False
 
 
